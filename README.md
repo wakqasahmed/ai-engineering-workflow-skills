@@ -1,6 +1,6 @@
-# May 2026 Skills
+# AI Engineering Workflow Skills
 
-My public AI-assisted engineering workflow as of May 2026.
+My public AI-assisted engineering workflow and agent operating playbook.
 
 This repository is descriptive first for humans adopting the workflow. Its agent entrypoints are directive when loaded by an AI coding agent.
 
@@ -15,7 +15,8 @@ This repository is descriptive first for humans adopting the workflow. Its agent
 
 1. Read `AGENTS.md` or `CLAUDE.md`.
 2. Read `system-level/core.md` for stable rules.
-3. Read `AI_ENGINEERING_WORKFLOW.md` for the full May 2026 workflow.
+3. Read `AI_ENGINEERING_WORKFLOW.md` for the full workflow.
+4. Read `CHANGELOG.md` for periodic updates and revision history.
 
 ## What This Repository Tries To Solve
 
@@ -47,4 +48,4 @@ Decomposition is not only a planning device. It is a context-quality control mec
 
 - This repository should stay free of private project details.
 - Technology-specific guidance belongs in separate skill packs.
-- Workflow changes can be versioned over time; this repository captures the May 2026 version.
+- Workflow changes should be versioned over time in `CHANGELOG.md`.

@@ -1,6 +1,6 @@
-# May 2026 Skills
+# AI Engineering Workflow Skills
 
-This repository contains my AI-assisted engineering workflow as of May 2026.
+This repository contains my AI-assisted engineering workflow and agent operating playbook.
 
 ## Start Here
 

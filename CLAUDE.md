@@ -1,4 +1,4 @@
-# May 2026 Skills
+# AI Engineering Workflow Skills
 
 This file mirrors `AGENTS.md` for compatibility.
 

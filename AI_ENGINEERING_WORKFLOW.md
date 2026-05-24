@@ -1,6 +1,6 @@
 # AI Engineering Workflow
 
-My current AI-assisted engineering workflow as of May 2026.
+My current public AI-assisted engineering workflow.
 
 This repository has two audiences:
 
@@ -175,13 +175,9 @@ Each issue should give a fresh agent enough context to start without inheriting 
 - Adopt only the review and traceability layer if your team already has a strong implementation workflow.
 - Adopt only the handoff discipline if context continuity is your main bottleneck.
 
-## Version History
-
-- May 2026: initial public workflow with issue-scoped agents, verification-first execution, independent review, and explicit assistance traceability.
-
 ## Influences
 
 - Matt Pocock's observations around keeping AI work scoped tightly enough to preserve sharpness
 - tool-assisted planning and issue decomposition workflows
 - independent review practices, including tools such as Greptile
-- technology-specific guidance such as Laravel Boost and frontend engineering practices inspired by people like Addy Osmani
+- real-world use of issue-scoped execution, verification-first delivery, and traceable AI assistance
