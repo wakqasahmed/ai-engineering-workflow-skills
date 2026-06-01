@@ -1,0 +1,16 @@
+name: Entrypoint sync
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  entrypoint-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify AGENTS.md and CLAUDE.md stay aligned
+        shell: bash
+        run: diff -u <(sed '3d' AGENTS.md) <(sed '3d' CLAUDE.md)

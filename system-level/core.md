@@ -16,10 +16,22 @@ Solve the stated problem directly. Prefer concrete delivery over speculative arc
 - For high-level work, start with `grill-with-docs`.
 - Use `to-prd` when scope or success criteria still need clarification.
 - Use `to-issues` before implementation on high-level work.
+- Use `tdd` when building features or fixing bugs where expected behavior is clear.
+- Use `simplify` after implementing a feature.
+- Use `diagnose` when something is broken, throwing, or regressing.
+- Use `security-review` before PRs touching auth, payments, secrets, or external APIs.
 - Keep implementation agents issue-scoped to avoid context bloat.
 - Use `handoff` only when context will cross an agent or session boundary.
 - For the full operating model, follow `AI_ENGINEERING_WORKFLOW.md`.
 - Use the playbook's risk levels, definition of done, and failure paths for non-trivial work.
+
+## Execution Discipline
+
+- Before non-trivial implementation, state assumptions, ambiguities, and the simplest viable approach.
+- Define success criteria before editing. For multi-step work, state each step with its verification check.
+- Every changed line must trace directly to the requested outcome.
+- Remove imports, variables, and functions made unused by your change. Mention unrelated dead code; do not delete it.
+- For trivial changes, use judgment and avoid unnecessary ceremony.
 
 ## Safety
 

@@ -44,6 +44,22 @@ Decomposition is not only a planning device. It is a context-quality control mec
 9. Use risk-based staging and HITL before production when warranted.
 10. Use `handoff` only when context crosses an agent or session boundary.
 
+## Optional Skill Prerequisites
+
+Some workflow triggers rely on separately installed skills:
+
+- `simplify`: `brianlovin/claude-config@simplify`
+- `security-review`: `getsentry/skills@security-review`
+- `security-best-practices`: OpenAI curated skill for supported Python, JavaScript/TypeScript, and Go projects
+
+Project-level conventions override skill defaults. In particular, the recommended `simplify` skill includes JavaScript-specific defaults that do not apply universally. Treat `security-best-practices` as an optional supported-stack supplement, not a mandatory workflow dependency.
+
+## User-Level Installation
+
+For user-level installations with duplicate instruction files, choose one canonical file and symlink compatibility files to it when the operating environment supports symlinks. Compare existing contents and create a backup before normalization.
+
+Keep repository copies as regular files for portability across operating systems and packaging tools.
+
 ## Publishing Notes
 
 - This repository should stay free of private project details.
