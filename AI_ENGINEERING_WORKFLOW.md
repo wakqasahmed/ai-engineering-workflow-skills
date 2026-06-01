@@ -18,6 +18,12 @@ The workflow is descriptive as a public playbook, but the files under `system-le
 
 ## Default Workflow
 
+### Planning Tracks
+
+- Quick: trivial or narrow changes. Execute directly with focused verification.
+- Standard: non-trivial issue with acceptance criteria, verification plan, and risk level.
+- Deep: ambiguous, architectural, or cross-cutting work. Clarify decisions, use a PRD when helpful, then decompose before implementation.
+
 ### 1. Clarify
 
 - Use `grill-with-docs` for high-level tasks.
@@ -34,6 +40,7 @@ The workflow is descriptive as a public playbook, but the files under `system-le
 - Use a fresh agent per issue by default.
 - Reuse the same agent only for a genuinely small, narrow execution loop where context is still clean.
 - Keep each issue small enough to complete and verify in one focused pass when possible.
+- Run the minimum relevant baseline checks before editing and record pre-existing failures.
 - Before non-trivial implementation, state assumptions, ambiguities, and the simplest viable approach.
 - Keep every changed line traceable to the issue acceptance criteria.
 - Remove imports, variables, and functions made unused by the change. Mention unrelated dead code without deleting it.
@@ -50,6 +57,7 @@ Agent role contracts:
 - Before implementation, define acceptance criteria and a verification plan in the issue itself.
 - Name the expected test layers when knowable: unit, integration, e2e, manual validation.
 - Prefer writing focused tests first when expected behavior is already clear.
+- For user-visible medium-risk and high-risk changes, name and perform the relevant manual acceptance walkthrough.
 - At minimum, no change is complete until the relevant automated or manual checks have been run.
 
 Definition of done:
@@ -68,6 +76,7 @@ Definition of done:
 - Require an independent review pass that is not just the implementing agent re-reading its own diff.
 - When agents support delegation and the human owner has granted standing authorization, spawn a cold-start reviewer subagent without waiting for per-task authorization.
 - That review can come from another human, another fresh agent, or a review tool such as Greptile.
+- For medium-risk and high-risk changes, review spec compliance against acceptance criteria before reviewing code quality, regressions, security, and maintainability.
 - Apply review findings before merge.
 
 ### 6. Release
@@ -85,6 +94,7 @@ Definition of done:
 
 ## Decision Rules
 
+- Use the quick, standard, or deep planning track that honestly fits the work.
 - Use `to-prd` conditionally, not universally.
 - Use `to-issues` by default for high-level work.
 - Prefer fresh agent per issue by default, with a small-issue exception.
@@ -158,6 +168,7 @@ Do not rely on commit messages for this traceability. Do not add AI co-author li
 
 ## Failure Paths
 
+- When the same preventable failure recurs, prefer deterministic enforcement with CI, hooks, or lint rules over adding more instructions.
 - If tests fail for unrelated reasons, capture the failing command and evidence, then decide whether the issue is blocked or whether a smaller verification still proves the change.
 - If scope expands during implementation, stop and split the new work into a follow-up issue unless the expansion is required to satisfy the original acceptance criteria.
 - If reviewer and implementer disagree, resolve against the issue acceptance criteria first and the product owner second. Do not merge unresolved correctness disputes.
@@ -173,6 +184,21 @@ Each issue should give a fresh agent enough context to start without inheriting 
 - explicit non-goals
 - expected test layers and exact verification commands when known
 - risk level and rollout constraints
+
+## Instruction Hygiene
+
+- Keep always-loaded instructions short. Move conditional workflows into skills or referenced playbooks.
+- Periodically prune instructions that do not prevent real mistakes.
+- After changing global or project instructions, start a fresh agent session and verify which instruction files loaded and their precedence order.
+
+## Dependency Checkpoint
+
+Before adding a production dependency:
+
+- verify the package source and maintainer legitimacy
+- check maintenance status and license
+- confirm the dependency is necessary
+- require human approval
 
 ## Adoption Modes
 
