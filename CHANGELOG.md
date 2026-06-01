@@ -13,6 +13,7 @@ The goal is transparency over time: what changed, why it changed, and when the w
 - optional skill prerequisite and user-level instruction synchronization guidance
 - CI check that keeps the root agent entrypoints aligned
 - extremely concise reporting guidance
+- standing authorization guidance for cold-start reviewer subagents
 
 ## 2026-05
 

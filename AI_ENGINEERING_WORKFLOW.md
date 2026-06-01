@@ -66,6 +66,7 @@ Definition of done:
 - Run `simplify` after feature implementation and before independent review.
 - Run `security-review` before PRs touching auth, payments, secrets, or external APIs.
 - Require an independent review pass that is not just the implementing agent re-reading its own diff.
+- When agents support delegation and the human owner has granted standing authorization, spawn a cold-start reviewer subagent without waiting for per-task authorization.
 - That review can come from another human, another fresh agent, or a review tool such as Greptile.
 - Apply review findings before merge.
 
