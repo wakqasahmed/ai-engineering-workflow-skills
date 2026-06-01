@@ -9,7 +9,7 @@ Solve the stated problem directly. Prefer concrete delivery over speculative arc
 - Match the scope of the solution to the scope of the request.
 - Prefer editing existing files over introducing new abstractions.
 - Reuse existing project patterns before inventing new ones.
-- Keep explanations concise and action-oriented.
+- When reporting information to the user, be extremely concise. Sacrifice grammar for concision.
 
 ## Workflow Defaults
 

@@ -12,6 +12,7 @@ The goal is transparency over time: what changed, why it changed, and when the w
 - proactive `tdd`, `simplify`, `diagnose`, and `security-review` trigger guidance
 - optional skill prerequisite and user-level instruction synchronization guidance
 - CI check that keeps the root agent entrypoints aligned
+- extremely concise reporting guidance
 
 ## 2026-05
 
