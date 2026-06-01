@@ -4,6 +4,17 @@ All notable changes to this workflow repository should be documented here.
 
 The goal is transparency over time: what changed, why it changed, and when the workflow evolved.
 
+## 2026-06
+
+### Added
+
+- execution-discipline rules for assumptions, success criteria, scoped diffs, newly unused code, and trivial-change judgment
+- proactive `tdd`, `simplify`, `diagnose`, and `security-review` trigger guidance
+- optional skill prerequisite and user-level instruction synchronization guidance
+- CI check that keeps the root agent entrypoints aligned
+- extremely concise reporting guidance
+- standing authorization guidance for cold-start reviewer subagents
+
 ## 2026-05
 
 ### Added

@@ -34,6 +34,9 @@ The workflow is descriptive as a public playbook, but the files under `system-le
 - Use a fresh agent per issue by default.
 - Reuse the same agent only for a genuinely small, narrow execution loop where context is still clean.
 - Keep each issue small enough to complete and verify in one focused pass when possible.
+- Before non-trivial implementation, state assumptions, ambiguities, and the simplest viable approach.
+- Keep every changed line traceable to the issue acceptance criteria.
+- Remove imports, variables, and functions made unused by the change. Mention unrelated dead code without deleting it.
 
 Agent role contracts:
 
@@ -60,7 +63,10 @@ Definition of done:
 ### 5. Review
 
 - Open a pull request for non-trivial changes.
+- Run `simplify` after feature implementation and before independent review.
+- Run `security-review` before PRs touching auth, payments, secrets, or external APIs.
 - Require an independent review pass that is not just the implementing agent re-reading its own diff.
+- When agents support delegation and the human owner has granted standing authorization, spawn a cold-start reviewer subagent without waiting for per-task authorization.
 - That review can come from another human, another fresh agent, or a review tool such as Greptile.
 - Apply review findings before merge.
 
