@@ -14,6 +14,8 @@ The goal is transparency over time: what changed, why it changed, and when the w
 - CI check that keeps the root agent entrypoints aligned
 - extremely concise reporting guidance
 - standing authorization guidance for cold-start reviewer subagents
+- scale-adaptive planning tracks, clean-baseline checks, two-stage review, and manual acceptance walkthrough guidance
+- instruction hygiene, deterministic enforcement, and production dependency checkpoints
 
 ## 2026-05
 

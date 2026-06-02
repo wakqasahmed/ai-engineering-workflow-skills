@@ -44,6 +44,8 @@ Decomposition is not only a planning device. It is a context-quality control mec
 9. Use risk-based staging and HITL before production when warranted.
 10. Use `handoff` only when context crosses an agent or session boundary.
 
+Planning depth should match the work: quick for trivial changes, standard for non-trivial issues, and deep for ambiguous or architectural work.
+
 ## Optional Skill Prerequisites
 
 Some workflow triggers rely on separately installed skills:

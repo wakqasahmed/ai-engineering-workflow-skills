@@ -24,6 +24,8 @@ Solve the stated problem directly. Prefer concrete delivery over speculative arc
 - Use `handoff` only when context will cross an agent or session boundary.
 - For the full operating model, follow `AI_ENGINEERING_WORKFLOW.md`.
 - Use the playbook's risk levels, definition of done, and failure paths for non-trivial work.
+- Keep always-loaded instructions short. Move conditional workflows into skills and periodically prune rules that do not prevent real mistakes.
+- When the same preventable mistake recurs, prefer CI, hooks, or lint rules over more prose.
 
 ## Execution Discipline
 
@@ -38,6 +40,7 @@ Solve the stated problem directly. Prefer concrete delivery over speculative arc
 - Never overwrite existing instruction files without comparing contents first.
 - Prefer backups before symlink normalization.
 - Treat auth, payments, secrets, and deployment paths as high-risk areas.
+- Before adding a production dependency, verify its source, maintenance status, license, and necessity. Require human approval.
 
 ## Git
 
@@ -49,6 +52,7 @@ Solve the stated problem directly. Prefer concrete delivery over speculative arc
 
 - Test every change.
 - Define verification before implementation starts.
+- Run the minimum relevant baseline checks before editing. Record pre-existing failures.
 - Run the minimum relevant checks before reporting completion.
 - Do not claim success without verification.
 
