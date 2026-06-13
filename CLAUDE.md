@@ -21,6 +21,7 @@ This file mirrors `AGENTS.md` for compatibility.
 ## Summary
 
 - Keep implementation agents issue-scoped to avoid context bloat.
+- Mark an issue as picked or claimed before an agent starts work on it.
 - Define acceptance criteria and verification before implementation.
 - Prefer a fresh agent per issue by default.
-- Require independent review and preserve automation/assistance traceability in merged PRs.
+- Require independent review with the strongest practical reviewer model/effort and preserve automation/assistance traceability in merged PRs.
