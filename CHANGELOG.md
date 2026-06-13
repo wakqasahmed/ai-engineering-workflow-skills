@@ -16,6 +16,8 @@ The goal is transparency over time: what changed, why it changed, and when the w
 - standing authorization guidance for cold-start reviewer subagents
 - scale-adaptive planning tracks, clean-baseline checks, two-stage review, and manual acceptance walkthrough guidance
 - instruction hygiene, deterministic enforcement, and production dependency checkpoints
+- issue claiming before agent execution to reduce duplicate work
+- guidance to use the strongest practical model and reasoning effort for independent reviewer agents
 
 ## 2026-05
 

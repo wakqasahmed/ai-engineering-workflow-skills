@@ -37,6 +37,7 @@ The workflow is descriptive as a public playbook, but the files under `system-le
 
 ### 3. Execute
 
+- Before an agent starts work on an issue, mark the issue as claimed or picked in the issue tracker so other agents do not duplicate the work. Use the team's standard label or status, for example `picked by agent`.
 - Use a fresh agent per issue by default.
 - Reuse the same agent only for a genuinely small, narrow execution loop where context is still clean.
 - Keep each issue small enough to complete and verify in one focused pass when possible.
@@ -48,7 +49,7 @@ The workflow is descriptive as a public playbook, but the files under `system-le
 Agent role contracts:
 
 - Implementer: reads the issue and relevant project docs, writes code, writes or updates tests, runs the named verification, and opens the PR.
-- Reviewer: reads only the issue, acceptance criteria, and PR diff unless more context is explicitly needed. Posts concrete findings that identify the failing behavior, risk, or missing proof.
+- Reviewer: use the strongest practical reviewer model and reasoning effort available. Reads only the issue, acceptance criteria, and PR diff unless more context is explicitly needed. Posts concrete findings that identify the failing behavior, risk, or missing proof.
 - Fixer: reads review comments, addresses each actionable finding, adds or updates tests when needed, reruns verification, and pushes follow-up commits.
 - Human owner: resolves product tradeoffs, approves merge and release decisions, and remains accountable for shipped behavior.
 
@@ -97,7 +98,9 @@ Definition of done:
 - Use the quick, standard, or deep planning track that honestly fits the work.
 - Use `to-prd` conditionally, not universally.
 - Use `to-issues` by default for high-level work.
+- Claim or mark an issue as picked before execution starts.
 - Prefer fresh agent per issue by default, with a small-issue exception.
+- Use the strongest practical model/effort for independent review passes.
 - Use risk-based staging and HITL, not universal staging for every change.
 - Treat context-bloat concerns as a heuristic, not a numeric rule.
 

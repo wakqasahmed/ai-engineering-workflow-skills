@@ -20,6 +20,7 @@ Solve the stated problem directly. Prefer concrete delivery over speculative arc
 - Use `simplify` after implementing a feature.
 - Use `diagnose` when something is broken, throwing, or regressing.
 - Use `security-review` before PRs touching auth, payments, secrets, or external APIs.
+- Mark an issue as picked or claimed before an agent starts work on it.
 - Keep implementation agents issue-scoped to avoid context bloat.
 - Use `handoff` only when context will cross an agent or session boundary.
 - For the full operating model, follow `AI_ENGINEERING_WORKFLOW.md`.
@@ -59,5 +60,6 @@ Solve the stated problem directly. Prefer concrete delivery over speculative arc
 ## Review And Traceability
 
 - Non-trivial changes should receive an independent review pass.
+- Independent reviewer agents should use the strongest practical model and reasoning effort available.
 - Record automation or assistance used in merged PRs for traceability, not authorship.
 - Human approvers remain responsible for validation, merge decisions, and release decisions.
