@@ -17,3 +17,9 @@ jobs:
       - name: Verify user installer
         shell: bash
         run: scripts/test-install-user.sh
+      - name: Verify skill listing
+        shell: bash
+        run: scripts/list-skills.sh | grep -q "skills/engineering/clarify-work/SKILL.md"
+      - name: Verify plugin skill paths
+        shell: bash
+        run: python3 scripts/validate-plugin.py

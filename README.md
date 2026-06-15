@@ -1,8 +1,17 @@
-# AI Engineering Workflow Skills
+# AI Engineering Workflow Skills [![skills.sh](https://skills.sh/b/wakqasahmed/ai-engineering-workflow-skills)](https://skills.sh/wakqasahmed/ai-engineering-workflow-skills)
 
-My public AI-assisted engineering workflow and agent operating playbook.
+Reusable skills and operating notes for AI-assisted software engineering work.
+
+Use this repo when you want an AI coding agent to clarify work, decompose issues, define done, handle HITL blockers, review releases, and preserve handoffs across sessions. It is written for humans deciding whether to install the workflow and for agents that need concise execution rules.
 
 This repository is descriptive first for humans adopting the workflow. Its agent entrypoints are directive when loaded by an AI coding agent.
+
+## Who This Is For
+
+- Founders and engineering leads who delegate implementation to AI coding agents.
+- Developers who want repeatable issue decomposition, verification, review, and release gates.
+- Agents that need short skills backed by a deeper workflow playbook.
+- Teams that want human-in-the-loop blockers to become visible GitHub issues instead of hidden chat failures.
 
 ## Repository Structure
 
@@ -17,6 +26,38 @@ This repository is descriptive first for humans adopting the workflow. Its agent
 2. Read `system-level/core.md` for stable rules.
 3. Read `AI_ENGINEERING_WORKFLOW.md` for the full workflow.
 4. Read `CHANGELOG.md` for periodic updates and revision history.
+
+## Install Skills
+
+Install the workflow skills with skills.sh-compatible tooling:
+
+```bash
+npx skills@latest add wakqasahmed/ai-engineering-workflow-skills
+```
+
+For local Claude CLI development, link the skills directly:
+
+```bash
+scripts/list-skills.sh
+scripts/link-skills.sh
+```
+
+The installable skills are intentionally short and independent. Use `AI_ENGINEERING_WORKFLOW.md` as the deeper reference playbook when a skill needs more detail.
+
+## Marketplace And Discovery
+
+Public install command: `npx skills@latest add wakqasahmed/ai-engineering-workflow-skills`
+
+Checklist:
+
+- Keep `.claude-plugin/plugin.json` in sync with every published skill path.
+- Keep skill descriptions activation-focused so agents load the right workflow.
+- Install once with `npx skills@latest add wakqasahmed/ai-engineering-workflow-skills` to seed skills.sh visibility.
+- Link this repo from public profiles and from domain-specific skill packs that depend on the workflow.
+
+## Positioning
+
+This is the general engineering workflow pack. Domain-specific skills, such as Agentic Commerce or ecommerce SEO/AEO/GEO work, belong in separate repositories that can depend on this workflow.
 
 ## Install User-Level Entrypoints
 

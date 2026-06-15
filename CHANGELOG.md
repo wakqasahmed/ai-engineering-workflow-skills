@@ -8,6 +8,8 @@ The goal is transparency over time: what changed, why it changed, and when the w
 
 ### Added
 
+- installable `skills/` layout with short independent workflow skills
+- Claude plugin metadata plus skill listing and plugin-path validation scripts
 - safe user-level installer for `AGENTS.md` and `.claude/CLAUDE.md`, with dry-run, backups, conflict reporting, and CI coverage
 - execution-discipline rules for assumptions, success criteria, scoped diffs, newly unused code, and trivial-change judgment
 - proactive `tdd`, `simplify`, `diagnose`, and `security-review` trigger guidance
