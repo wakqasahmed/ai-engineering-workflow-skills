@@ -18,6 +18,23 @@ This repository is descriptive first for humans adopting the workflow. Its agent
 3. Read `AI_ENGINEERING_WORKFLOW.md` for the full workflow.
 4. Read `CHANGELOG.md` for periodic updates and revision history.
 
+## Install Skills
+
+Install through skills.sh-compatible tooling:
+
+```bash
+npx skills@latest add wakqasahmed/ai-engineering-workflow-skills
+```
+
+For local Claude CLI development, link the skills directly:
+
+```bash
+scripts/list-skills.sh
+scripts/link-skills.sh
+```
+
+The installable skills are intentionally short and independent. Use `AI_ENGINEERING_WORKFLOW.md` as the deeper reference playbook when a skill needs more detail.
+
 ## Install User-Level Entrypoints
 
 Inspired by the installer discipline in `alirezarezvani/claude-skills`, this repo includes a small installer for the two user-level entrypoints only. It does not install third-party skill catalogs.

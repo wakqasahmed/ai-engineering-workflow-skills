@@ -1,0 +1,12 @@
+{
+  "name": "ai-engineering-workflow-skills",
+  "skills": [
+    "./skills/engineering/clarify-work",
+    "./skills/engineering/decompose-to-issues",
+    "./skills/engineering/define-done",
+    "./skills/engineering/review-gate",
+    "./skills/engineering/hitl-blocker",
+    "./skills/engineering/release-gate",
+    "./skills/productivity/handoff"
+  ]
+}
