@@ -14,3 +14,6 @@ jobs:
       - name: Verify AGENTS.md and CLAUDE.md stay aligned
         shell: bash
         run: diff -u <(sed '3d' AGENTS.md) <(sed '3d' CLAUDE.md)
+      - name: Verify user installer
+        shell: bash
+        run: scripts/test-install-user.sh

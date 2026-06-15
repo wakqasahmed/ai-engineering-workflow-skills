@@ -18,6 +18,35 @@ This repository is descriptive first for humans adopting the workflow. Its agent
 3. Read `AI_ENGINEERING_WORKFLOW.md` for the full workflow.
 4. Read `CHANGELOG.md` for periodic updates and revision history.
 
+## Install User-Level Entrypoints
+
+Inspired by the installer discipline in `alirezarezvani/claude-skills`, this repo includes a small installer for the two user-level entrypoints only. It does not install third-party skill catalogs.
+
+Preview the install:
+
+```bash
+scripts/install-user.sh --dry-run
+```
+
+Install to the current user:
+
+```bash
+scripts/install-user.sh --force
+```
+
+Default targets:
+
+- `AGENTS.md` -> `$HOME/AGENTS.md`
+- `CLAUDE.md` -> `$HOME/.claude/CLAUDE.md`
+
+If an existing target file differs, the installer reports a conflict and stops unless `--force` is passed. With `--force`, it backs up the existing file under `$HOME/.ai-engineering-workflow-backups/<timestamp>/` before replacing it.
+
+For test or staging installs:
+
+```bash
+scripts/install-user.sh --target-home /tmp/workflow-install-test --dry-run
+```
+
 ## What This Repository Tries To Solve
 
 - context bloat in long-running agent sessions
