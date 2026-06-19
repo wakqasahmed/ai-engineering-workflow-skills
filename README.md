@@ -1,69 +1,37 @@
-# AI Engineering Workflow Skills
+# AI Engineering Workflow Skills [![skills.sh](https://skills.sh/b/wakqasahmed/ai-engineering-workflow-skills)](https://skills.sh/wakqasahmed/ai-engineering-workflow-skills)
 
-My public AI-assisted engineering workflow and agent operating playbook.
+Practical engineering workflow skills for clarifying work, defining done, decomposing scope, gating reviews and releases, and preserving handoffs when context has to cross agents or sessions.
 
-This repository is descriptive first for humans adopting the workflow. Its agent entrypoints are directive when loaded by an AI coding agent.
+## Install
 
-## Repository Structure
+```bash
+npx skills@latest add wakqasahmed/ai-engineering-workflow-skills
+```
 
-- `AGENTS.md`: neutral agent entrypoint
-- `CLAUDE.md`: compatibility entrypoint
-- `AI_ENGINEERING_WORKFLOW.md`: full workflow, role contracts, risk levels, and failure paths
-- `system-level/core.md`: invariant operating principles for agents
+Local Claude CLI fallback:
 
-## Start Here
+```bash
+scripts/list-skills.sh
+scripts/link-skills.sh
+```
 
-1. Read `AGENTS.md` or `CLAUDE.md`.
-2. Read `system-level/core.md` for stable rules.
-3. Read `AI_ENGINEERING_WORKFLOW.md` for the full workflow.
-4. Read `CHANGELOG.md` for periodic updates and revision history.
+## Skills
 
-## What This Repository Tries To Solve
+- `clarify-work`: resolve ambiguity before implementation starts.
+- `define-done`: lock acceptance criteria, risk, and verification before editing.
+- `decompose-to-issues`: split broad work into issue-sized vertical slices.
+- `review-gate`: enforce an independent review pass before merge.
+- `release-gate`: enforce deployment, rollback, and health checks before release.
+- `workflow-handoff`: preserve compact state when work crosses agents or sessions.
+- `hitl-blocker`: turn missing human-held access into explicit GitHub issues.
+- `setup-matt-pocock-skills`: configure per-repo issue tracker, triage labels, and domain doc layout.
 
-- context bloat in long-running agent sessions
-- weak decomposition of high-level work
-- fuzzy issue boundaries
-- inconsistent verification
-- weak review and assistance traceability
-- poor cross-agent continuity
+## Why This Exists
 
-## Core Idea
+This pack turns the workflow from `AI_ENGINEERING_WORKFLOW.md` into installable skills instead of keeping it as guidance only. The docs remain useful for humans; the skill folders are the install surface for `skills.sh` and compatible tooling.
 
-Decomposition is not only a planning device. It is a context-quality control mechanism for AI agents. High-level work should be clarified, decomposed into issues, and executed by issue-scoped agents whenever practical.
+## Marketplace And Discovery
 
-## Workflow Summary
-
-1. Clarify high-level work with `grill-with-docs`.
-2. Use `to-prd` when scope or success criteria are still fuzzy.
-3. Use `to-issues` to create issue-sized execution units.
-4. Prefer a fresh agent per issue by default.
-5. Define acceptance criteria and verification before implementation.
-6. Use risk levels to choose verification, review, staging, and rollback gates.
-7. Use an independent review pass before merge.
-8. Preserve automation/assistance traceability in PRs.
-9. Use risk-based staging and HITL before production when warranted.
-10. Use `handoff` only when context crosses an agent or session boundary.
-
-Planning depth should match the work: quick for trivial changes, standard for non-trivial issues, and deep for ambiguous or architectural work.
-
-## Optional Skill Prerequisites
-
-Some workflow triggers rely on separately installed skills:
-
-- `simplify`: `brianlovin/claude-config@simplify`
-- `security-review`: `getsentry/skills@security-review`
-- `security-best-practices`: OpenAI curated skill for supported Python, JavaScript/TypeScript, and Go projects
-
-Project-level conventions override skill defaults. In particular, the recommended `simplify` skill includes JavaScript-specific defaults that do not apply universally. Treat `security-best-practices` as an optional supported-stack supplement, not a mandatory workflow dependency.
-
-## User-Level Installation
-
-For user-level installations with duplicate instruction files, choose one canonical file and symlink compatibility files to it when the operating environment supports symlinks. Compare existing contents and create a backup before normalization.
-
-Keep repository copies as regular files for portability across operating systems and packaging tools.
-
-## Publishing Notes
-
-- This repository should stay free of private project details.
-- Technology-specific guidance belongs in separate skill packs.
-- Workflow changes should be versioned over time in `CHANGELOG.md`.
+- Public install command: `npx skills@latest add wakqasahmed/ai-engineering-workflow-skills`
+- skills.sh page: `https://skills.sh/wakqasahmed/ai-engineering-workflow-skills`
+- GitHub repo: `https://github.com/wakqasahmed/ai-engineering-workflow-skills`

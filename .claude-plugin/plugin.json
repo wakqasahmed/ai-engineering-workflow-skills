@@ -1,0 +1,13 @@
+{
+  "name": "ai-engineering-workflow-skills",
+  "skills": [
+    "./skills/engineering-workflow/clarify-work",
+    "./skills/engineering-workflow/define-done",
+    "./skills/engineering-workflow/decompose-to-issues",
+    "./skills/engineering-workflow/review-gate",
+    "./skills/engineering-workflow/release-gate",
+    "./skills/engineering-workflow/workflow-handoff",
+    "./skills/engineering-workflow/hitl-blocker",
+    "./skills/engineering-workflow/setup-matt-pocock-skills"
+  ]
+}
