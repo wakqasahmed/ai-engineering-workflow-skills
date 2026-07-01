@@ -4,6 +4,12 @@ All notable changes to this workflow repository should be documented here.
 
 The goal is transparency over time: what changed, why it changed, and when the workflow evolved.
 
+## 2026-07
+
+### Added
+
+- `subagent-pipeline` skill codifying the cold-start implementer/reviewer/fixer chain, CI gate, and staging auto-merge rule used for issue execution
+
 ## 2026-06
 
 ### Added
