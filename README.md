@@ -103,16 +103,17 @@ Decomposition is not only a planning device. It is a context-quality control mec
 
 ## Workflow Summary
 
-1. Clarify high-level work with `grill-with-docs`.
-2. Use `to-prd` when scope or success criteria are still fuzzy.
-3. Use `to-issues` to create issue-sized execution units.
-4. Prefer a fresh agent per issue by default.
-5. Define acceptance criteria and verification before implementation.
-6. Use risk levels to choose verification, review, staging, and rollback gates.
-7. Use an independent review pass before merge.
-8. Preserve automation/assistance traceability in PRs.
-9. Use risk-based staging and HITL before production when warranted.
-10. Use `handoff` only when context crosses an agent or session boundary.
+1. Pressure-test a new idea with `roast` before committing to build it.
+2. Clarify high-level work with `grill-with-docs`.
+3. Use `to-prd` when scope or success criteria are still fuzzy.
+4. Use `to-issues` to create issue-sized execution units.
+5. Prefer a fresh agent per issue by default.
+6. Define acceptance criteria and verification before implementation.
+7. Use risk levels to choose verification, review, staging, and rollback gates.
+8. Use an independent review pass before merge.
+9. Preserve automation/assistance traceability in PRs.
+10. Use risk-based staging and HITL before production when warranted.
+11. Use `handover` only when context crosses an agent or session boundary.
 
 Planning depth should match the work: quick for trivial changes, standard for non-trivial issues, and deep for ambiguous or architectural work.
 

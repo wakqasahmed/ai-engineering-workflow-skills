@@ -7,6 +7,7 @@
     "./skills/engineering/review-gate",
     "./skills/engineering/hitl-blocker",
     "./skills/engineering/release-gate",
-    "./skills/productivity/handoff"
+    "./skills/product/roast",
+    "./skills/productivity/handover"
   ]
 }
