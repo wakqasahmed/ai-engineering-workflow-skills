@@ -1,21 +1,22 @@
 ---
 name: handover
-description: Compact the current conversation into a handoff/handover document for fresh agent to pickup and continue seamlessly. Covers decisions, shipped changes, key files, running state, verification, deferrals, and open questions.
-argument-hint:	What will the next session be used for?
-disable-model-invocation: true
+description: Compact the current conversation into a handover document a fresh agent can pick up and continue seamlessly. Invoke when only 5-10% of the session limit remains, when context usage passes 40% (less than 60% of the context window remaining), when context is about to cross an agent or session boundary, when work is blocked, or on explicit user request — never haphazardly mid-task. Covers decisions, shipped changes, key files, running state, verification, deferrals, and open questions.
+argument-hint: "[what the next session will focus on]"
 ---
 
 # Handover
 
-Produce a compact, structured summary so a fresh agent or session can continue without re-deriving what already happened. This is a **context-handoff artifact**, not a status report — the audience is the next agent, not a stakeholder. Save to the temporary directory of the user's OS - not the current workspace.
+Produce a compact, structured summary so a fresh agent or session can continue without re-deriving what already happened. This is a **context-handover artifact**, not a status report — the audience is the next agent, not a stakeholder. Save to the temporary directory of the user's OS - not the current workspace.
 
 ## When to invoke
 
+- Only 5-10% of the session limit remains and the work is unfinished: pause the task at the next safe point and write the handover — do not run to the last token and stop silently.
+- Context usage passes 40% of the window (less than 60% remaining) on unfinished multi-step work: hand over to a fresh session before context bloat degrades quality.
 - Continuity is needed: context is about to cross an agent, session, or clear boundary, or work is blocked and non-obvious state must be preserved.
 - User says: "handoff", "hand off", "handover", "hand over" "session handoff", "wrap up session", "handover summary", "let's wrap up", or a near-equivalent.
 - Also invoke proactively if the user signals they're about to clear context without having asked for a handover yet.
 
-Skip it when work is already complete and legible from the issue, PR, and tests — don't create a handover for its own sake.
+Do not invoke haphazardly while ample context remains and the work is progressing. Skip it when work is already complete and legible from the issue, PR, and tests — don't create a handover for its own sake.
 
 ## How to produce it
 
@@ -33,6 +34,16 @@ Skip it when work is already complete and legible from the issue, PR, and tests 
 5. Do not duplicate content already captured in other artifacts (PRDs, plans, ADRs, issues, commits, diffs). Reference them by path or URL instead.
 6. Redact any sensitive information, such as API keys, passwords, or personally identifiable information.
 7. If the user passed arguments, treat them as a description of what the next session will focus on and tailor the doc accordingly.
+
+## Publish to the issue
+
+If the work traces to a GitHub issue or PR:
+
+1. Comment on the issue with the absolute path of the handover file and the full handover content in the comment body — temp directories do not survive; the comment is the durable copy.
+2. Add the label `paused by agent` (create it if missing). It marks half-done work waiting for pickup and pairs with `picked by agent`.
+3. The agent that resumes the work removes `paused by agent`, applies `picked by agent`, and continues from the "Pick up here" line.
+
+If no issue exists, report the handover file path in chat instead.
 
 ## Output template — use this structure every time
 

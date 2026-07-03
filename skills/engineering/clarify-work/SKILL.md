@@ -28,4 +28,4 @@ Use this before implementation when the request is not already issue-sized.
 
 - Do not plan around hypothetical future requirements.
 - Do not start implementation while key terms or ownership boundaries are unclear.
-- Prefer `grill-with-docs` when project terminology or decisions need to be updated.
+- When project terminology or documented decisions change during clarification, record the outcome in the project's domain docs (glossary, ADRs) before implementation starts.

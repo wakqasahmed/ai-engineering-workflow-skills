@@ -12,7 +12,7 @@ Claude's default is to agree with you. `roast` is the opposite. It convenes a co
 
 The council is adversarial on purpose. No persona is allowed to hedge or be polite. The point is to surface what you can't see because you're too close to it.
 
-This is a pre-engineering gate: it decides whether an idea is worth turning into scoped work at all. If the idea already survived a `roast` and just needs scoping, hand off to `clarify-work` or `to-issues` instead.
+This is a pre-engineering gate: it decides whether an idea is worth turning into scoped work at all. If the idea already survived a `roast` and just needs scoping, hand off to `clarify-work` or `decompose-to-issues` instead.
 
 ## Step 1: Get the brief
 
