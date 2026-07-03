@@ -2,7 +2,7 @@
 
 Reusable skills and operating notes for AI-assisted software engineering work.
 
-Use this repo when you want an AI coding agent to clarify work, decompose issues, define done, handle HITL blockers, review releases, and preserve handoffs across sessions. It is written for humans deciding whether to install the workflow and for agents that need concise execution rules.
+Use this repo when you want an AI coding agent to clarify work, decompose issues, define done, handle HITL blockers, review releases, and preserve handovers across sessions. It is written for humans deciding whether to install the workflow and for agents that need concise execution rules.
 
 This repository is descriptive first for humans adopting the workflow. Its agent entrypoints are directive when loaded by an AI coding agent.
 
@@ -104,28 +104,34 @@ Decomposition is not only a planning device. It is a context-quality control mec
 ## Workflow Summary
 
 1. Pressure-test a new idea with `roast` before committing to build it.
-2. Clarify high-level work with `grill-with-docs`.
+2. Clarify high-level work with `clarify-work`.
 3. Use `to-prd` when scope or success criteria are still fuzzy.
-4. Use `to-issues` to create issue-sized execution units.
+4. Use `decompose-to-issues` to create issue-sized execution units.
 5. Prefer a fresh agent per issue by default.
 6. Define acceptance criteria and verification before implementation.
 7. Use risk levels to choose verification, review, staging, and rollback gates.
 8. Use an independent review pass before merge.
 9. Preserve automation/assistance traceability in PRs.
 10. Use risk-based staging and HITL before production when warranted.
-11. Use `handover` only when context crosses an agent or session boundary.
+11. Use `handover` when context crosses an agent or session boundary, when only 5-10% of the session limit remains with work unfinished, or when context usage passes 40% on unfinished multi-step work.
 
 Planning depth should match the work: quick for trivial changes, standard for non-trivial issues, and deep for ambiguous or architectural work.
 
 ## Optional Skill Prerequisites
 
-Some workflow triggers rely on separately installed skills:
+Some workflow triggers rely on separately installed skills. The MIT-licensed `addyosmani/agent-skills` pack covers all of them from one maintained repo:
 
-- `simplify`: `brianlovin/claude-config@simplify`
-- `security-review`: `getsentry/skills@security-review`
-- `security-best-practices`: OpenAI curated skill for supported Python, JavaScript/TypeScript, and Go projects
+- `tdd`: `addyosmani/agent-skills@test-driven-development`
+- `diagnose`: `addyosmani/agent-skills@debugging-and-error-recovery`
+- `simplify`: `addyosmani/agent-skills@code-simplification`
+- `security-review`: `addyosmani/agent-skills@security-and-hardening`
 
-Project-level conventions override skill defaults. In particular, the recommended `simplify` skill includes JavaScript-specific defaults that do not apply universally. Treat `security-best-practices` as an optional supported-stack supplement, not a mandatory workflow dependency.
+```bash
+npx skills@latest add addyosmani/agent-skills \
+  -s test-driven-development,debugging-and-error-recovery,code-simplification,security-and-hardening
+```
+
+Project-level conventions override skill defaults. Treat `security-best-practices` (OpenAI curated, for supported Python, JavaScript/TypeScript, and Go projects) as an optional supported-stack supplement, not a mandatory workflow dependency.
 
 ## User-Level Installation
 

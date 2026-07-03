@@ -27,13 +27,13 @@ The workflow is descriptive as a public playbook, but the files under `system-le
 
 ### 1. Clarify
 
-- Use `grill-with-docs` for high-level tasks.
+- Use `clarify-work` for high-level tasks.
 - Resolve fuzzy terminology, unclear requirements, and hidden constraints before implementation starts.
 
 ### 2. Decompose
 
 - Use `to-prd` when the work still needs product framing, decision-making, or success criteria clarification.
-- Use `to-issues` before implementation on high-level work.
+- Use `decompose-to-issues` before implementation on high-level work.
 - Treat the issue as the preferred execution boundary for an implementation agent.
 
 ### 3. Execute
@@ -50,7 +50,7 @@ The workflow is descriptive as a public playbook, but the files under `system-le
 Agent role contracts:
 
 - Implementer: reads the issue and relevant project docs, writes code, writes or updates tests, runs the named verification, and opens the PR.
-- Reviewer: use the strongest practical reviewer model and reasoning effort available. Reads only the issue, acceptance criteria, and PR diff unless more context is explicitly needed. Posts concrete findings that identify the failing behavior, risk, or missing proof.
+- Reviewer: model and reasoning effort chosen by the PR's risk and complexity. Reads only the issue, acceptance criteria, and PR diff unless more context is explicitly needed. Posts concrete findings that identify the failing behavior, risk, or missing proof.
 - Fixer: reads review comments, addresses each actionable finding, adds or updates tests when needed, reruns verification, and pushes follow-up commits.
 - Human owner: resolves product tradeoffs, approves merge and release decisions, and remains accountable for shipped behavior.
 
@@ -91,14 +91,15 @@ Definition of done:
 
 ### 7. Handover When Needed
 
-- Use `handover` only when context will cross an agent or session boundary, when work is blocked, or when non-obvious state must be preserved.
+- Use `handover` when context will cross an agent or session boundary, when work is blocked, when only 5-10% of the session limit remains with work unfinished, when context usage passes 40% on unfinished multi-step work, or when non-obvious state must be preserved.
+- Publish the handover to the linked issue and add the `paused by agent` label so a fresh agent can find and resume half-done work.
 - Do not create handovers for work that is already complete and legible from the issue, PR, and tests.
 
 ## Decision Rules
 
 - Use the quick, standard, or deep planning track that honestly fits the work.
 - Use `to-prd` conditionally, not universally.
-- Use `to-issues` by default for high-level work.
+- Use `decompose-to-issues` by default for high-level work.
 - Claim or mark an issue as picked before execution starts.
 - Prefer fresh agent per issue by default, with a small-issue exception.
 - For each PR review, choose the model and reasoning effort based on the PR’s risk and complexity.
@@ -181,7 +182,7 @@ Do not rely on commit messages for this traceability. Do not add AI co-author li
 - If scope expands during implementation, stop and split the new work into a follow-up issue unless the expansion is required to satisfy the original acceptance criteria.
 - If reviewer and implementer disagree, resolve against the issue acceptance criteria first and the product owner second. Do not merge unresolved correctness disputes.
 - If CI is flaky, rerun once, then record the flake evidence and either fix the flake or require human approval before proceeding.
-- If the issue cannot be completed in one focused pass, leave a handoff with current state, failing checks, open decisions, and next action.
+- If the issue cannot be completed in one focused pass, write a handover with current state, failing checks, open decisions, and next action, publish it to the issue, and add the `paused by agent` label.
 
 ## Context Packet For Fresh Agents
 
@@ -213,7 +214,7 @@ Before adding a production dependency:
 - Adopt the full workflow if you want structured planning, issue-scoped execution, and release discipline.
 - Adopt only the planning layer if your main problem is fuzzy requirements.
 - Adopt only the review and traceability layer if your team already has a strong implementation workflow.
-- Adopt only the handoff discipline if context continuity is your main bottleneck.
+- Adopt only the handover discipline if context continuity is your main bottleneck.
 
 ## Influences
 
