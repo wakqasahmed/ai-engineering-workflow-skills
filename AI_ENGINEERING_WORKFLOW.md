@@ -101,7 +101,11 @@ Definition of done:
 - Use `to-issues` by default for high-level work.
 - Claim or mark an issue as picked before execution starts.
 - Prefer fresh agent per issue by default, with a small-issue exception.
-- Use the strongest practical model/effort for independent review passes.
+- For each PR review, choose the model and reasoning effort based on the PR’s risk and complexity.
+- Use cheaper/faster settings for simple changes.
+- Use stronger/higher-effort settings for complex, security-sensitive, payment, auth, database, or production-critical changes.
+- When appropriate, run independent review passes focused on correctness, security, performance, and regressions.
+- Use the appropriate model and effort level per PR for independent review passes.
 - Use risk-based staging and HITL, not universal staging for every change.
 - Treat context-bloat concerns as a heuristic, not a numeric rule.
 
