@@ -119,13 +119,19 @@ Planning depth should match the work: quick for trivial changes, standard for no
 
 ## Optional Skill Prerequisites
 
-Some workflow triggers rely on separately installed skills:
+Some workflow triggers rely on separately installed skills. The MIT-licensed `addyosmani/agent-skills` pack covers all of them from one maintained repo:
 
-- `simplify`: `brianlovin/claude-config@simplify`
-- `security-review`: `getsentry/skills@security-review`
-- `security-best-practices`: OpenAI curated skill for supported Python, JavaScript/TypeScript, and Go projects
+- `tdd`: `addyosmani/agent-skills@test-driven-development`
+- `diagnose`: `addyosmani/agent-skills@debugging-and-error-recovery`
+- `simplify`: `addyosmani/agent-skills@code-simplification`
+- `security-review`: `addyosmani/agent-skills@security-and-hardening`
 
-Project-level conventions override skill defaults. In particular, the recommended `simplify` skill includes JavaScript-specific defaults that do not apply universally. Treat `security-best-practices` as an optional supported-stack supplement, not a mandatory workflow dependency.
+```bash
+npx skills@latest add addyosmani/agent-skills \
+  -s test-driven-development,debugging-and-error-recovery,code-simplification,security-and-hardening
+```
+
+Project-level conventions override skill defaults. Treat `security-best-practices` (OpenAI curated, for supported Python, JavaScript/TypeScript, and Go projects) as an optional supported-stack supplement, not a mandatory workflow dependency.
 
 ## User-Level Installation
 

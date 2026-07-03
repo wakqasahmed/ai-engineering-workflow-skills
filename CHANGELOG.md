@@ -19,6 +19,7 @@ The goal is transparency over time: what changed, why it changed, and when the w
 - `handover` now triggers when 5-10% of the session limit remains or context usage passes 40% on unfinished work, publishes the handover to the linked issue, and adds a `paused by agent` label so half-done work is discoverable; fixed invalid tab in `argument-hint` and removed `disable-model-invocation` so agents can self-invoke at the thresholds
 - `subagent-pipeline` guardrails now require every subagent prompt to carry the bail-out contract (handover + issue comment + `paused by agent` label instead of stopping silently)
 - replaced remaining `handoff` wording with `handover` outside user-utterance trigger synonyms
+- optional skill prerequisites (`tdd`, `diagnose`, `simplify`, `security-review`) now map to the maintained `addyosmani/agent-skills` pack instead of scattered third-party repos
 
 ## 2026-06
 
