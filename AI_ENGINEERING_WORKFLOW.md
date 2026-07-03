@@ -14,6 +14,7 @@ The workflow is descriptive as a public playbook, but the files under `system-le
 - Decomposition is not just project management. It is a context-quality control mechanism for agents.
 - Smaller, issue-scoped execution helps agents stay sharp, reduces context bloat, and improves reliability.
 - For high-level work, clarify first, then decompose, then execute issue by issue.
+- For a new idea, not yet a scoped piece of work, pressure-test it with `roast` before it enters this pipeline at all.
 - Human owners remain responsible for what gets merged, released, and shipped.
 
 ## Default Workflow
@@ -88,10 +89,10 @@ Definition of done:
 - Final changelog assembly can happen later, but each non-trivial PR should include a short release-note candidate.
 - For medium-risk and high-risk changes, state the rollback path and the production health check before release.
 
-### 7. Handoff When Needed
+### 7. Handover When Needed
 
-- Use `handoff` only when context will cross an agent or session boundary, when work is blocked, or when non-obvious state must be preserved.
-- Do not create handoffs for work that is already complete and legible from the issue, PR, and tests.
+- Use `handover` only when context will cross an agent or session boundary, when work is blocked, or when non-obvious state must be preserved.
+- Do not create handovers for work that is already complete and legible from the issue, PR, and tests.
 
 ## Decision Rules
 

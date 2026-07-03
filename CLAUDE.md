@@ -9,6 +9,7 @@ This file mirrors `AGENTS.md` for compatibility.
 
 ## Trigger Map
 
+- Use `roast` before committing to build a new idea, to pressure-test it from multiple angles first.
 - Use `grill-with-docs` for high-level task clarification and decomposition.
 - Use `to-prd` when scope, terminology, or success criteria are still fuzzy.
 - Use `to-issues` before implementation on high-level work.
@@ -16,7 +17,7 @@ This file mirrors `AGENTS.md` for compatibility.
 - Use `simplify` after implementing a feature.
 - Use `diagnose` when something is broken, throwing, or regressing.
 - Use `security-review` before PRs touching auth, payments, secrets, or external APIs.
-- Use `handoff` only when context crosses an agent or session boundary.
+- Use `handover` only when context crosses an agent or session boundary.
 
 ## Summary
 
