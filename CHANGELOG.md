@@ -8,6 +8,7 @@ The goal is transparency over time: what changed, why it changed, and when the w
 
 ### Added
 
+- `subagent-pipeline` skill codifying the cold-start implementer/reviewer/fixer chain, CI gate, and staging auto-merge rule used for issue execution
 - `roast` skill: a 6-persona adversarial council plus Judge verdict for pressure-testing a new idea before it enters the delivery pipeline, under a new `skills/product/` category
 
 ### Changed
