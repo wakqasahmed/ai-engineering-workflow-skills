@@ -9,6 +9,11 @@ The goal is transparency over time: what changed, why it changed, and when the w
 ### Added
 
 - `subagent-pipeline` skill codifying the cold-start implementer/reviewer/fixer chain, CI gate, and staging auto-merge rule used for issue execution
+- `roast` skill: a 6-persona adversarial council plus Judge verdict for pressure-testing a new idea before it enters the delivery pipeline, under a new `skills/product/` category
+
+### Changed
+
+- renamed `handoff`/`workflow-handoff` to `handover` and merged in a stricter end-of-session template (chat-only output, running-state and background-process tracking, plan/task/memory sourcing order, anti-patterns); updated all root entrypoint references
 
 ## 2026-06
 
