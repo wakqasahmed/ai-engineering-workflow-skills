@@ -21,6 +21,14 @@ Use this before changing code or docs on non-trivial work.
 - Medium: user-visible behavior, business logic, data handling, CI, integrations, or multi-file behavior.
 - High: auth, payments, permissions, secrets, migrations, deployment, infrastructure, tenant data, or irreversible operations.
 
+## Test Database Requirement
+
+- Automated tests must use disposable storage or a dedicated test database.
+- Disposable means sqlite `:memory:` or an equivalent throwaway database created for that run.
+- Dedicated means a database whose name clearly contains `test` or `testing` and has no staging, production, customer, demo, or manually-entered data.
+- If a test plan needs a staging backup first, stop and fix the test environment instead.
+- If the work intentionally changes staging data with a seeder, migration, import, repair script, or one-off command, require a staging backup and restore note.
+
 ## Done Means
 
 - Acceptance criteria satisfied.

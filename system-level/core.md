@@ -58,6 +58,15 @@ Solve the stated problem directly. Prefer concrete delivery over speculative arc
 - Run the minimum relevant checks before reporting completion.
 - Do not claim success without verification.
 
+## Test Database Safety
+
+- Never run automated tests against staging, production, customer, demo, or shared operational databases.
+- Test runs must use disposable storage, such as sqlite `:memory:`, or a dedicated test database whose name clearly contains `test` or `testing`.
+- `RefreshDatabase`, `migrate:fresh`, seeders, fixture loaders, and similar reset tools are safe only against disposable or dedicated test databases.
+- Do not take staging backups just to run tests. If tests require a backup first, the test environment is wrong.
+- Before intentional staging data changes, such as seeders, migrations, imports, repair scripts, or one-off data fixes, create a staging backup and record the restore path.
+- Prefer executable guardrails in bootstrap scripts, CI, wrappers, or framework hooks over relying on agent memory.
+
 ## Review And Traceability
 
 - Non-trivial changes should receive an independent review pass.
