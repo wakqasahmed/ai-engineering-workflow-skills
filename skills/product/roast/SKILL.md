@@ -6,11 +6,7 @@ argument-hint: "[the idea to roast]"
 
 # Roast
 
-## Why
-
-Claude's default is to agree with you. `roast` is the opposite. It convenes a council of six independent persona agents who tear an idea apart and build it up from every angle, then a Judge synthesizes everything into one honest verdict. Use it before you sink time and money into building the wrong thing.
-
-The council is adversarial on purpose. No persona is allowed to hedge or be polite. The point is to surface what you can't see because you're too close to it.
+Claude's default is to agree with you. `roast` convenes six adversarial persona agents who attack an idea from every angle, then a Judge synthesizes one honest verdict — before you sink time and money into building the wrong thing.
 
 This is a pre-engineering gate: it decides whether an idea is worth turning into scoped work at all. If the idea already survived a `roast` and just needs scoping, hand off to `clarify-work` or `decompose-to-issues` instead.
 
@@ -23,15 +19,13 @@ If `$ARGUMENTS` contains the idea, start there. Then ask the user a tight set of
 3. **Your edge** — relevant skills, audience, or assets you already have.
 4. **Constraints** — budget, timeline, how fast you need first dollar.
 
-If the user says "just run it" or gives you enough already, skip the questions and proceed. Don't over-interrogate. One round, then convene the council.
-
-Write the brief into a single short paragraph you will paste into every council member's prompt, so all six judge the same thing.
+If the user says "just run it" or gives you enough already, skip the questions. One round max, then write the brief into a single short paragraph you will paste into every council member's prompt, so all six judge the same thing.
 
 ## Step 2: Convene the council (6 agents, in parallel)
 
 Spin up **all six agents in parallel in a single message** (one Agent call each, `subagent_type: general-purpose`). Paste the same brief into each, then give each its persona mandate below.
 
-Each council member must return: a one-line stance, their 3-5 sharpest points, the single most important thing the user must hear, and a 1-10 score on their own dimension (1 = walk away, 10 = no-brainer). The six scores are not on the same scale and must never be averaged — see Step 3.
+Each council member must return: a one-line stance, their 3-5 sharpest points, the single most important thing the user must hear, and a 1-10 score on their own dimension (1 = walk away, 10 = no-brainer).
 
 **1. The Contrarian (Red Team)**
 > You are the Contrarian on an idea council. Assume this idea fails. Your job is to find the fatal flaws, the fastest way it dies, and the load-bearing assumptions that are probably wrong. Be ruthless and specific. No hedging, no "but it could work." Attack the weakest points. THE BRIEF: [brief]
@@ -53,9 +47,7 @@ Each council member must return: a one-line stance, their 3-5 sharpest points, t
 
 ## Step 3: The Judge delivers the verdict
 
-Once all six return, YOU act as the Judge — do not spawn a seventh agent for this. Read every council member's findings, weigh them, and synthesize one decisive verdict. Do not average the six scores; they measure different dimensions (survivability, upside, logical soundness, market evidence, willingness to pay, trend direction), not one scale. Name the real tension between the personas and resolve it.
-
-Fold in the **economics lens** yourself: rough pricing, realistic time-to-first-dollar, and whether the user can actually ship this fast given the edge they described.
+Once all six return, YOU act as the Judge — do not spawn a seventh agent. Weigh every council member's findings and synthesize one decisive verdict. Do not average the six scores; they measure different dimensions (survivability, upside, logical soundness, market evidence, willingness to pay, trend direction), not one scale. Name the real tension between the personas and resolve it. Fold in the **economics lens** yourself: rough pricing, realistic time-to-first-dollar, and whether the user can ship fast given their edge.
 
 Output the verdict in this exact shape:
 
@@ -82,8 +74,8 @@ Then list the six council scores in one line: `Contrarian X/10 · Expansionist X
 
 ## Guardrails
 
-- Every persona stays in character. None of them hedges or softens. The value is in the friction.
-- The Judge must make an actual call. "It depends" is not a verdict. Pick GO, RESHAPE, or KILL and own it.
-- The cheapest 48-hour test is the most important output. It's how the user finds out if they're right without building the whole thing.
-- Keep the final verdict skimmable. The council does the depth; the Judge does the decision.
-- This spins up 6 parallel subagents, two of which do live web search — real token and time cost. Reserve it for an actual go/no-go call on a new idea, not for minor features or incremental changes to something already validated.
+- Every persona stays in character; none hedges or softens. The value is in the friction.
+- The Judge must make an actual call. "It depends" is not a verdict.
+- The cheapest 48-hour test is the most important output — it's how the user finds out if they're right without building the whole thing.
+- Keep the verdict skimmable: the council does the depth, the Judge does the decision.
+- This spins up 6 parallel subagents, two with live web search — real token and time cost. Reserve it for a genuine go/no-go call, not minor features or increments to something already validated.
