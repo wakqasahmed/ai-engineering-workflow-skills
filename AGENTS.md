@@ -24,5 +24,6 @@ This repository contains my AI-assisted engineering workflow and agent operating
 - Keep implementation agents issue-scoped to avoid context bloat.
 - Mark an issue as picked or claimed before an agent starts work on it.
 - Define acceptance criteria and verification before implementation.
+- Run tests only against disposable storage or a dedicated test database; never staging, production, customer, demo, or shared operational databases.
 - Prefer a fresh agent per issue by default.
 - Require independent review with reviewer model/effort chosen by the PR's risk and complexity, and preserve automation/assistance traceability in merged PRs.
