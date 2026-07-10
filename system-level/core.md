@@ -11,6 +11,12 @@ Solve the stated problem directly. Prefer concrete delivery over speculative arc
 - Reuse existing project patterns before inventing new ones.
 - When reporting information to the user, be extremely concise. Sacrifice grammar for concision.
 
+## Brand Icon Sources
+
+- Use Simple Icons first for real product, platform, or company marks.
+- Avoid Flaticon/Flat Icons for brand logos unless Simple Icons lacks the mark and the license/attribution terms are explicitly acceptable.
+- Verify the Simple Icons slug or asset URL resolves before hardcoding it.
+
 ## Workflow Defaults
 
 - Before committing to build a new idea, start with `roast` to pressure-test it.
