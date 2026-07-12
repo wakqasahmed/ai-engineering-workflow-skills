@@ -29,6 +29,9 @@ something that executes on `npm install` / `pip install`.
   authenticated GitHub operations, not arbitrary remote code execution, but they do mean an
   agent following this skill can open PRs, post review comments, and merge to a repository it
   has access to.
+- `skills/engineering/ai-agent-pr-metadata/SKILL.md` instructs the agent to edit PR templates
+  and post or wrap GitHub PR comments/reviews with AI agent, model, and run metadata. This uses
+  authenticated `gh` operations and should not add AI attribution to commit messages.
 - No `SKILL.md` in this repository instructs fetching remote URLs (`curl`, `wget`, HTTP
   fetch) as part of its documented workflow. If you find one that does in a future revision,
   please report it (see below) so this file can be updated.

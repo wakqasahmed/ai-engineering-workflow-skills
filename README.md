@@ -2,7 +2,7 @@
 
 Reusable skills and operating notes for AI-assisted software engineering work.
 
-Use this repo when you want an AI coding agent to clarify work, decompose issues, define done, handle HITL blockers, review releases, and preserve handovers across sessions. It is written for humans deciding whether to install the workflow and for agents that need concise execution rules.
+Use this repo when you want an AI coding agent to clarify work, decompose issues, define done, handle HITL blockers, review releases, preserve handovers across sessions, and keep AI assistance metadata visible in PRs without polluting commit history. It is written for humans deciding whether to install the workflow and for agents that need concise execution rules.
 
 This repository is descriptive first for humans adopting the workflow. Its agent entrypoints are directive when loaded by an AI coding agent.
 
