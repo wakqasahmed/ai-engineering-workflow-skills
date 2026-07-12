@@ -5,6 +5,7 @@
     "./skills/engineering/decompose-to-issues",
     "./skills/engineering/define-done",
     "./skills/engineering/review-gate",
+    "./skills/engineering/ai-agent-pr-metadata",
     "./skills/engineering/subagent-pipeline",
     "./skills/engineering/hitl-blocker",
     "./skills/engineering/release-gate",
