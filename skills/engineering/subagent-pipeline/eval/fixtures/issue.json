@@ -1,0 +1,7 @@
+{
+  "number": 9001,
+  "title": "[fixture] Add retry to webhook dispatcher",
+  "body": "## Why\nWebhook delivery has no retry on transient 5xx responses, so a single blip drops the event.\n\n## What\n- Add exponential backoff retry (max 3 attempts) around the webhook POST call.\n- Log each retry attempt.\n\n## Acceptance criteria\n- [ ] Transient 5xx triggers a retry, not an immediate failure\n- [ ] Permanent 4xx does not retry\n- [ ] Test covers both paths",
+  "labels": ["picked by agent"],
+  "base_branch": "staging"
+}

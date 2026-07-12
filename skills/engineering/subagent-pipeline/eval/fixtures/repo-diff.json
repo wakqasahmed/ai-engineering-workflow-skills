@@ -1,0 +1,14 @@
+{
+  "pr_number": 9002,
+  "base_branch": "staging",
+  "files": [
+    {
+      "path": "app/Services/WebhookDispatcher.php",
+      "patch": "@@ -10,7 +10,17 @@ class WebhookDispatcher\n     public function send(string $url, array $payload): void\n     {\n-        Http::post($url, $payload);\n+        $attempts = 0;\n+        do {\n+            $response = Http::post($url, $payload);\n+            $attempts++;\n+            if ($response->successful() || $response->status() < 500) {\n+                return;\n+            }\n+            usleep((2 ** $attempts) * 100000);\n+        } while ($attempts < 3);\n+\n+        Log::warning('Webhook delivery failed after retries', ['url' => $url]);\n     }\n }"
+    },
+    {
+      "path": "tests/Feature/WebhookDispatcherTest.php",
+      "patch": "@@ -0,0 +1,20 @@\n+it('retries on transient 5xx')->assertRetried();\n+it('does not retry on 4xx')->assertNotRetried();"
+    }
+  ]
+}

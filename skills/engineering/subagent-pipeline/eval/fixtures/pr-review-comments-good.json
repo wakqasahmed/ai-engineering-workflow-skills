@@ -1,0 +1,26 @@
+{
+  "source": "gh api repos/OWNER/REPO/pulls/9002/comments",
+  "comments": [
+    {
+      "id": 5001,
+      "path": "app/Services/WebhookDispatcher.php",
+      "line": 22,
+      "body": "Blocking: usleep() with a full doubling backoff (up to ~800ms) runs synchronously inside the request cycle. If this dispatcher is called from a queued job that's fine, but if it can be called from a web request this will hold the HTTP worker. Confirm call sites before merge.",
+      "author": "reviewer-bot"
+    },
+    {
+      "id": 5002,
+      "path": "tests/Feature/WebhookDispatcherTest.php",
+      "line": 2,
+      "body": "Blocking: assertRetried()/assertNotRetried() are not real PHPUnit/Pest assertions in this fixture's patch — the acceptance criteria requires a test that actually covers both paths, not placeholder assertion calls.",
+      "author": "reviewer-bot"
+    },
+    {
+      "id": 5003,
+      "path": "app/Services/WebhookDispatcher.php",
+      "line": 10,
+      "body": "Non-blocking: consider naming the retry count constant instead of the literal 3.",
+      "author": "reviewer-bot"
+    }
+  ]
+}
