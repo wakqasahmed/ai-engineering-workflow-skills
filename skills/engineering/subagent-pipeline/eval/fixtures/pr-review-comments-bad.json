@@ -1,0 +1,12 @@
+{
+  "source": "in-conversation summary (never posted to GitHub)",
+  "comments": [
+    {
+      "id": null,
+      "path": null,
+      "line": null,
+      "body": "Looks fine overall, one concern about the retry sleep but I mentioned it in chat, not on the PR.",
+      "author": "reviewer-agent"
+    }
+  ]
+}

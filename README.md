@@ -139,6 +139,35 @@ For user-level installations with duplicate instruction files, choose one canoni
 
 Keep repository copies as regular files for portability across operating systems and packaging tools.
 
+## Behavioral Eval Fixtures
+
+Dense, non-obvious skills can silently break under future edits with no test catching it.
+`skills/engineering/subagent-pipeline/eval/` is the first behavioral eval fixture: a frozen
+synthetic issue, repo diff, PR review comments, and CI/merge-gate states, plus a runner script
+that asserts the skill's documented contract against those fixtures.
+
+Run it:
+
+```bash
+skills/engineering/subagent-pipeline/eval/run-eval.sh
+```
+
+This is `--dry-run` by default: it only reads the fixtures under `eval/fixtures/` and the
+skill's own `SKILL.md`, and makes no network calls. It asserts things like: the reviewer step
+must post real inline `gh pr review` comments rather than an in-conversation-only summary, the
+fixer must read comments via `gh api repos/.../pulls/.../comments`, merges only proceed when
+CI is green, and merges to `main` require an explicit human-approval flag even when CI is
+green.
+
+`--live --repo OWNER/NAME --pr NUMBER` re-runs the structural checks against a real PR's
+review comments and CI status via `gh` (read-only `gh api` / `gh pr view` calls only — it
+never opens PRs, posts comments, or merges anything). It requires an authenticated `gh`
+(`GH_TOKEN`) and fails fast with a clear error if `--repo`/`--pr` are omitted, so dry-run
+fixture assertions and live GitHub reads never run under the same code path by accident.
+
+To extend it for another skill, add a sibling `eval/` directory with its own `fixtures/` and
+`run-eval.sh`, following the same dry-run-by-default / explicit-`--live` pattern.
+
 ## Publishing Notes
 
 - This repository should stay free of private project details.
