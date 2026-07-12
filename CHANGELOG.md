@@ -14,6 +14,8 @@ The goal is transparency over time: what changed, why it changed, and when the w
 
 ### Changed
 
+- `review-gate` and `subagent-pipeline` now draw an explicit line between mechanical checks (lint, formatting, conventional style, straightforward static analysis — owned by Alibaba Code Review and CI, recorded via `ai-agent-pr-metadata`) and semantic review (requirements compliance, correctness, regressions, security/authorization, contract/integration risk, acceptance-test adequacy — owned by the independent reviewer). The reviewer must read Alibaba Code Review's and CI's output before its own pass and must not repeat resolved mechanical findings; it may revisit one only if it signals an unresolved correctness/security/data-loss/configuration/acceptance-criteria issue. CI remains a hard merge gate and this review does not replace or duplicate it (#31)
+
 - renamed `handoff`/`workflow-handoff` to `handover` and merged in a stricter end-of-session template (chat-only output, running-state and background-process tracking, plan/task/memory sourcing order, anti-patterns); updated all root entrypoint references
 - routed dangling `grill-with-docs`/`to-issues` references to the in-repo `clarify-work`/`decompose-to-issues` skills so a cold install has no missing skill dependencies
 - reviewer model and reasoning effort are now chosen per PR by risk and complexity (was: always strongest practical); aligned `subagent-pipeline`, role contracts, and entrypoints with `AI_ENGINEERING_WORKFLOW.md`
