@@ -157,7 +157,11 @@ skill's own `SKILL.md`, and makes no network calls. It asserts things like: the 
 must post real inline `gh pr review` comments rather than an in-conversation-only summary, the
 fixer must read comments via `gh api repos/.../pulls/.../comments`, merges only proceed when
 CI is green, and merges to `main` require an explicit human-approval flag even when CI is
-green.
+green. The synthetic `issue.json` + `repo-diff.json` fixtures are also asserted against each
+other (the diff must actually implement what the issue's acceptance criteria ask for), and the
+merge-gate check is implemented twice, once in bash and once in jq, requiring both
+independent implementations to agree with each other and with the fixture's recorded outcome
+— so the eval can't pass purely by a fixture agreeing with a copy of its own logic.
 
 `--live --repo OWNER/NAME --pr NUMBER` re-runs the structural checks against a real PR's
 review comments and CI status via `gh` (read-only `gh api` / `gh pr view` calls only — it

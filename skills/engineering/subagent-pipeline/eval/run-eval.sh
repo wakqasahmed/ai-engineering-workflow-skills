@@ -100,9 +100,15 @@ assert_fixer_reads_structured_comments() {
   check "good fixture's comment source matches the documented gh api path" "$good_source_is_api"
 }
 
-# Shared merge-decision logic mirroring SKILL.md's stated rule:
-# CI must be green, and merges to main require explicit human approval.
-merge_should_proceed() {
+# Merge-decision logic, deliberately implemented twice in two different
+# languages so the eval isn't just "a copy of the rule agreeing with
+# itself": a bash version and an independent jq version. Both must agree
+# with each other, and both must agree with the fixture's expect_merge,
+# before a fixture is considered passing. This mirrors two literal
+# sentences from SKILL.md's "Merge" step:
+#   "auto-merge (`gh pr merge --squash --auto`) to `staging` once CI passes."
+#   "Always require human approval before merging to `main`."
+merge_should_proceed_bash() {
   local ci_state="$1" base_branch="$2" human_approval="$3"
   if [[ "$ci_state" != "success" ]]; then
     echo "false"
@@ -115,45 +121,48 @@ merge_should_proceed() {
   echo "true"
 }
 
+merge_should_proceed_jq() {
+  local ci_state="$1" base_branch="$2" human_approval="$3"
+  jq -n --arg ci "$ci_state" --arg base "$base_branch" --argjson approved "$human_approval" \
+    '($ci == "success") and (($base != "main") or $approved)'
+}
+
+# Evaluate a merge-gate fixture with both independent implementations and
+# require: (1) they agree with each other, (2) they agree with the
+# fixture's recorded expect_merge. A regression in either implementation,
+# or a fixture whose expect_merge no longer matches the documented rule,
+# fails this — it is not merely self-consistency.
+assert_merge_fixture() {
+  local fixture="$1" label="$2"
+  local ci_state base_branch human_approval expected bash_result jq_result
+  ci_state=$(jq -r '.ci_state' "$fixture")
+  base_branch=$(jq -r '.base_branch' "$fixture")
+  human_approval=$(jq -r '.human_approval' "$fixture")
+  expected=$(jq -r '.expect_merge' "$fixture")
+  bash_result=$(merge_should_proceed_bash "$ci_state" "$base_branch" "$human_approval")
+  jq_result=$(merge_should_proceed_jq "$ci_state" "$base_branch" "$human_approval")
+  local agree="false"
+  [[ "$bash_result" == "$jq_result" && "$bash_result" == "$expected" ]] && agree="true"
+  check "$label" "$agree"
+}
+
 # (c) Merge only proceeds when the CI-green condition is true in the fixture.
 assert_merge_requires_ci_green() {
   local fixture="${FIXTURES_DIR}/merge-target-staging.json"
-  local ci_state base_branch human_approval expected actual
-  ci_state=$(jq -r '.ci_state' "$fixture")
-  base_branch=$(jq -r '.base_branch' "$fixture")
-  human_approval=$(jq -r '.human_approval' "$fixture")
-  expected=$(jq -r '.expect_merge' "$fixture")
-  actual=$(merge_should_proceed "$ci_state" "$base_branch" "$human_approval")
-  check "staging + CI green -> merge proceeds" "$([[ "$actual" == "$expected" ]] && echo true || echo false)"
+  assert_merge_fixture "$fixture" "staging + CI green -> merge proceeds (bash and jq implementations agree)"
 
   fixture="${FIXTURES_DIR}/merge-target-staging-ci-red.json"
-  ci_state=$(jq -r '.ci_state' "$fixture")
-  base_branch=$(jq -r '.base_branch' "$fixture")
-  human_approval=$(jq -r '.human_approval' "$fixture")
-  expected=$(jq -r '.expect_merge' "$fixture")
-  actual=$(merge_should_proceed "$ci_state" "$base_branch" "$human_approval")
-  check "staging + CI red -> merge blocked" "$([[ "$actual" == "$expected" ]] && echo true || echo false)"
+  assert_merge_fixture "$fixture" "staging + CI red -> merge blocked (bash and jq implementations agree)"
 }
 
 # (d) A main-branch fixture where merge must NOT proceed without a
 #     human-approval flag, contrasted with one where it does.
 assert_main_requires_human_approval() {
   local fixture="${FIXTURES_DIR}/merge-target-main-no-approval.json"
-  local ci_state base_branch human_approval expected actual
-  ci_state=$(jq -r '.ci_state' "$fixture")
-  base_branch=$(jq -r '.base_branch' "$fixture")
-  human_approval=$(jq -r '.human_approval' "$fixture")
-  expected=$(jq -r '.expect_merge' "$fixture")
-  actual=$(merge_should_proceed "$ci_state" "$base_branch" "$human_approval")
-  check "main + CI green + no human approval -> merge blocked" "$([[ "$actual" == "$expected" ]] && echo true || echo false)"
+  assert_merge_fixture "$fixture" "main + CI green + no human approval -> merge blocked (bash and jq implementations agree)"
 
   fixture="${FIXTURES_DIR}/merge-target-main-approved.json"
-  ci_state=$(jq -r '.ci_state' "$fixture")
-  base_branch=$(jq -r '.base_branch' "$fixture")
-  human_approval=$(jq -r '.human_approval' "$fixture")
-  expected=$(jq -r '.expect_merge' "$fixture")
-  actual=$(merge_should_proceed "$ci_state" "$base_branch" "$human_approval")
-  check "main + CI green + human approval -> merge proceeds" "$([[ "$actual" == "$expected" ]] && echo true || echo false)"
+  assert_merge_fixture "$fixture" "main + CI green + human approval -> merge proceeds (bash and jq implementations agree)"
 
   local doc_states_it="false"
   if grep -q "Always require human approval before merging to \`main\`" "$SKILL_MD"; then
@@ -162,12 +171,57 @@ assert_main_requires_human_approval() {
   check "SKILL.md states human approval is always required for main" "$doc_states_it"
 }
 
+# (e) The implementer-stage fixtures (issue.json, repo-diff.json) and the
+#     standalone CI-status fixtures are not dead weight: assert the diff
+#     actually addresses the issue's stated acceptance criteria, and that
+#     the CI-status fixtures are internally consistent with the same PR.
+assert_implementer_and_ci_status_fixtures_are_used() {
+  local issue_fixture="${FIXTURES_DIR}/issue.json"
+  local diff_fixture="${FIXTURES_DIR}/repo-diff.json"
+
+  local issue_wants_retry="false"
+  if jq -e '.body | test("retry"; "i")' "$issue_fixture" > /dev/null 2>&1; then
+    issue_wants_retry="true"
+  fi
+  check "issue fixture's acceptance criteria mention retry behavior" "$issue_wants_retry"
+
+  local diff_implements_retry="false"
+  if jq -e '[.files[].patch] | join("\n") | test("attempts") and test("usleep")' \
+    "$diff_fixture" > /dev/null 2>&1; then
+    diff_implements_retry="true"
+  fi
+  check "repo-diff fixture's patch implements retry/backoff (addresses the issue)" "$diff_implements_retry"
+
+  local pr_numbers_consistent="false"
+  local diff_pr green_pr red_pr
+  diff_pr=$(jq -r '.pr_number' "$diff_fixture")
+  green_pr=$(jq -r '.pr_number' "${FIXTURES_DIR}/ci-status-green.json")
+  red_pr=$(jq -r '.pr_number' "${FIXTURES_DIR}/ci-status-red.json")
+  if [[ "$diff_pr" == "$green_pr" && "$diff_pr" == "$red_pr" ]]; then
+    pr_numbers_consistent="true"
+  fi
+  check "ci-status fixtures reference the same PR as the implementer diff fixture" "$pr_numbers_consistent"
+
+  local states_map_to_merge_gate="false"
+  local green_state red_state
+  green_state=$(jq -r '.state' "${FIXTURES_DIR}/ci-status-green.json")
+  red_state=$(jq -r '.state' "${FIXTURES_DIR}/ci-status-red.json")
+  local staging_ci merge_red_ci
+  staging_ci=$(jq -r '.ci_state' "${FIXTURES_DIR}/merge-target-staging.json")
+  merge_red_ci=$(jq -r '.ci_state' "${FIXTURES_DIR}/merge-target-staging-ci-red.json")
+  if [[ "$green_state" == "$staging_ci" && "$red_state" == "$merge_red_ci" ]]; then
+    states_map_to_merge_gate="true"
+  fi
+  check "ci-status fixture states match the ci_state values used by the merge-gate fixtures" "$states_map_to_merge_gate"
+}
+
 run_dry_run() {
   echo "== subagent-pipeline eval (dry-run, fixtures only, no network) =="
   assert_inline_comments_required
   assert_fixer_reads_structured_comments
   assert_merge_requires_ci_green
   assert_main_requires_human_approval
+  assert_implementer_and_ci_status_fixtures_are_used
 }
 
 run_live() {
