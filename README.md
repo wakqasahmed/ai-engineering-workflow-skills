@@ -19,6 +19,7 @@ This repository is descriptive first for humans adopting the workflow. Its agent
 - `CLAUDE.md`: compatibility entrypoint
 - `AI_ENGINEERING_WORKFLOW.md`: full workflow, role contracts, risk levels, and failure paths
 - `system-level/core.md`: invariant operating principles for agents
+- `SECURITY.md`: security posture, scope, and how to report a concern
 
 ## Start Here
 
