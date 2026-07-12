@@ -1,6 +1,6 @@
 ---
 name: ai-agent-pr-metadata
-description: Add GitHub-visible AI agent and AI code-review metadata without adding AI attribution to commits. Use when configuring PR templates, PR creation commands, PR update comments, or Alibaba Code Review/open code review workflows to disclose the implementing agent, review tool, LLM model, and run URL.
+description: Add GitHub-visible AI agent and AI code-review metadata without adding AI attribution to commits, and scope Alibaba/Open Code Review's review surface to control LLM token spend. Use when configuring PR templates, PR creation commands, PR update comments, or Alibaba Code Review/open code review workflows to disclose the implementing agent, review tool, LLM model, run URL, or to add/tune a `.opencodereview/rule.json`.
 ---
 
 # AI Agent PR Metadata
@@ -44,6 +44,38 @@ Review metadata:
 ```
 
 If the review tool cannot customize its prompt or footer, wrap the generated review body before posting it with `gh pr review`.
+
+### Cost scoping with `.opencodereview/rule.json`
+
+`alibaba/open-code-review` runs an agentic tool-use loop per changed file (`code_search`, `file_read`, `file_read_diff`, then `code_comment`) — request/tool-call count scales with codebase exploration, not just diff size. A small diff across several files can still burn hundreds of thousands of input tokens if the agent goes hunting for context on every file. The action does not expose a tool-call or token budget flag, but it auto-discovers `<repoDir>/.opencodereview/rule.json` at review time (no workflow change needed — priority chain: `--rule` flag > project config > global config > built-in defaults).
+
+Commit a project-level rule file to cut spend without losing coverage on files that matter:
+
+```json
+{
+  "rules": [
+    {
+      "path": "tests/**/*.php",
+      "rule": "Review test correctness, coverage of edge cases, and whether assertions match the intended behavior. Only inspect the implementation file directly under test when necessary — avoid broad codebase exploration for test files.",
+      "merge_system_rule": true
+    }
+  ],
+  "exclude": [
+    "vendor/**",
+    "node_modules/**",
+    "**/dist/**",
+    "**/build/**",
+    "storage/**",
+    "*.lock"
+  ]
+}
+```
+
+- `exclude` removes generated/vendored/build-artifact paths from review scope entirely — fewer files reviewed means fewer exploratory tool-call rounds.
+- A scoped `rule` entry (merged with the built-in system rule via `merge_system_rule: true`) steers the agent toward the specific file instead of open-ended `code_search`, without dropping the file from review.
+- Built-in default excludes already cover common test-file naming for Go/Java/JS/TS/Rust/Ruby (`**/*_test.go`, `**/*.spec.ts`, `**/__tests__/**`, etc.) — they do **not** cover PHPUnit/Pest's `*Test.php` convention, so PHP repos need an explicit rule/exclude decision for `tests/**`.
+- Verify a rule matches before relying on it: `ocr rules check --rule .opencodereview/rule.json <path>` (no LLM call, free).
+- After changing the rule file, compare the next run's `tool_calls`/`input_tokens` in the OCR result JSON (printed in the workflow log under `=== OCR result ===`) against a prior baseline run to confirm spend actually dropped.
 
 ## PR Updates
 
