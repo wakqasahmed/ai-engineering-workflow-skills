@@ -17,10 +17,12 @@ something that executes on `npm install` / `pip install`.
 
 ## What Can Actually Execute
 
-- `scripts/install-user.sh` and `scripts/list-skills.sh` / `scripts/link-skills.sh` are real
-  shell scripts. Review them before running, as you would any shell script from the internet.
-  `install-user.sh` writes/backs up files under `$HOME` (or `--target-home`) and supports
-  `--dry-run` to preview changes without writing anything.
+- Everything under `scripts/` (`install-user.sh`, `list-skills.sh`, `link-skills.sh`,
+  `test-install-user.sh`, `validate-plugin.py`) is real, executable shell/Python. Review any
+  script before running it, as you would any script from the internet. `install-user.sh`
+  writes/backs up files under `$HOME` (or `--target-home`) and supports `--dry-run` to preview
+  changes without writing anything. `test-install-user.sh` and `validate-plugin.py` are
+  dev/CI-only checks with no network or destructive action.
 - `skills/engineering/subagent-pipeline/SKILL.md` instructs the agent to run `gh` CLI
   commands (`gh pr review`, `gh api .../pulls/.../comments`, `gh pr merge`) against GitHub on
   the agent's behalf, as part of an implement -> review -> fix -> merge workflow. These are
