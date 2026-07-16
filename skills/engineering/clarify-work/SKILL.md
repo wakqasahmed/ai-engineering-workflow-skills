@@ -11,10 +11,13 @@ Use this before implementation when the request is not already issue-sized.
 
 1. Restate the outcome in one sentence.
 2. Name assumptions and unknowns that can change the implementation.
-3. Ask only blocking questions. Prefer 1-3 questions.
-4. Identify the planning track: quick, standard, or deep.
-5. State the smallest viable approach and non-goals.
-6. Convert broad work into issue-shaped execution units when needed.
+3. Keep only unknowns that block a safe, issue-shaped execution boundary. Estimate the initial number of blocking questions from all available context before asking any. Prefer 1-3 by omitting non-blocking questions, not by combining unrelated decisions.
+4. If the estimate is zero, skip the interview and continue to the execution boundary.
+5. Ask exactly one blocking question per user turn, then wait for the answer. Prefix each planned question with `Question n/N · [■■□]`, where `N` is the initial estimate and the compact bar has `N` cells filled through the current question.
+6. After each answer, reassess the remaining blockers. Keep the original `N` for planned questions. Label a newly discovered blocker `Follow-up k (after Question n/N) · [■■□]`; do not silently increase the denominator or relabel it as a planned question.
+7. When no blocking questions remain, identify the planning track: quick, standard, or deep.
+8. State the smallest viable approach and non-goals.
+9. Convert broad work into issue-shaped execution units when needed.
 
 ## Output
 
@@ -27,5 +30,6 @@ Use this before implementation when the request is not already issue-sized.
 ## Guardrails
 
 - Do not plan around hypothetical future requirements.
+- During the interview, include only the current question and context needed to answer it.
 - Do not start implementation while key terms or ownership boundaries are unclear.
 - When project terminology or documented decisions change during clarification, record the outcome in the project's domain docs (glossary, ADRs) before implementation starts.
