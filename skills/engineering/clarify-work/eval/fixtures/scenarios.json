@@ -1,0 +1,56 @@
+[
+  {
+    "name": "quick",
+    "initial_estimate": 1,
+    "initial_questions": ["Which command should change?"],
+    "turns": [
+      {"answer": null, "output": "Question 1/1 · [■]\nWhich command should change?", "position": 1},
+      {"answer": "deploy", "output": "Execution boundary · quick", "position": 1}
+    ]
+  },
+  {
+    "name": "standard-arbitrary-n",
+    "initial_estimate": 4,
+    "initial_questions": ["Which client is affected?", "What is the failure mode?", "What proves the fix?", "Which versions are supported?"],
+    "turns": [
+      {"answer": null, "output": "Question 1/4 · [■□□□]\nWhich client is affected?", "position": 1},
+      {"answer": "CLI", "output": "Question 2/4 · [■■□□]\nWhat is the failure mode?", "position": 2},
+      {"answer": "timeout", "output": "Question 3/4 · [■■■□]\nWhat proves the fix?", "position": 3},
+      {"answer": "integration test", "output": "Question 4/4 · [■■■■]\nWhich versions are supported?", "position": 4},
+      {"answer": "current", "output": "Execution boundary · standard", "position": 4}
+    ]
+  },
+  {
+    "name": "adaptive-follow-up",
+    "initial_estimate": 3,
+    "initial_questions": ["Which API owns the operation?", "What response is required?", "How is success verified?"],
+    "follow_ups": [{"after": 2, "question": "Does that API require authentication?"}],
+    "turns": [
+      {"answer": null, "output": "Question 1/3 · [■□□]\nWhich API owns the operation?", "position": 1},
+      {"answer": "Orders", "output": "Question 2/3 · [■■□]\nWhat response is required?", "position": 2},
+      {"answer": "202", "output": "Follow-up 1 (after Question 2/3) · [■■□]\nDoes that API require authentication?", "position": 2},
+      {"answer": "yes", "output": "Question 3/3 · [■■■]\nHow is success verified?", "position": 3},
+      {"answer": "contract test", "output": "Execution boundary · standard", "position": 3}
+    ]
+  },
+  {
+    "name": "incomplete-answer-follow-up",
+    "initial_estimate": 2,
+    "initial_questions": ["Which events and recipients are in scope?", "What proves delivery?"],
+    "follow_ups": [{"after": 1, "question": "Which recipients are relevant?"}],
+    "turns": [
+      {"answer": null, "output": "Question 1/2 · [■□]\nWhich events and recipients are in scope?", "position": 1},
+      {"answer": {"text": "Order events; unsure about recipients", "resolved": false}, "output": "Follow-up 1 (after Question 1/2) · [■□]\nWhich recipients are relevant?", "position": 1},
+      {"answer": {"text": "The buyer and fulfillment team", "resolved": true}, "output": "Question 2/2 · [■■]\nWhat proves delivery?", "position": 2},
+      {"answer": "integration test", "output": "Execution boundary · standard", "position": 2}
+    ]
+  },
+  {
+    "name": "zero-blocker-fast-path",
+    "initial_estimate": 0,
+    "initial_questions": [],
+    "turns": [
+      {"answer": null, "output": "Execution boundary · quick", "position": 0}
+    ]
+  }
+]
