@@ -1,6 +1,6 @@
 ---
 name: ai-agent-pr-metadata
-description: Add GitHub-visible AI agent and AI code-review metadata without adding AI attribution to commits, and scope Alibaba/Open Code Review's review surface to control LLM token spend. Use when configuring PR templates, PR creation commands, PR update comments, or Alibaba Code Review/open code review workflows to disclose the implementing agent, review tool, LLM model, run URL, or to add/tune a `.opencodereview/rule.json`.
+description: Add GitHub-visible AI agent and AI code-review metadata and exact agent labels without adding AI attribution to commits, and scope Alibaba/Open Code Review's review surface to control LLM token spend. Use when configuring PR templates, issue/PR labels, PR creation commands, PR update comments, or Alibaba Code Review/open code review workflows to disclose the implementing agent, review tool, LLM model, run URL, or to add/tune a `.opencodereview/rule.json`.
 ---
 
 # AI Agent PR Metadata
@@ -14,6 +14,14 @@ Use this when a repository needs traceable AI assistance metadata in GitHub whil
 - Never guess the model name. Read it from workflow vars, orchestration config, or an explicit user-provided value.
 - Include a run URL when the work was produced by GitHub Actions or another traceable runner.
 
+## Agent Labels
+
+- Apply an additive `agent:<model+version>-<effort>-<role>` label to the claimed issue and its PR.
+- Use the resolved model identifier and declared effort exactly.
+- Never replace the resolved model version or declared effort with an alias or a stronger/weaker value.
+- Create the label before applying it if it does not already exist, and never remove other agents' `agent:*` labels.
+- Example: `gpt5.6-terra` at `medium` effort as the implementer requires `agent:gpt5.6-terra-medium-implementer`.
+
 ## PR Template
 
 Add or update `.github/pull_request_template.md`:
@@ -22,7 +30,7 @@ Add or update `.github/pull_request_template.md`:
 ## Agent Metadata
 
 Implementation/update agent:
-- Name: <!-- e.g. Claude Sonnet 5 Medium, Codex GPT-5 High, or N/A -->
+- Name: <!-- e.g. Claude Sonnet 5 Medium, Codex GPT-5.6 Terra Medium, or N/A -->
 - Run: <!-- GitHub Actions run URL, local session reference, or N/A -->
 
 Code review agent:
@@ -89,5 +97,6 @@ gh pr comment "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" \
 ## Verification
 
 - Confirm `git log --format=%B -n 5` has no `Co-Authored-By` or AI attribution lines.
+- Confirm the claimed issue and PR both contain the exact `agent:<model+version>-<effort>-<role>` label.
 - Confirm the PR body contains `Agent Metadata`.
 - Confirm the Alibaba review body contains `Review metadata` with the actual LLM model.
