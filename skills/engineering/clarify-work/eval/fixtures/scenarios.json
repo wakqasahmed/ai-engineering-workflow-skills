@@ -34,6 +34,18 @@
     ]
   },
   {
+    "name": "incomplete-answer-follow-up",
+    "initial_estimate": 2,
+    "initial_questions": ["Which events and recipients are in scope?", "What proves delivery?"],
+    "follow_ups": [{"after": 1, "question": "Which recipients are relevant?"}],
+    "turns": [
+      {"answer": null, "output": "Question 1/2 · [■□]\nWhich events and recipients are in scope?", "position": 1},
+      {"answer": {"text": "Order events; unsure about recipients", "resolved": false}, "output": "Follow-up 1 (after Question 1/2) · [■□]\nWhich recipients are relevant?", "position": 1},
+      {"answer": {"text": "The buyer and fulfillment team", "resolved": true}, "output": "Question 2/2 · [■■]\nWhat proves delivery?", "position": 2},
+      {"answer": "integration test", "output": "Execution boundary · standard", "position": 2}
+    ]
+  },
+  {
     "name": "zero-blocker-fast-path",
     "initial_estimate": 0,
     "initial_questions": [],

@@ -10,8 +10,10 @@ CONTRACT_RULES = {
     "zero-blocker fast path": r"If the estimate is zero, skip the interview and continue to the execution boundary\.",
     "one question per turn": r"Ask exactly one blocking question per user turn, then wait for the answer\.",
     "arbitrary-N progress": r"Render the bar with exactly `N` cells: `n` filled `■` cells followed by `N - n` empty `□` cells\.",
-    "stable follow-up denominator": r"Keep the original `N` for planned questions\.",
-    "stable follow-up position": r"Render its bar at the current planned-question position `n`, without advancing `n` or changing `N`\.",
+    "follow-up conditions": r"Treat an incomplete or ambiguous answer, or a newly discovered blocker, as a follow-up labeled `Follow-up k \(after Question n/N\) · \[bar\]`\.",
+    "stable follow-up denominator": r"Keep the original `N`",
+    "unresolved blocker does not advance": r"do not advance `n` or consume the next planned question until the current blocker is resolved\.",
+    "stable follow-up position": r"Render the follow-up bar at position `n`, without changing `N`\.",
     "concise interview output": r"During the interview, include only the current question and context needed to answer it\.",
 }
 
@@ -20,7 +22,9 @@ CONTRACT_CONTRADICTIONS = {
     "zero-blocker fast path": "If the estimate is zero, start the interview.",
     "one question per turn": "Ask multiple blocking questions per user turn.",
     "arbitrary-N progress": "Render the bar with exactly three cells.",
+    "follow-up conditions": "Treat an incomplete answer as the next planned question.",
     "stable follow-up denominator": "Increase `N` for follow-up questions.",
+    "unresolved blocker does not advance": "Advance `n` before the current blocker is resolved.",
     "stable follow-up position": "Advance `n` for follow-up questions.",
     "concise interview output": "During the interview, include all remaining questions.",
 }
@@ -116,6 +120,12 @@ def validate(scenario: dict) -> None:
         if actual_turn["output"].startswith(("Question", "Follow-up")):
             if len(actual_turn["output"].splitlines()) != 2:
                 raise AssertionError(f"turn {index} must contain exactly one question")
+        answer = actual_turn["answer"]
+        if isinstance(answer, dict) and not answer["resolved"]:
+            if not actual_turn["output"].startswith("Follow-up"):
+                raise AssertionError(f"turn {index} must label an unresolved answer as a follow-up")
+            if actual_turn["position"] != actual[index - 2]["position"]:
+                raise AssertionError(f"turn {index} advanced past an unresolved blocker")
 
 
 def main() -> None:
