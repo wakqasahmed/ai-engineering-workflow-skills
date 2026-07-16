@@ -1,0 +1,15 @@
+name: notify-aggregate
+on:
+  push:
+    branches: [main]
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dispatch aggregate sync
+        run: |
+          curl -sf -X POST \
+            -H "Authorization: token ${{ secrets.AGGREGATE_DISPATCH_TOKEN }}" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/wakqasahmed/skills/dispatches \
+            -d '{"event_type":"source-updated","client_payload":{"source":"'"${{ github.repository }}"'","sha":"'"${{ github.sha }}"'"}}'
