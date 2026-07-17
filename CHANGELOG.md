@@ -16,6 +16,7 @@ The goal is transparency over time: what changed, why it changed, and when the w
 
 ### Changed
 
+- `to-prd` now synthesizes conversation and repository context into a concise product-and-engineering spec, reuses the highest existing test seam, publishes to the detected issue tracker, gates `ready-for-agent` on resolved blockers, and hands off cleanly to `decompose-to-issues` (#45)
 - `review-gate` and `subagent-pipeline` now draw an explicit line between mechanical checks (lint, formatting, conventional style, straightforward static analysis — owned by Alibaba Code Review and CI, recorded via `ai-agent-pr-metadata`) and semantic review (requirements compliance, correctness, regressions, security/authorization, contract/integration risk, acceptance-test adequacy — owned by the independent reviewer). The reviewer must read Alibaba Code Review's and CI's output before its own pass and must not repeat resolved mechanical findings; it may revisit one only if it signals an unresolved correctness/security/data-loss/configuration/acceptance-criteria issue. CI remains a hard merge gate and this review does not replace or duplicate it (#31)
 
 - renamed `handoff`/`workflow-handoff` to `handover` and merged in a stricter end-of-session template (chat-only output, running-state and background-process tracking, plan/task/memory sourcing order, anti-patterns); updated all root entrypoint references

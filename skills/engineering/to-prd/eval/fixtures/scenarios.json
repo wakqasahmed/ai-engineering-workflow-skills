@@ -1,0 +1,221 @@
+{
+  "schema_version": 2,
+  "scenarios": [
+    {
+      "name": "well-specified-no-interview",
+      "prompt": "Synthesize the supplied conversation and repository context into a PRD and publish it when ready.",
+      "input": {
+        "conversation": "Add saved checkout addresses for returning customers. Scope and acceptance criteria are settled.",
+        "repository_context": "An existing feature test covers the externally observable checkout flow. GitHub issue publishing is available.",
+        "test_seam": "existing feature test",
+        "blockers": {
+          "product": [],
+          "test_seam": [],
+          "implementation_architecture": [],
+          "publication_access": [],
+          "other": []
+        }
+      },
+      "candidates": [
+        {
+          "name": "publishes-ready-spec",
+          "capture": {
+            "kind": "cold-agent-capture",
+            "model": "gpt-5",
+            "captured_at": "2026-07-17T01:59:08Z",
+            "run_id": "/root/fix_to_prd_47/cold_well_capture"
+          },
+          "expected_valid": true,
+          "expected_errors": [],
+          "output": "Problem\n\nReturning customers must repeatedly enter checkout address details, adding friction and increasing input errors.\n\nGoal and solution\n\nAllow authenticated returning customers to save checkout addresses and reuse them in later checkouts while preserving the existing checkout experience.\n\nPrioritized user stories\n\n1. As a returning customer, I can select a saved address during checkout so I can complete checkout faster.\n2. As a customer, I can save a checkout address for future purchases.\n\nSuccess criteria\n\n- An authenticated customer can save a checkout address.\n- The saved address is available in a later checkout.\n- Selecting it populates the checkout address details correctly.\n- Checkout remains completable with the selected address.\n- Customers without saved addresses retain the existing checkout flow.\n- Saved addresses are isolated to their owning customer.\n\nNon-goals\n\n- Address-book management outside checkout.\n- Sharing addresses between customer accounts.\n- Changes to guest checkout.\n- Redesigning the broader checkout flow.\n\nConstraints\n\n- Preserve existing checkout behavior for guests and customers entering a new address.\n- Reuse the established checkout feature-test seam.\n- Do not expose one customer’s saved addresses to another customer.\n\nOpen product decisions\n\nNone.\n\nImplementation decisions\n\n- Integrate saved-address selection and creation into the existing authenticated checkout flow.\n- Preserve current checkout contracts and observable behavior outside saved-address handling.\n- Scope persisted addresses to the authenticated customer.\n\nTesting decisions\n\nExtend the existing checkout feature test, following its externally observable feature-test pattern. Cover saving an address, reusing it in a later checkout, correct checkout population and completion, ownership isolation, and the unchanged no-saved-address path. No additional manual validation is required.\n\nPublished successfully to the detected GitHub issue tracker. Applied ready-for-agent because publication succeeded and no product, test-seam, implementation, architecture, access, or other blockers remain. Handed the published spec to decompose-to-issues for decomposition."
+        },
+        {
+          "name": "paraphrased-always-interview",
+          "capture": {"kind": "authored-fixture"},
+          "expected_valid": false,
+          "expected_errors": ["redundant-interview", "missing-spec", "not-published", "not-ready"],
+          "output": "Even with the checkout feature test settled, I always interview the requester first. Please walk me through the requirements again?"
+        },
+        {
+          "name": "empty-required-sections",
+          "capture": {"kind": "authored-fixture"},
+          "expected_valid": false,
+          "expected_errors": ["missing-spec"],
+          "output": "Problem\n\nGoal and solution\n\nPrioritized user stories\n\nSuccess criteria\n\nNon-goals\n\nConstraints\n\nOpen product decisions\n\nImplementation decisions\n\nTesting decisions\n\nPublished issue #96 with ready-for-agent. Hand off the published spec to decompose-to-issues."
+        },
+        {
+          "name": "ungrounded-generic-decisions",
+          "capture": {"kind": "authored-fixture"},
+          "expected_valid": false,
+          "expected_errors": ["ungrounded-spec"],
+          "output": "Problem\nUsers need an improvement.\n\nGoal and solution\nProvide the requested improvement.\n\nPrioritized user stories\nA user can use the improvement.\n\nSuccess criteria\nThe improvement works.\n\nNon-goals\nUnrelated changes are excluded.\n\nConstraints\nPreserve current behavior.\n\nOpen product decisions\nNone.\n\nImplementation decisions\nUse the current design.\n\nTesting decisions\nAdd appropriate tests.\n\nPublished issue #97 with ready-for-agent. Hand off the published spec to decompose-to-issues."
+        }
+      ]
+    },
+    {
+      "name": "genuinely-unresolved-test-seam",
+      "prompt": "Synthesize the supplied request into a PRD and publish it when ready.",
+      "input": {
+        "conversation": "Expose order status to signed-in customers. Product behavior is fully specified.",
+        "repository_context": "Both an API contract suite and browser suite cover order status, with no project decision selecting the authoritative seam.",
+        "test_seam": null,
+        "blockers": {
+          "product": [],
+          "test_seam": ["Choose whether the API contract or browser flow is the authoritative test seam."],
+          "implementation_architecture": [],
+          "publication_access": [],
+          "other": []
+        }
+      },
+      "candidates": [
+        {
+          "name": "asks-one-seam-question-and-pauses",
+          "capture": {
+            "kind": "cold-agent-capture",
+            "model": "gpt-5",
+            "captured_at": "2026-07-17T01:59:08Z",
+            "run_id": "/root/fix_to_prd_47/cold_seam_capture"
+          },
+          "expected_valid": true,
+          "expected_errors": [],
+          "output": "Which existing test seam should be authoritative for proving order-status behavior: the API contract suite or the signed-in customer browser flow?"
+        },
+        {
+          "name": "asks-unrelated-question-and-repeats-seam",
+          "capture": {"kind": "authored-fixture"},
+          "expected_valid": false,
+          "expected_errors": ["invalid-seam-confirmation"],
+          "output": "What color should the icon be? The API contract or browser flow remains the authoritative test seam choice. I’ll wait before drafting or publishing."
+        }
+      ]
+    },
+    {
+      "name": "blocked-product-decision-not-ready",
+      "prompt": "Synthesize and publish the PRD while preserving unresolved decisions.",
+      "input": {
+        "conversation": "Add automatic deletion for inactive accounts; the retention duration has not been chosen.",
+        "repository_context": "An existing integration test covers account deletion. Issue publishing is available.",
+        "test_seam": "existing integration test",
+        "blockers": {
+          "product": ["Product owner must choose the retention period."],
+          "test_seam": [],
+          "implementation_architecture": [],
+          "publication_access": [],
+          "other": []
+        }
+      },
+      "candidates": [
+        {
+          "name": "publishes-blocked-spec",
+          "capture": {"kind": "authored-fixture"},
+          "expected_valid": true,
+          "expected_errors": [],
+          "output": "Problem\nInactive accounts require a defined deletion policy.\n\nGoal and solution\nAutomatically delete eligible inactive accounts after the approved retention period.\n\nPrioritized user stories\nAn operator can rely on the approved retention policy.\n\nSuccess criteria\nEligible accounts are deleted only after the chosen duration.\n\nNon-goals\nChanging authentication is excluded.\n\nConstraints\nDeletion must follow the approved policy.\n\nOpen product decisions\nBlocker — Product owner must choose the retention period.\n\nImplementation decisions\nUse the existing account lifecycle boundary.\n\nTesting decisions\nExtend the existing integration test for observable deletion behavior.\n\nPublished issue #92 without ready-for-agent. It was not marked or labeled ready-for-agent; the readiness label was withheld and not applied."
+        },
+        {
+          "name": "paraphrased-ready-despite-product-blocker",
+          "capture": {"kind": "authored-fixture"},
+          "expected_valid": false,
+          "expected_errors": ["ready-with-blockers", "unreported-blocker"],
+          "output": "The retention choice can wait; I tagged issue #92 as implementation-ready and sent it to decomposition."
+        },
+        {
+          "name": "actual-ready-label-despite-product-blocker",
+          "capture": {"kind": "authored-fixture"},
+          "expected_valid": false,
+          "expected_errors": ["ready-with-blockers"],
+          "output": "Problem\nInactive accounts require a defined deletion policy.\n\nGoal and solution\nAutomatically delete eligible inactive accounts after the approved retention period.\n\nPrioritized user stories\nAn operator can rely on the approved retention policy.\n\nSuccess criteria\nEligible accounts are deleted only after the chosen duration.\n\nNon-goals\nChanging authentication is excluded.\n\nConstraints\nDeletion must follow the approved policy.\n\nOpen product decisions\nBlocker — Product owner must choose the retention period.\n\nImplementation decisions\nUse the existing account lifecycle boundary.\n\nTesting decisions\nExtend the existing integration test for observable deletion behavior.\n\nPublished issue #95 with ready-for-agent applied."
+        },
+        {
+          "name": "simple-negated-readiness",
+          "capture": {"kind": "authored-fixture"},
+          "expected_valid": true,
+          "expected_errors": [],
+          "output": "Problem\nInactive accounts require a defined deletion policy.\n\nGoal and solution\nAutomatically delete eligible inactive accounts after the approved retention period.\n\nPrioritized user stories\nAn operator can rely on the approved retention policy.\n\nSuccess criteria\nEligible accounts are deleted only after the chosen duration.\n\nNon-goals\nChanging authentication is excluded.\n\nConstraints\nDeletion must follow the approved policy.\n\nOpen product decisions\nBlocker — Product owner must choose the retention period.\n\nImplementation decisions\nUse the existing account lifecycle boundary.\n\nTesting decisions\nExtend the existing integration test for observable deletion behavior.\n\nPublished issue #98. It is not ready-for-agent."
+        },
+        {
+          "name": "natural-positive-readiness",
+          "capture": {"kind": "authored-fixture"},
+          "expected_valid": false,
+          "expected_errors": ["ready-with-blockers"],
+          "output": "Problem\nInactive accounts require a defined deletion policy.\n\nGoal and solution\nAutomatically delete eligible inactive accounts after the approved retention period.\n\nPrioritized user stories\nAn operator can rely on the approved retention policy.\n\nSuccess criteria\nEligible accounts are deleted only after the chosen duration.\n\nNon-goals\nChanging authentication is excluded.\n\nConstraints\nDeletion must follow the approved policy.\n\nOpen product decisions\nBlocker — Product owner must choose the retention period.\n\nImplementation decisions\nUse the existing account lifecycle boundary.\n\nTesting decisions\nExtend the existing integration test for observable deletion behavior.\n\nPublished issue #99. This issue is ready for an agent."
+        }
+      ]
+    },
+    {
+      "name": "blocked-architecture-decision-not-ready",
+      "prompt": "Synthesize and publish the PRD while preserving unresolved decisions.",
+      "input": {
+        "conversation": "Add organization-wide audit export. Product behavior is settled.",
+        "repository_context": "The repository has equally established synchronous and queued export boundaries. Issue publishing is available.",
+        "test_seam": "existing end-to-end export test",
+        "blockers": {
+          "product": [],
+          "test_seam": [],
+          "implementation_architecture": ["Architecture owner must choose synchronous or queued export delivery."],
+          "publication_access": [],
+          "other": []
+        }
+      },
+      "candidates": [
+        {
+          "name": "publishes-architecture-blocker",
+          "capture": {"kind": "authored-fixture"},
+          "expected_valid": true,
+          "expected_errors": [],
+          "output": "Problem\nOrganizations need a complete audit export.\n\nGoal and solution\nAuthorized operators receive an audit export.\n\nPrioritized user stories\nAn organization owner can request the export.\n\nSuccess criteria\nThe export contains the authorized audit records.\n\nNon-goals\nChanging audit retention is excluded.\n\nConstraints\nPreserve authorization boundaries.\n\nOpen product decisions\nNone.\n\nImplementation decisions\nBlocker — Architecture owner must choose synchronous or queued export delivery.\n\nTesting decisions\nReuse the existing end-to-end export test.\n\nPublished issue #93 without a readiness label."
+        }
+      ]
+    },
+    {
+      "name": "publishing-access-blocked",
+      "prompt": "Synthesize the supplied request into a PRD and publish it when ready.",
+      "input": {
+        "conversation": "Show customers an order-history export. All product and testing decisions are settled.",
+        "repository_context": "An existing contract test covers exports, but issue-tracker credentials are unavailable.",
+        "test_seam": "existing contract test",
+        "blockers": {
+          "product": [],
+          "test_seam": [],
+          "implementation_architecture": [],
+          "publication_access": ["Issue-tracker publishing access is unavailable."],
+          "other": []
+        }
+      },
+      "candidates": [
+        {
+          "name": "returns-spec-with-publishing-blocker",
+          "capture": {"kind": "authored-fixture"},
+          "expected_valid": true,
+          "expected_errors": [],
+          "output": "Problem\nCustomers cannot export order history.\n\nGoal and solution\nCustomers can request an order-history export.\n\nPrioritized user stories\nA customer can retrieve their own order history.\n\nSuccess criteria\nThe export contains the customer’s orders.\n\nNon-goals\nOrganization-wide exports are excluded.\n\nConstraints\nPreserve tenant isolation.\n\nOpen product decisions\nNone.\n\nImplementation decisions\nReuse the export boundary.\n\nTesting decisions\nReuse the existing contract test.\n\nBlocker — Issue-tracker publishing access is unavailable. The finished spec is returned without publication, readiness, or decomposition handoff."
+        }
+      ]
+    },
+    {
+      "name": "combined-adversarial-contradiction",
+      "prompt": "Synthesize and publish the PRD only when all blockers are resolved.",
+      "input": {
+        "conversation": "Add regional invoice delivery. Several ownership decisions remain unresolved.",
+        "repository_context": "The feature test seam is settled, but issue publishing access is unavailable.",
+        "test_seam": "existing feature test",
+        "blockers": {
+          "product": ["Product owner must choose supported regions."],
+          "test_seam": [],
+          "implementation_architecture": ["Architecture owner must choose the delivery boundary."],
+          "publication_access": ["Issue-tracker publishing access is unavailable."],
+          "other": ["Legal owner must approve invoice retention wording."]
+        }
+      },
+      "candidates": [
+        {
+          "name": "reviewer-combined-contradiction",
+          "capture": {"kind": "authored-fixture"},
+          "expected_valid": false,
+          "expected_errors": ["redundant-interview", "volatile-path", "ready-with-blockers", "publication-without-access", "unreported-blocker"],
+          "output": "I always begin with another requirements interview even though the seam is settled. Please explain the requirements again? Then edit src/features/invoices/handler.ts. I published issue #94, applied ready-for-agent, and sent it to decomposition; the remaining choices can wait."
+        }
+      ]
+    }
+  ]
+}
