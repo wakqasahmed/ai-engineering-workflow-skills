@@ -79,7 +79,7 @@
           "capture": {"kind": "authored-fixture"},
           "expected_valid": true,
           "expected_errors": [],
-          "output": "Problem\nInactive accounts require a defined deletion policy.\n\nGoal and solution\nAutomatically delete eligible inactive accounts after the approved retention period.\n\nPrioritized user stories\nAn operator can rely on the approved retention policy.\n\nSuccess criteria\nEligible accounts are deleted only after the chosen duration.\n\nNon-goals\nChanging authentication is excluded.\n\nConstraints\nDeletion must follow the approved policy.\n\nOpen product decisions\nBlocker — Product owner must choose the retention period.\n\nImplementation decisions\nUse the existing account lifecycle boundary.\n\nTesting decisions\nExtend the existing integration test for observable deletion behavior.\n\nPublished issue #92 without a readiness label."
+          "output": "Problem\nInactive accounts require a defined deletion policy.\n\nGoal and solution\nAutomatically delete eligible inactive accounts after the approved retention period.\n\nPrioritized user stories\nAn operator can rely on the approved retention policy.\n\nSuccess criteria\nEligible accounts are deleted only after the chosen duration.\n\nNon-goals\nChanging authentication is excluded.\n\nConstraints\nDeletion must follow the approved policy.\n\nOpen product decisions\nBlocker — Product owner must choose the retention period.\n\nImplementation decisions\nUse the existing account lifecycle boundary.\n\nTesting decisions\nExtend the existing integration test for observable deletion behavior.\n\nPublished issue #92 without ready-for-agent. It was not marked or labeled ready-for-agent; the readiness label was withheld and not applied."
         },
         {
           "name": "paraphrased-ready-despite-product-blocker",
@@ -87,6 +87,13 @@
           "expected_valid": false,
           "expected_errors": ["ready-with-blockers", "unreported-blocker"],
           "output": "The retention choice can wait; I tagged issue #92 as implementation-ready and sent it to decomposition."
+        },
+        {
+          "name": "actual-ready-label-despite-product-blocker",
+          "capture": {"kind": "authored-fixture"},
+          "expected_valid": false,
+          "expected_errors": ["ready-with-blockers"],
+          "output": "Problem\nInactive accounts require a defined deletion policy.\n\nGoal and solution\nAutomatically delete eligible inactive accounts after the approved retention period.\n\nPrioritized user stories\nAn operator can rely on the approved retention policy.\n\nSuccess criteria\nEligible accounts are deleted only after the chosen duration.\n\nNon-goals\nChanging authentication is excluded.\n\nConstraints\nDeletion must follow the approved policy.\n\nOpen product decisions\nBlocker — Product owner must choose the retention period.\n\nImplementation decisions\nUse the existing account lifecycle boundary.\n\nTesting decisions\nExtend the existing integration test for observable deletion behavior.\n\nPublished issue #95 with ready-for-agent applied."
         }
       ]
     },

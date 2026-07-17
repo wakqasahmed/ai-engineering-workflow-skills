@@ -96,7 +96,15 @@ REDUNDANT_INTERVIEW = re.compile(
     re.IGNORECASE,
 )
 READY_CLAIM = re.compile(
-    r"\bready-for-agent\b|\bimplementation-ready\b|\b(?:marked|labelled|labeled|tagged)\b.{0,30}\bready\b",
+    r"\bready-for-agent\b|\bimplementation-ready\b|\b(?:marked|labelled|labeled|tagged)\b.{0,30}\bready\b|"
+    r"\breadiness\s+label\s+(?:was\s+)?applied\b",
+    re.IGNORECASE,
+)
+NEGATED_READY_CLAIM = re.compile(
+    r"\bwithout\s+(?:(?:the|a)\s+)?ready-for-agent(?:\s+label)?\b|"
+    r"\bnot\s+(?:marked|labelled|labeled)(?:\s+or\s+(?:marked|labelled|labeled))?\s+"
+    r"(?:as\s+)?ready-for-agent\b|"
+    r"\breadiness\s+label\s+(?:was\s+)?(?:withheld(?:\s+and\s+not\s+applied)?|not\s+applied)\b",
     re.IGNORECASE,
 )
 PUBLISHED_CLAIM = re.compile(
@@ -120,6 +128,11 @@ def blocker_is_reported(blocker: str, output: str) -> bool:
     return required_matches > 0 and sum(word in output.lower() for word in words) >= required_matches
 
 
+def claims_readiness(output: str) -> bool:
+    positive_claims = NEGATED_READY_CLAIM.sub("", output)
+    return bool(READY_CLAIM.search(positive_claims))
+
+
 def candidate_errors(scenario_input: dict, output: str) -> list[str]:
     errors = []
     blockers = scenario_input["blockers"]
@@ -128,7 +141,7 @@ def candidate_errors(scenario_input: dict, output: str) -> list[str]:
     publication_blockers = blockers["publication_access"]
     question_count = output.count("?")
     has_spec = all(re.search(rf"^{re.escape(section)}$", output, re.MULTILINE) for section in REQUIRED_SECTIONS)
-    claims_ready = bool(READY_CLAIM.search(output))
+    claims_ready = claims_readiness(output)
     claims_published = bool(PUBLISHED_CLAIM.search(output))
     claims_handoff = bool(HANDOFF_CLAIM.search(output))
 
