@@ -10,6 +10,7 @@
     "./skills/engineering/subagent-pipeline",
     "./skills/engineering/hitl-blocker",
     "./skills/engineering/release-gate",
+    "./skills/engineering/changesets-release",
     "./skills/product/roast",
     "./skills/productivity/handover"
   ]
