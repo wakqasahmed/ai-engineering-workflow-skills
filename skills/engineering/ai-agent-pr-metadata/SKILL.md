@@ -9,8 +9,7 @@ Use this when a repository needs traceable AI assistance metadata in GitHub whil
 
 ## Rules
 
-- Keep commit messages free of AI co-author lines and AI attribution.
-- Put agent details in PR bodies, PR comments, and PR review bodies only.
+- Commit attribution follows `system-level/core.md` (Git: no AI co-author metadata unless explicitly required). This skill governs where the traceable detail goes instead: PR bodies, PR comments, and PR review bodies only.
 - Never guess the model name. Read it from workflow vars, orchestration config, or an explicit user-provided value.
 - Include a run URL when the work was produced by GitHub Actions or another traceable runner.
 
