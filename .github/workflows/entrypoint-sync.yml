@@ -29,3 +29,6 @@ jobs:
       - name: Run clarify-work behavioral eval
         shell: bash
         run: skills/engineering/clarify-work/eval/run-eval.sh
+      - name: Run to-prd behavioral eval
+        shell: bash
+        run: skills/engineering/to-prd/eval/run-eval.sh

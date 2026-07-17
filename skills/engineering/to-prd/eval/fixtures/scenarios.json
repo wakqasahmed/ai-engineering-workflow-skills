@@ -1,0 +1,148 @@
+[
+  {
+    "name": "well-specified-no-interview",
+    "context": {
+      "test_seam": "existing feature test",
+      "blocking_product_decisions": [],
+      "tracker_available": true,
+      "publishing_access": true
+    },
+    "candidates": [
+      {
+        "name": "publishes-ready-spec",
+        "expected_valid": true,
+        "output": "Published the synthesized spec as issue #91 and marked it ready for decomposition.",
+        "questions": [],
+        "drafted": true,
+        "published": true,
+        "ready_for_agent": true,
+        "blockers_reported": [],
+        "includes_required_sections": true,
+        "includes_volatile_paths": false,
+        "handoff_to_decompose": true
+      },
+      {
+        "name": "paraphrased-always-interview",
+        "expected_valid": false,
+        "output": "Even though the feature test is settled, I always interview the requester before producing a PRD.",
+        "questions": ["Please walk me through the requirements again."],
+        "drafted": false,
+        "published": false,
+        "ready_for_agent": false,
+        "blockers_reported": [],
+        "includes_required_sections": false,
+        "includes_volatile_paths": false,
+        "handoff_to_decompose": false
+      }
+    ]
+  },
+  {
+    "name": "genuinely-unresolved-test-seam",
+    "context": {
+      "test_seam": null,
+      "blocking_product_decisions": [],
+      "tracker_available": true,
+      "publishing_access": true
+    },
+    "candidates": [
+      {
+        "name": "asks-one-seam-question-and-pauses",
+        "expected_valid": true,
+        "output": "One test decision is unresolved: should the observable behavior be proven at the API or browser seam?",
+        "questions": ["Should the observable behavior be proven at the existing API or browser seam?"],
+        "drafted": false,
+        "published": false,
+        "ready_for_agent": false,
+        "blockers_reported": [],
+        "includes_required_sections": false,
+        "includes_volatile_paths": false,
+        "handoff_to_decompose": false
+      }
+    ]
+  },
+  {
+    "name": "blocked-product-decision-not-ready",
+    "context": {
+      "test_seam": "existing integration test",
+      "blocking_product_decisions": ["Product owner must choose the retention period."],
+      "tracker_available": true,
+      "publishing_access": true
+    },
+    "candidates": [
+      {
+        "name": "publishes-blocked-spec",
+        "expected_valid": true,
+        "output": "Published the spec without a readiness label and named the product owner as owner of the retention blocker.",
+        "questions": [],
+        "drafted": true,
+        "published": true,
+        "ready_for_agent": false,
+        "blockers_reported": ["Product owner must choose the retention period."],
+        "includes_required_sections": true,
+        "includes_volatile_paths": false,
+        "handoff_to_decompose": false
+      },
+      {
+        "name": "paraphrased-ready-despite-blocker",
+        "expected_valid": false,
+        "output": "The retention choice can wait; I tagged the issue as implementation-ready now.",
+        "questions": [],
+        "drafted": true,
+        "published": true,
+        "ready_for_agent": true,
+        "blockers_reported": ["Product owner must choose the retention period."],
+        "includes_required_sections": true,
+        "includes_volatile_paths": false,
+        "handoff_to_decompose": true
+      }
+    ]
+  },
+  {
+    "name": "publishing-access-blocked",
+    "context": {
+      "test_seam": "existing contract test",
+      "blocking_product_decisions": [],
+      "tracker_available": true,
+      "publishing_access": false
+    },
+    "candidates": [
+      {
+        "name": "returns-spec-with-publishing-blocker",
+        "expected_valid": true,
+        "output": "The spec is complete, but publishing access is unavailable, so it is not labeled ready or handed to decomposition.",
+        "questions": [],
+        "drafted": true,
+        "published": false,
+        "ready_for_agent": false,
+        "blockers_reported": ["Publishing access is unavailable."],
+        "includes_required_sections": true,
+        "includes_volatile_paths": false,
+        "handoff_to_decompose": false
+      }
+    ]
+  },
+  {
+    "name": "volatile-path-output",
+    "context": {
+      "test_seam": "existing feature test",
+      "blocking_product_decisions": [],
+      "tracker_available": true,
+      "publishing_access": true
+    },
+    "candidates": [
+      {
+        "name": "rejects-file-path-plan",
+        "expected_valid": false,
+        "output": "The implementation decision names src/features/orders/handler.ts as the file to edit.",
+        "questions": [],
+        "drafted": true,
+        "published": true,
+        "ready_for_agent": true,
+        "blockers_reported": [],
+        "includes_required_sections": true,
+        "includes_volatile_paths": true,
+        "handoff_to_decompose": true
+      }
+    ]
+  }
+]
