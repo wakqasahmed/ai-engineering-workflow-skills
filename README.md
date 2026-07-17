@@ -25,7 +25,7 @@ This repository is descriptive first for humans adopting the workflow. Its agent
 
 Skills live under `skills/<category>/<skill-name>/`. Three categories exist today:
 
-- `skills/engineering/`: skills that operate directly on the delivery pipeline — issues, PRs, code, tests, review, and release (`ai-agent-pr-metadata`, `clarify-work`, `decompose-to-issues`, `define-done`, `hitl-blocker`, `release-gate`, `review-gate`, `subagent-pipeline`).
+- `skills/engineering/`: skills that operate directly on the delivery pipeline — issues, PRs, code, tests, review, and release (`ai-agent-pr-metadata`, `changesets-release`, `clarify-work`, `decompose-to-issues`, `define-done`, `hitl-blocker`, `release-gate`, `review-gate`, `subagent-pipeline`).
 - `skills/product/`: skills that validate or shape what to build, independent of any specific implementation (`roast`).
 - `skills/productivity/`: skills that manage the agent's own working session rather than the codebase (`handover`).
 
