@@ -2,6 +2,7 @@
   "name": "ai-engineering-workflow-skills",
   "skills": [
     "./skills/engineering/clarify-work",
+    "./skills/engineering/to-prd",
     "./skills/engineering/decompose-to-issues",
     "./skills/engineering/define-done",
     "./skills/engineering/review-gate",
