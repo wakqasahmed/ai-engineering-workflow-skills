@@ -1,148 +1,169 @@
-[
-  {
-    "name": "well-specified-no-interview",
-    "context": {
-      "test_seam": "existing feature test",
-      "blocking_product_decisions": [],
-      "tracker_available": true,
-      "publishing_access": true
-    },
-    "candidates": [
-      {
-        "name": "publishes-ready-spec",
-        "expected_valid": true,
-        "output": "Published the synthesized spec as issue #91 and marked it ready for decomposition.",
-        "questions": [],
-        "drafted": true,
-        "published": true,
-        "ready_for_agent": true,
-        "blockers_reported": [],
-        "includes_required_sections": true,
-        "includes_volatile_paths": false,
-        "handoff_to_decompose": true
+{
+  "schema_version": 2,
+  "scenarios": [
+    {
+      "name": "well-specified-no-interview",
+      "prompt": "Synthesize the supplied conversation and repository context into a PRD and publish it when ready.",
+      "input": {
+        "conversation": "Add saved checkout addresses for returning customers. Scope and acceptance criteria are settled.",
+        "repository_context": "An existing feature test covers the externally observable checkout flow. GitHub issue publishing is available.",
+        "test_seam": "existing feature test",
+        "blockers": {
+          "product": [],
+          "test_seam": [],
+          "implementation_architecture": [],
+          "publication_access": [],
+          "other": []
+        }
       },
-      {
-        "name": "paraphrased-always-interview",
-        "expected_valid": false,
-        "output": "Even though the feature test is settled, I always interview the requester before producing a PRD.",
-        "questions": ["Please walk me through the requirements again."],
-        "drafted": false,
-        "published": false,
-        "ready_for_agent": false,
-        "blockers_reported": [],
-        "includes_required_sections": false,
-        "includes_volatile_paths": false,
-        "handoff_to_decompose": false
-      }
-    ]
-  },
-  {
-    "name": "genuinely-unresolved-test-seam",
-    "context": {
-      "test_seam": null,
-      "blocking_product_decisions": [],
-      "tracker_available": true,
-      "publishing_access": true
+      "candidates": [
+        {
+          "name": "publishes-ready-spec",
+          "capture": {"kind": "authored-fixture"},
+          "expected_valid": true,
+          "expected_errors": [],
+          "output": "Problem\nReturning customers must repeatedly enter checkout addresses.\n\nGoal and solution\nCustomers can select a saved address during checkout.\n\nPrioritized user stories\nA returning customer can reuse a saved address.\n\nSuccess criteria\nThe checkout flow accepts a previously saved address.\n\nNon-goals\nAddress-book sharing is excluded.\n\nConstraints\nPreserve the existing checkout contract.\n\nOpen product decisions\nNone.\n\nImplementation decisions\nReuse the existing address domain boundary.\n\nTesting decisions\nExtend the existing feature test around observable checkout behavior.\n\nPublished issue #91 with ready-for-agent. Hand off the published spec to decompose-to-issues."
+        },
+        {
+          "name": "paraphrased-always-interview",
+          "capture": {"kind": "authored-fixture"},
+          "expected_valid": false,
+          "expected_errors": ["redundant-interview", "missing-spec", "not-published", "not-ready"],
+          "output": "Even with the checkout feature test settled, I always interview the requester first. Please walk me through the requirements again?"
+        }
+      ]
     },
-    "candidates": [
-      {
-        "name": "asks-one-seam-question-and-pauses",
-        "expected_valid": true,
-        "output": "One test decision is unresolved: should the observable behavior be proven at the API or browser seam?",
-        "questions": ["Should the observable behavior be proven at the existing API or browser seam?"],
-        "drafted": false,
-        "published": false,
-        "ready_for_agent": false,
-        "blockers_reported": [],
-        "includes_required_sections": false,
-        "includes_volatile_paths": false,
-        "handoff_to_decompose": false
-      }
-    ]
-  },
-  {
-    "name": "blocked-product-decision-not-ready",
-    "context": {
-      "test_seam": "existing integration test",
-      "blocking_product_decisions": ["Product owner must choose the retention period."],
-      "tracker_available": true,
-      "publishing_access": true
-    },
-    "candidates": [
-      {
-        "name": "publishes-blocked-spec",
-        "expected_valid": true,
-        "output": "Published the spec without a readiness label and named the product owner as owner of the retention blocker.",
-        "questions": [],
-        "drafted": true,
-        "published": true,
-        "ready_for_agent": false,
-        "blockers_reported": ["Product owner must choose the retention period."],
-        "includes_required_sections": true,
-        "includes_volatile_paths": false,
-        "handoff_to_decompose": false
+    {
+      "name": "genuinely-unresolved-test-seam",
+      "prompt": "Synthesize the supplied request into a PRD and publish it when ready.",
+      "input": {
+        "conversation": "Expose order status to signed-in customers. Product behavior is fully specified.",
+        "repository_context": "Both an API contract suite and browser suite cover order status, with no project decision selecting the authoritative seam.",
+        "test_seam": null,
+        "blockers": {
+          "product": [],
+          "test_seam": ["Choose whether the API contract or browser flow is the authoritative test seam."],
+          "implementation_architecture": [],
+          "publication_access": [],
+          "other": []
+        }
       },
-      {
-        "name": "paraphrased-ready-despite-blocker",
-        "expected_valid": false,
-        "output": "The retention choice can wait; I tagged the issue as implementation-ready now.",
-        "questions": [],
-        "drafted": true,
-        "published": true,
-        "ready_for_agent": true,
-        "blockers_reported": ["Product owner must choose the retention period."],
-        "includes_required_sections": true,
-        "includes_volatile_paths": false,
-        "handoff_to_decompose": true
-      }
-    ]
-  },
-  {
-    "name": "publishing-access-blocked",
-    "context": {
-      "test_seam": "existing contract test",
-      "blocking_product_decisions": [],
-      "tracker_available": true,
-      "publishing_access": false
+      "candidates": [
+        {
+          "name": "asks-one-seam-question-and-pauses",
+          "capture": {"kind": "authored-fixture"},
+          "expected_valid": true,
+          "expected_errors": [],
+          "output": "One testing decision remains unresolved: should the observable order-status behavior be proven at the existing API contract or browser seam? I’ll wait for that answer before drafting or publishing."
+        }
+      ]
     },
-    "candidates": [
-      {
-        "name": "returns-spec-with-publishing-blocker",
-        "expected_valid": true,
-        "output": "The spec is complete, but publishing access is unavailable, so it is not labeled ready or handed to decomposition.",
-        "questions": [],
-        "drafted": true,
-        "published": false,
-        "ready_for_agent": false,
-        "blockers_reported": ["Publishing access is unavailable."],
-        "includes_required_sections": true,
-        "includes_volatile_paths": false,
-        "handoff_to_decompose": false
-      }
-    ]
-  },
-  {
-    "name": "volatile-path-output",
-    "context": {
-      "test_seam": "existing feature test",
-      "blocking_product_decisions": [],
-      "tracker_available": true,
-      "publishing_access": true
+    {
+      "name": "blocked-product-decision-not-ready",
+      "prompt": "Synthesize and publish the PRD while preserving unresolved decisions.",
+      "input": {
+        "conversation": "Add automatic deletion for inactive accounts; the retention duration has not been chosen.",
+        "repository_context": "An existing integration test covers account deletion. Issue publishing is available.",
+        "test_seam": "existing integration test",
+        "blockers": {
+          "product": ["Product owner must choose the retention period."],
+          "test_seam": [],
+          "implementation_architecture": [],
+          "publication_access": [],
+          "other": []
+        }
+      },
+      "candidates": [
+        {
+          "name": "publishes-blocked-spec",
+          "capture": {"kind": "authored-fixture"},
+          "expected_valid": true,
+          "expected_errors": [],
+          "output": "Problem\nInactive accounts require a defined deletion policy.\n\nGoal and solution\nAutomatically delete eligible inactive accounts after the approved retention period.\n\nPrioritized user stories\nAn operator can rely on the approved retention policy.\n\nSuccess criteria\nEligible accounts are deleted only after the chosen duration.\n\nNon-goals\nChanging authentication is excluded.\n\nConstraints\nDeletion must follow the approved policy.\n\nOpen product decisions\nBlocker — Product owner must choose the retention period.\n\nImplementation decisions\nUse the existing account lifecycle boundary.\n\nTesting decisions\nExtend the existing integration test for observable deletion behavior.\n\nPublished issue #92 without a readiness label."
+        },
+        {
+          "name": "paraphrased-ready-despite-product-blocker",
+          "capture": {"kind": "authored-fixture"},
+          "expected_valid": false,
+          "expected_errors": ["ready-with-blockers", "unreported-blocker"],
+          "output": "The retention choice can wait; I tagged issue #92 as implementation-ready and sent it to decomposition."
+        }
+      ]
     },
-    "candidates": [
-      {
-        "name": "rejects-file-path-plan",
-        "expected_valid": false,
-        "output": "The implementation decision names src/features/orders/handler.ts as the file to edit.",
-        "questions": [],
-        "drafted": true,
-        "published": true,
-        "ready_for_agent": true,
-        "blockers_reported": [],
-        "includes_required_sections": true,
-        "includes_volatile_paths": true,
-        "handoff_to_decompose": true
-      }
-    ]
-  }
-]
+    {
+      "name": "blocked-architecture-decision-not-ready",
+      "prompt": "Synthesize and publish the PRD while preserving unresolved decisions.",
+      "input": {
+        "conversation": "Add organization-wide audit export. Product behavior is settled.",
+        "repository_context": "The repository has equally established synchronous and queued export boundaries. Issue publishing is available.",
+        "test_seam": "existing end-to-end export test",
+        "blockers": {
+          "product": [],
+          "test_seam": [],
+          "implementation_architecture": ["Architecture owner must choose synchronous or queued export delivery."],
+          "publication_access": [],
+          "other": []
+        }
+      },
+      "candidates": [
+        {
+          "name": "publishes-architecture-blocker",
+          "capture": {"kind": "authored-fixture"},
+          "expected_valid": true,
+          "expected_errors": [],
+          "output": "Problem\nOrganizations need a complete audit export.\n\nGoal and solution\nAuthorized operators receive an audit export.\n\nPrioritized user stories\nAn organization owner can request the export.\n\nSuccess criteria\nThe export contains the authorized audit records.\n\nNon-goals\nChanging audit retention is excluded.\n\nConstraints\nPreserve authorization boundaries.\n\nOpen product decisions\nNone.\n\nImplementation decisions\nBlocker — Architecture owner must choose synchronous or queued export delivery.\n\nTesting decisions\nReuse the existing end-to-end export test.\n\nPublished issue #93 without a readiness label."
+        }
+      ]
+    },
+    {
+      "name": "publishing-access-blocked",
+      "prompt": "Synthesize the supplied request into a PRD and publish it when ready.",
+      "input": {
+        "conversation": "Show customers an order-history export. All product and testing decisions are settled.",
+        "repository_context": "An existing contract test covers exports, but issue-tracker credentials are unavailable.",
+        "test_seam": "existing contract test",
+        "blockers": {
+          "product": [],
+          "test_seam": [],
+          "implementation_architecture": [],
+          "publication_access": ["Issue-tracker publishing access is unavailable."],
+          "other": []
+        }
+      },
+      "candidates": [
+        {
+          "name": "returns-spec-with-publishing-blocker",
+          "capture": {"kind": "authored-fixture"},
+          "expected_valid": true,
+          "expected_errors": [],
+          "output": "Problem\nCustomers cannot export order history.\n\nGoal and solution\nCustomers can request an order-history export.\n\nPrioritized user stories\nA customer can retrieve their own order history.\n\nSuccess criteria\nThe export contains the customer’s orders.\n\nNon-goals\nOrganization-wide exports are excluded.\n\nConstraints\nPreserve tenant isolation.\n\nOpen product decisions\nNone.\n\nImplementation decisions\nReuse the export boundary.\n\nTesting decisions\nReuse the existing contract test.\n\nBlocker — Issue-tracker publishing access is unavailable. The finished spec is returned without publication, readiness, or decomposition handoff."
+        }
+      ]
+    },
+    {
+      "name": "combined-adversarial-contradiction",
+      "prompt": "Synthesize and publish the PRD only when all blockers are resolved.",
+      "input": {
+        "conversation": "Add regional invoice delivery. Several ownership decisions remain unresolved.",
+        "repository_context": "The feature test seam is settled, but issue publishing access is unavailable.",
+        "test_seam": "existing feature test",
+        "blockers": {
+          "product": ["Product owner must choose supported regions."],
+          "test_seam": [],
+          "implementation_architecture": ["Architecture owner must choose the delivery boundary."],
+          "publication_access": ["Issue-tracker publishing access is unavailable."],
+          "other": ["Legal owner must approve invoice retention wording."]
+        }
+      },
+      "candidates": [
+        {
+          "name": "reviewer-combined-contradiction",
+          "capture": {"kind": "authored-fixture"},
+          "expected_valid": false,
+          "expected_errors": ["redundant-interview", "volatile-path", "ready-with-blockers", "publication-without-access", "unreported-blocker"],
+          "output": "I always begin with another requirements interview even though the seam is settled. Please explain the requirements again? Then edit src/features/invoices/handler.ts. I published issue #94, applied ready-for-agent, and sent it to decomposition; the remaining choices can wait."
+        }
+      ]
+    }
+  ]
+}

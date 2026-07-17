@@ -16,8 +16,8 @@ CONTRACT_RULES = {
     "no volatile paths": r"Exclude volatile file paths and code snippets\.",
     "prototype exception": r"Include a prototype artifact only when it records a decision more clearly than prose",
     "publish issue": r"Publish the spec to the detected project issue tracker\.",
-    "readiness gate": r"Apply `ready-for-agent` only when no blocking product decisions remain",
-    "product decisions stay blocking": r"Unresolved product decisions remain explicit blockers",
+    "readiness gate": r"Apply `ready-for-agent` only after every blocker is resolved",
+    "all blocker categories": r"Product, test-seam, implementation or architecture, publication or access, and other blockers all prevent readiness",
     "decomposition handoff": r"Hand the published spec to `decompose-to-issues`; do not turn the PRD into an issue breakdown\.",
 }
 
@@ -32,8 +32,8 @@ CONTRACT_CONTRADICTIONS = {
     "no volatile paths": "Include specific file paths in implementation decisions.",
     "prototype exception": "Include complete prototype code whether or not it records a decision.",
     "publish issue": "Leave the spec only in the conversation.",
-    "readiness gate": "Apply `ready-for-agent` while blocking product decisions remain.",
-    "product decisions stay blocking": "Treat unresolved product decisions as non-blocking implementation details.",
+    "readiness gate": "Apply `ready-for-agent` while any blocker remains.",
+    "all blocker categories": "Treat architecture and publishing blockers as non-blocking implementation details.",
     "decomposition handoff": "Break the PRD into implementation issues in this skill.",
 }
 
@@ -69,63 +69,138 @@ def mutation_check(skill_text: str) -> None:
         raise AssertionError(f"contradicting skill rule did not fail validation: {name}")
 
 
-def candidate_errors(context: dict, candidate: dict) -> list[str]:
+BLOCKER_CATEGORIES = {
+    "product",
+    "test_seam",
+    "implementation_architecture",
+    "publication_access",
+    "other",
+}
+REQUIRED_SECTIONS = [
+    "Problem",
+    "Goal and solution",
+    "Prioritized user stories",
+    "Success criteria",
+    "Non-goals",
+    "Constraints",
+    "Open product decisions",
+    "Implementation decisions",
+    "Testing decisions",
+]
+VOLATILE_PATH = re.compile(
+    r"(?:^|[\s`(])(?:/|\.?\.?/)?(?:[A-Za-z0-9_.-]+/)+[A-Za-z0-9_.-]+\.[A-Za-z0-9]+"
+)
+REDUNDANT_INTERVIEW = re.compile(
+    r"always\s+(?:begin\s+with\s+)?(?:another\s+)?(?:requirements\s+)?interview|"
+    r"requirements\s+(?:interview|again)|walk\s+me\s+through\s+the\s+requirements",
+    re.IGNORECASE,
+)
+READY_CLAIM = re.compile(
+    r"\bready-for-agent\b|\bimplementation-ready\b|\b(?:marked|labelled|labeled|tagged)\b.{0,30}\bready\b",
+    re.IGNORECASE,
+)
+PUBLISHED_CLAIM = re.compile(
+    r"\bpublished\s+(?:the\s+)?(?:spec|issue)|\b(?:created|opened|posted)\s+(?:the\s+)?issue",
+    re.IGNORECASE,
+)
+HANDOFF_CLAIM = re.compile(
+    r"hand\s+off\b.*\bdecompos|sent\s+it\s+to\s+decomposition",
+    re.IGNORECASE | re.DOTALL,
+)
+STOP_WORDS = {"and", "are", "for", "must", "owner", "the", "to"}
+
+
+def blocker_is_reported(blocker: str, output: str) -> bool:
+    words = [
+        word
+        for word in re.findall(r"[a-z0-9]+", blocker.lower())
+        if len(word) > 3 and word not in STOP_WORDS
+    ]
+    required_matches = min(2, len(words))
+    return required_matches > 0 and sum(word in output.lower() for word in words) >= required_matches
+
+
+def candidate_errors(scenario_input: dict, output: str) -> list[str]:
     errors = []
-    seam_is_resolved = context["test_seam"] is not None
-    product_blockers = context["blocking_product_decisions"]
-    can_publish = context["tracker_available"] and context["publishing_access"]
+    blockers = scenario_input["blockers"]
+    all_blockers = [blocker for category in blockers.values() for blocker in category]
+    seam_blockers = blockers["test_seam"]
+    publication_blockers = blockers["publication_access"]
+    question_count = output.count("?")
+    has_spec = all(re.search(rf"^{re.escape(section)}$", output, re.MULTILINE) for section in REQUIRED_SECTIONS)
+    claims_ready = bool(READY_CLAIM.search(output))
+    claims_published = bool(PUBLISHED_CLAIM.search(output))
+    claims_handoff = bool(HANDOFF_CLAIM.search(output))
 
-    if candidate["includes_volatile_paths"]:
-        errors.append("spec includes volatile paths")
+    if VOLATILE_PATH.search(output):
+        errors.append("volatile-path")
 
-    if seam_is_resolved and candidate["questions"]:
-        errors.append("interviews despite a settled test seam")
-    if not seam_is_resolved:
-        if len(candidate["questions"]) != 1:
-            errors.append("unresolved test seam requires exactly one question")
-        if candidate["drafted"] or candidate["published"]:
-            errors.append("drafts or publishes before the seam confirmation")
+    if not seam_blockers and (question_count or REDUNDANT_INTERVIEW.search(output)):
+        errors.append("redundant-interview")
+    if seam_blockers:
+        if question_count != 1:
+            errors.append("invalid-seam-confirmation")
+        if has_spec or claims_published or claims_ready:
+            errors.append("did-not-pause-for-seam")
+    elif not has_spec:
+        errors.append("missing-spec")
 
-    if product_blockers:
-        if candidate["questions"]:
-            errors.append("uses the seam confirmation for a product decision")
-        if candidate["ready_for_agent"]:
-            errors.append("claims readiness with unresolved product decisions")
-        if candidate["blockers_reported"] != product_blockers:
-            errors.append("does not preserve the product blockers")
+    if any(not blocker_is_reported(blocker, output) for blocker in all_blockers):
+        errors.append("unreported-blocker")
 
-    if candidate["drafted"] and not candidate["includes_required_sections"]:
-        errors.append("draft omits required sections")
+    if all_blockers and claims_ready:
+        errors.append("ready-with-blockers")
+    if not all_blockers and not claims_ready:
+        errors.append("not-ready")
 
-    if can_publish and seam_is_resolved and not candidate["published"]:
-        errors.append("does not publish when the tracker is available")
-    if not can_publish:
-        if candidate["published"]:
-            errors.append("claims publication without tracker access")
-        if candidate["ready_for_agent"]:
-            errors.append("claims readiness without publication")
-        if not candidate["blockers_reported"]:
-            errors.append("does not report the publishing blocker")
+    if publication_blockers and claims_published:
+        errors.append("publication-without-access")
+    if not publication_blockers and not seam_blockers and not claims_published:
+        errors.append("not-published")
 
-    should_be_ready = can_publish and seam_is_resolved and not product_blockers
-    if candidate["ready_for_agent"] != should_be_ready:
-        errors.append("readiness does not match the publishing gate")
-    if candidate["handoff_to_decompose"] != should_be_ready:
-        errors.append("decomposition handoff bypasses the readiness gate")
+    if all_blockers and claims_handoff:
+        errors.append("handoff-with-blockers")
+    if not all_blockers and not claims_handoff:
+        errors.append("missing-handoff")
 
     return errors
 
 
-def validate_scenarios(scenarios: list[dict]) -> None:
-    for scenario in scenarios:
+def validate_capture(candidate: dict) -> None:
+    kind = candidate["capture"]["kind"]
+    if kind == "authored-fixture":
+        return
+    if kind == "cold-agent-capture":
+        required = {"model", "captured_at", "run_id"}
+        if not required.issubset(candidate["capture"]):
+            raise AssertionError("cold-agent capture requires model, captured_at, and run_id")
+        return
+    raise AssertionError(f"unknown capture kind: {kind}")
+
+
+def validate_scenarios(fixture: dict) -> None:
+    if fixture["schema_version"] != 2:
+        raise AssertionError("unsupported fixture schema")
+    for scenario in fixture["scenarios"]:
+        if not isinstance(scenario["prompt"], str) or not isinstance(scenario["input"], dict):
+            raise AssertionError(f"{scenario['name']}: prompt/input do not match capture schema")
+        if set(scenario["input"]["blockers"]) != BLOCKER_CATEGORIES:
+            raise AssertionError(f"{scenario['name']}: blocker categories do not match schema")
         for candidate in scenario["candidates"]:
-            errors = candidate_errors(scenario["context"], candidate)
+            if not isinstance(candidate["output"], str):
+                raise AssertionError(f"{scenario['name']}/{candidate['name']}: output is not text")
+            validate_capture(candidate)
+            errors = candidate_errors(scenario["input"], candidate["output"])
             actual_valid = not errors
-            if actual_valid != candidate["expected_valid"]:
+            expected_valid = candidate["expected_valid"]
+            missing_errors = set(candidate["expected_errors"]) - set(errors)
+            if actual_valid != expected_valid or missing_errors:
                 detail = "; ".join(errors) or "candidate unexpectedly passed"
+                if missing_errors:
+                    detail += f"; missing expected errors: {', '.join(sorted(missing_errors))}"
                 raise AssertionError(f"{scenario['name']}/{candidate['name']}: {detail}")
             result = "accepted" if actual_valid else "rejected"
-            print(f"PASS: {scenario['name']}/{candidate['name']} ({result})")
+            print(f"PASS: {scenario['name']}/{candidate['name']} ({result}: {', '.join(errors) or 'clean'})")
 
 
 def main() -> None:
