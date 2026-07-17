@@ -23,3 +23,9 @@ jobs:
       - name: Verify plugin skill paths
         shell: bash
         run: python3 scripts/validate-plugin.py
+      - name: Run subagent-pipeline behavioral eval
+        shell: bash
+        run: skills/engineering/subagent-pipeline/eval/run-eval.sh --dry-run
+      - name: Run clarify-work behavioral eval
+        shell: bash
+        run: skills/engineering/clarify-work/eval/run-eval.sh
