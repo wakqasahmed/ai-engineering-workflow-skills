@@ -11,6 +11,7 @@ The goal is transparency over time: what changed, why it changed, and when the w
 - `ai-agent-pr-metadata` skill for keeping AI agent, review tool, LLM model, and run metadata visible in PR bodies/comments/reviews without adding AI attribution to commit messages (#28)
 - `subagent-pipeline` skill codifying the cold-start implementer/reviewer/fixer chain, CI gate, and staging auto-merge rule used for issue execution
 - `roast` skill: a 6-persona adversarial council plus Judge verdict for pressure-testing a new idea before it enters the delivery pipeline, under a new `skills/product/` category
+- `to-prd` skill so the dangling `to-prd` references in `AGENTS.md`, `CLAUDE.md`, `system-level/core.md`, `README.md`, and `AI_ENGINEERING_WORKFLOW.md` resolve to an in-repo skill; it produces a short PRD-shaped spec (problem, goal, non-goals, success criteria) that feeds `decompose-to-issues`, distinct from `clarify-work`'s terminology/scope clarification (#38)
 
 ### Changed
 
