@@ -30,5 +30,4 @@ Use this before staging or production release.
 - Prefer deploying reviewed artifacts over rebuilding unreviewed source.
 - Do not deploy production from unreviewed PRs.
 - Do not silently work around missing secrets, DNS, or account permissions.
-- Do not run automated tests against staging or production databases.
-- Back up staging before intentional staging data changes, not before ordinary test runs.
+- Test database safety (disposable/dedicated storage, staging backup timing) follows `system-level/core.md` (Test Database Safety) — this gate does not relax it.

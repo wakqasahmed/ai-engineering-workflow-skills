@@ -23,11 +23,7 @@ Use this before changing code or docs on non-trivial work.
 
 ## Test Database Requirement
 
-- Automated tests must use disposable storage or a dedicated test database.
-- Disposable means sqlite `:memory:` or an equivalent throwaway database created for that run.
-- Dedicated means a database whose name clearly contains `test` or `testing` and has no staging, production, customer, demo, or manually-entered data.
-- If a test plan needs a staging backup first, stop and fix the test environment instead.
-- If the work intentionally changes staging data with a seeder, migration, import, repair script, or one-off command, require a staging backup and restore note.
+Follow `system-level/core.md` (Test Database Safety) for what counts as disposable/dedicated storage and when a staging backup is required. Verification commands named in step 3 of the workflow above must satisfy that rule before this skill is considered done.
 
 ## Async/Stateful Contract Requirement
 
