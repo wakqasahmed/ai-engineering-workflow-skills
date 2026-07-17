@@ -95,27 +95,47 @@ REDUNDANT_INTERVIEW = re.compile(
     r"requirements\s+(?:interview|again)|walk\s+me\s+through\s+the\s+requirements",
     re.IGNORECASE,
 )
+READY_TERM = r"(?:ready-for-agent|implementation-ready|ready\s+for\s+(?:an?\s+)?agent)"
 READY_CLAIM = re.compile(
-    r"\bready-for-agent\b|\bimplementation-ready\b|\b(?:marked|labelled|labeled|tagged)\b.{0,30}\bready\b|"
+    rf"\b{READY_TERM}\b|\b(?:marked|labelled|labeled|tagged)\b.{{0,30}}\bready\b|"
     r"\breadiness\s+label\s+(?:was\s+)?applied\b",
     re.IGNORECASE,
 )
 NEGATED_READY_CLAIM = re.compile(
-    r"\bwithout\s+(?:(?:the|a)\s+)?ready-for-agent(?:\s+label)?\b|"
+    rf"\b(?:is|was|remains?)\s+(?:not|never)\s+(?:marked\s+or\s+labelled\s+)?(?:as\s+)?{READY_TERM}\b|"
+    rf"\bwithout\s+(?:(?:the|a)\s+)?{READY_TERM}(?:\s+label)?\b|"
     r"\bnot\s+(?:marked|labelled|labeled)(?:\s+or\s+(?:marked|labelled|labeled))?\s+"
     r"(?:as\s+)?ready-for-agent\b|"
     r"\breadiness\s+label\s+(?:was\s+)?(?:withheld(?:\s+and\s+not\s+applied)?|not\s+applied)\b",
     re.IGNORECASE,
 )
 PUBLISHED_CLAIM = re.compile(
-    r"\bpublished\s+(?:the\s+)?(?:spec|issue)|\b(?:created|opened|posted)\s+(?:the\s+)?issue",
+    r"(?:^|[.!]\s+|\n\n)(?:i\s+)?published(?:\s+successfully\b|\s+(?:the\s+)?(?:spec|issue)\b)|"
+    r"\b(?:created|opened|posted)\s+(?:the\s+)?issue",
     re.IGNORECASE,
 )
 HANDOFF_CLAIM = re.compile(
-    r"hand\s+off\b.*\bdecompos|sent\s+it\s+to\s+decomposition",
+    r"\bhand(?:ed|\s+off)\b.*\bdecompos|sent\s+it\s+to\s+decomposition",
     re.IGNORECASE | re.DOTALL,
 )
 STOP_WORDS = {"and", "are", "for", "must", "owner", "the", "to"}
+CONTEXT_STOP_WORDS = STOP_WORDS | {
+    "available",
+    "covers",
+    "existing",
+    "externally",
+    "github",
+    "issue",
+    "observable",
+    "project",
+    "publishing",
+    "repository",
+    "settled",
+    "suite",
+    "test",
+    "tests",
+    "with",
+}
 
 
 def blocker_is_reported(blocker: str, output: str) -> bool:
@@ -133,14 +153,51 @@ def claims_readiness(output: str) -> bool:
     return bool(READY_CLAIM.search(positive_claims))
 
 
+def section_contents(output: str) -> dict[str, str]:
+    contents = {}
+    headings = [
+        (section, re.search(rf"^{re.escape(section)}$", output, re.MULTILINE))
+        for section in REQUIRED_SECTIONS
+    ]
+    if any(match is None for _, match in headings):
+        return contents
+    for index, (section, heading) in enumerate(headings):
+        end = headings[index + 1][1].start() if index + 1 < len(headings) else len(output)
+        body = output[heading.end() : end].strip().split("\n\n", 1)[0].strip()
+        if section == "Testing decisions" and PUBLISHED_CLAIM.search(body):
+            body = ""
+        if body:
+            contents[section] = body
+    return contents
+
+
+def has_substantive_spec(output: str) -> bool:
+    contents = section_contents(output)
+    if set(contents) != set(REQUIRED_SECTIONS):
+        return False
+    placeholders = {"none", "none.", "n/a", "tbd", "unknown"}
+    return all(contents[section].lower() not in placeholders for section in ("Implementation decisions", "Testing decisions"))
+
+
+def is_grounded(repository_context: str, output: str) -> bool:
+    context_terms = {
+        word
+        for word in re.findall(r"[a-z0-9]+", repository_context.lower())
+        if len(word) > 3 and word not in CONTEXT_STOP_WORDS
+    }
+    required_matches = min(2, len(context_terms))
+    return required_matches == 0 or sum(word in output.lower() for word in context_terms) >= required_matches
+
+
 def candidate_errors(scenario_input: dict, output: str) -> list[str]:
     errors = []
     blockers = scenario_input["blockers"]
     all_blockers = [blocker for category in blockers.values() for blocker in category]
     seam_blockers = blockers["test_seam"]
     publication_blockers = blockers["publication_access"]
-    question_count = output.count("?")
-    has_spec = all(re.search(rf"^{re.escape(section)}$", output, re.MULTILINE) for section in REQUIRED_SECTIONS)
+    questions = re.findall(r"[^?]*\?", output)
+    question_count = len(questions)
+    has_spec = has_substantive_spec(output)
     claims_ready = claims_readiness(output)
     claims_published = bool(PUBLISHED_CLAIM.search(output))
     claims_handoff = bool(HANDOFF_CLAIM.search(output))
@@ -151,12 +208,17 @@ def candidate_errors(scenario_input: dict, output: str) -> list[str]:
     if not seam_blockers and (question_count or REDUNDANT_INTERVIEW.search(output)):
         errors.append("redundant-interview")
     if seam_blockers:
-        if question_count != 1:
+        focused_question = question_count == 1 and all(
+            blocker_is_reported(blocker, questions[0]) for blocker in seam_blockers
+        )
+        if not focused_question:
             errors.append("invalid-seam-confirmation")
         if has_spec or claims_published or claims_ready:
             errors.append("did-not-pause-for-seam")
     elif not has_spec:
         errors.append("missing-spec")
+    elif not is_grounded(scenario_input["repository_context"], output):
+        errors.append("ungrounded-spec")
 
     if any(not blocker_is_reported(blocker, output) for blocker in all_blockers):
         errors.append("unreported-blocker")
@@ -180,13 +242,16 @@ def candidate_errors(scenario_input: dict, output: str) -> list[str]:
 
 
 def validate_capture(candidate: dict) -> None:
-    kind = candidate["capture"]["kind"]
+    capture = candidate["capture"]
+    kind = capture["kind"]
     if kind == "authored-fixture":
         return
     if kind == "cold-agent-capture":
         required = {"model", "captured_at", "run_id"}
-        if not required.issubset(candidate["capture"]):
+        if not required.issubset(capture):
             raise AssertionError("cold-agent capture requires model, captured_at, and run_id")
+        if any(not isinstance(capture[field], str) or not capture[field] for field in required):
+            raise AssertionError("cold-agent capture metadata must be non-empty text")
         return
     raise AssertionError(f"unknown capture kind: {kind}")
 
@@ -194,6 +259,18 @@ def validate_capture(candidate: dict) -> None:
 def validate_scenarios(fixture: dict) -> None:
     if fixture["schema_version"] != 2:
         raise AssertionError("unsupported fixture schema")
+    required_cold_captures = {"well-specified-no-interview", "genuinely-unresolved-test-seam"}
+    captured_scenarios = {
+        scenario["name"]
+        for scenario in fixture["scenarios"]
+        if any(
+            candidate["expected_valid"] and candidate["capture"]["kind"] == "cold-agent-capture"
+            for candidate in scenario["candidates"]
+        )
+    }
+    if not required_cold_captures.issubset(captured_scenarios):
+        missing = required_cold_captures - captured_scenarios
+        raise AssertionError(f"missing required cold-agent captures: {', '.join(sorted(missing))}")
     for scenario in fixture["scenarios"]:
         if not isinstance(scenario["prompt"], str) or not isinstance(scenario["input"], dict):
             raise AssertionError(f"{scenario['name']}: prompt/input do not match capture schema")
