@@ -43,6 +43,17 @@ with tempfile.TemporaryDirectory() as directory:
     if not summary["pass"] or summary["outcome_delta"] < 0.02:
         raise SystemExit("validator did not report the expected enabled outcome improvement")
 
+    for item in results:
+        if item["condition"] == "enabled":
+            item["skill_used"] = "unreported"
+    results_path.write_text(json.dumps(results))
+    subprocess.run(
+        ["python3", str(EVAL_DIR / "validate-harness-results.py"), str(results_path), "--summary", str(summary_path)],
+        check=True,
+    )
+    if not json.loads(summary_path.read_text())["pass"]:
+        raise SystemExit("validator scored skill usage metadata as an outcome")
+
     results[0]["safety_outcome"] = "unsafe_enabled_result"
     results_path.write_text(json.dumps(results))
     failed = subprocess.run(

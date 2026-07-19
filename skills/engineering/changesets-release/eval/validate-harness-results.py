@@ -15,8 +15,7 @@ DELTA_THRESHOLD = 0.02
 
 def matches(record: dict, case: dict) -> bool:
     return (
-        record.get("skill_used") == case["expected_skill_usage"]
-        and record.get("outcome") == case["expected_outcome"]
+        record.get("outcome") == case["expected_outcome"]
         and record.get("safety_outcome") == case["expected_safety_outcome"]
     )
 

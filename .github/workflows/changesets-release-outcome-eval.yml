@@ -3,8 +3,8 @@ name: Changesets release outcome eval
 on:
   workflow_dispatch:
     inputs:
-      runner:
-        description: Repository-controlled runner path
+      command:
+        description: Evaluator command run inside the isolated image; emit one JSON record to stdout
         required: true
         type: string
       image:
@@ -25,7 +25,7 @@ jobs:
         shell: bash
         run: >-
           python3 skills/engineering/changesets-release/eval/run_harness.py
-          --runner "${{ inputs.runner }}"
+          --command "${{ inputs.command }}"
           --image "${{ inputs.image }}"
           --model "${{ inputs.model }}"
           --trials 5

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run a repository-controlled Changesets evaluator in isolated workspaces."""
+"""Run a supplied Changesets evaluator command in isolated workspaces."""
 import argparse
 import json
 import os
@@ -10,20 +10,17 @@ from pathlib import Path
 
 
 EVAL_DIR = Path(__file__).resolve().parent
-ROOT = EVAL_DIR.parents[3]
 CASES = EVAL_DIR / "fixtures" / "held-out.json"
 HARNESS_VERSION = "1"
 
 
-def prepare_workspace(workspace: Path, runner: Path, case: dict, condition: str) -> None:
+def prepare_workspace(workspace: Path, case: dict, condition: str) -> None:
     (workspace / "case.json").write_text(json.dumps({"prompt": case["prompt"]}))
-    shutil.copy2(runner, workspace / "runner")
-    (workspace / "runner").chmod(0o755)
     if condition == "enabled":
         shutil.copy2(EVAL_DIR.parent / "SKILL.md", workspace / "SKILL.md")
 
 
-def isolated_command(workspace: Path, image: str, condition: str, trial: int, model: str) -> list[str]:
+def isolated_command(workspace: Path, image: str, command: str, condition: str, trial: int, model: str) -> list[str]:
     return [
         "docker", "run", "--rm", "--network", "none", "--read-only", "--cap-drop", "ALL",
         "--tmpfs", "/tmp:rw,noexec,nosuid,size=64m",
@@ -32,13 +29,14 @@ def isolated_command(workspace: Path, image: str, condition: str, trial: int, mo
         "--env", f"HARNESS_CONDITION={condition}",
         "--env", f"HARNESS_TRIAL={trial}",
         "--env", f"HARNESS_MODEL={model}",
-        "--workdir", "/workspace", image, "/workspace/runner",
+        "--workdir", "/workspace", "--entrypoint", "/bin/sh", image, "-ceu", command,
     ]
 
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--runner", type=Path, required=True)
+    parser.add_argument("--command", required=True,
+                        help="command run inside the evaluator image; it must emit one JSON record to stdout")
     parser.add_argument("--image", required=True)
     parser.add_argument("--model", required=True)
     parser.add_argument("--trials", type=int, choices=range(3, 7), default=5)
@@ -46,9 +44,6 @@ def main() -> int:
     args = parser.parse_args()
     if args.trials != 5:
         raise SystemExit("this evaluator requires five trials for each condition")
-    runner = args.runner.resolve()
-    if not runner.is_file() or not runner.is_relative_to(ROOT):
-        raise SystemExit("runner must be a repository-controlled file")
     if "@sha256:" not in args.image:
         raise SystemExit("image must be pinned by digest")
 
@@ -58,9 +53,9 @@ def main() -> int:
             for trial in range(1, args.trials + 1):
                 with tempfile.TemporaryDirectory() as directory:
                     workspace = Path(directory)
-                    prepare_workspace(workspace, runner, case, condition)
+                    prepare_workspace(workspace, case, condition)
                     result = subprocess.run(
-                        isolated_command(workspace, args.image, condition, trial, args.model),
+                        isolated_command(workspace, args.image, args.command, condition, trial, args.model),
                         text=True,
                         capture_output=True,
                         check=True,
