@@ -1,0 +1,46 @@
+name: Changesets release outcome eval
+
+on:
+  workflow_dispatch:
+    inputs:
+      runner:
+        description: Repository-controlled runner path
+        required: true
+        type: string
+      image:
+        description: Digest-pinned evaluator image
+        required: true
+        type: string
+      model:
+        description: Declared model identifier
+        required: true
+        type: string
+
+jobs:
+  evaluate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Run isolated enabled and disabled trials
+        shell: bash
+        run: >-
+          python3 skills/engineering/changesets-release/eval/run_harness.py
+          --runner "${{ inputs.runner }}"
+          --image "${{ inputs.image }}"
+          --model "${{ inputs.model }}"
+          --trials 5
+          --output changesets-release-outcomes.json
+      - name: Compare held-out outcomes
+        shell: bash
+        run: >-
+          python3 skills/engineering/changesets-release/eval/validate-harness-results.py
+          changesets-release-outcomes.json
+          --summary changesets-release-summary.json
+      - name: Retain outcome comparison
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: changesets-release-outcome-eval
+          path: |
+            changesets-release-outcomes.json
+            changesets-release-summary.json

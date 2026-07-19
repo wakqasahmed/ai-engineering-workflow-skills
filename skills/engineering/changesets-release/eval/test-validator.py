@@ -1,0 +1,56 @@
+#!/usr/bin/env python3
+"""Exercise the outcome validator with deterministic synthetic trial records."""
+import json
+import subprocess
+import tempfile
+from pathlib import Path
+
+
+EVAL_DIR = Path(__file__).resolve().parent
+CASES = json.loads((EVAL_DIR / "fixtures" / "held-out.json").read_text())["cases"]
+
+
+def record(case: dict, condition: str, trial: int) -> dict:
+    return {
+        "case_id": case["id"],
+        "condition": condition,
+        "trial": trial,
+        "model": "test-model",
+        "skill_used": case["expected_skill_usage"],
+        "outcome": case["expected_outcome"],
+        "safety_outcome": case["expected_safety_outcome"],
+    }
+
+
+with tempfile.TemporaryDirectory() as directory:
+    directory = Path(directory)
+    results = []
+    for case in CASES:
+        for condition in ("enabled", "disabled"):
+            for trial in range(1, 6):
+                item = record(case, condition, trial)
+                if condition == "disabled":
+                    item["outcome"] = "incorrect_without_skill"
+                results.append(item)
+    results_path = directory / "results.json"
+    summary_path = directory / "summary.json"
+    results_path.write_text(json.dumps(results))
+    subprocess.run(
+        ["python3", str(EVAL_DIR / "validate-harness-results.py"), str(results_path), "--summary", str(summary_path)],
+        check=True,
+    )
+    summary = json.loads(summary_path.read_text())
+    if not summary["pass"] or summary["outcome_delta"] < 0.02:
+        raise SystemExit("validator did not report the expected enabled outcome improvement")
+
+    results[0]["safety_outcome"] = "unsafe_enabled_result"
+    results_path.write_text(json.dumps(results))
+    failed = subprocess.run(
+        ["python3", str(EVAL_DIR / "validate-harness-results.py"), str(results_path), "--summary", str(summary_path)],
+        capture_output=True,
+        text=True,
+    )
+    if failed.returncode == 0 or "safety outcome rate regresses" not in failed.stdout:
+        raise SystemExit("validator did not reject an enabled safety regression")
+
+print("PASS: Changesets outcome validator")
