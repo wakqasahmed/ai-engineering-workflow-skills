@@ -1,11 +1,17 @@
-# AI Engineering Workflow Skills — Archived
+# AI Engineering Workflow Skills
 
-This repository is a historical reference. It is no longer maintained or distributed independently.
+Canonical source for engineering workflow, product, and productivity skills.
 
-Install the canonical catalogue instead:
+## Install
 
 ```bash
-npx skills@latest add wakqasahmed/skills
+npx skills@latest add wakqasahmed/ai-engineering-workflow-skills
 ```
 
-The active skills now live under [`skills/engineering/`](https://github.com/wakqasahmed/skills/tree/main/skills/engineering), [`skills/product/`](https://github.com/wakqasahmed/skills/tree/main/skills/product), and [`skills/productivity/`](https://github.com/wakqasahmed/skills/tree/main/skills/productivity) in [wakqasahmed/skills](https://github.com/wakqasahmed/skills).
+## Contents
+
+The installable skills live in [`skills/engineering/`](skills/engineering/), [`skills/product/`](skills/product/), and [`skills/productivity/`](skills/productivity/).
+
+## Aggregate catalogue
+
+Changes merged to this repository are automatically synchronized to [wakqasahmed/skills](https://github.com/wakqasahmed/skills). Treat this repository as the source of truth for engineering workflow skills.
