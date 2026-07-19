@@ -4,6 +4,8 @@ set -euo pipefail
 EVAL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 FIXTURES_DIR="${EVAL_DIR}/fixtures"
 SKILL_MD="${EVAL_DIR}/../SKILL.md"
+WORKSPACE="$(mktemp -d)"
+trap 'rm -rf "$WORKSPACE"' EXIT
 
 MODE="dry-run"
 LIVE_REPO=""
@@ -217,6 +219,19 @@ assert_implementer_and_ci_status_fixtures_are_used() {
 
 run_dry_run() {
   echo "== subagent-pipeline eval (dry-run, fixtures only, no network) =="
+  mkdir -p "$WORKSPACE/eval/fixtures"
+  cp "$EVAL_DIR/check-contract.py" "$WORKSPACE/eval/"
+  cp "$FIXTURES_DIR/held-out.json" "$WORKSPACE/eval/fixtures/"
+  cp "$SKILL_MD" "$WORKSPACE/SKILL.md"
+  cat > "$WORKSPACE/sitecustomize.py" <<'PY'
+import socket
+def blocked(*args, **kwargs):
+    raise OSError("network disabled for deterministic eval")
+socket.socket = blocked
+socket.create_connection = blocked
+PY
+  PYTHONPATH="$WORKSPACE" HOME="$WORKSPACE/home" PYTHONNOUSERSITE=1 \
+    python3 -s "$WORKSPACE/eval/check-contract.py"
   assert_inline_comments_required
   assert_fixer_reads_structured_comments
   assert_merge_requires_ci_green

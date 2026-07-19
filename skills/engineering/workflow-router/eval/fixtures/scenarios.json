@@ -1,0 +1,10 @@
+[
+  {"name":"bug","request":"Checkout now returns 500 after coupon changes.","route":"bug","sequence":["diagnose","regression test","smallest fix","review-gate"],"rationale":"reproduce and isolate"},
+  {"name":"small-feature","request":"Add one verified export field with an acceptance test.","route":"small-feature","sequence":["define done","tdd","test-first change","simplify","review-gate","staging PR"],"excluded_steps":["clarify-work","decompose-to-issues","subagent-pipeline"],"rationale":"already bounded"},
+  {"name":"successful-returning-feature","request":"Add an endpoint that returns CSV.","route":"small-feature","sequence":["define done","tdd","test-first change","simplify","review-gate","staging PR"],"excluded_steps":["diagnose","regression test"],"rationale":"already bounded"},
+  {"name":"large-multi-issue-feature","request":"Design a new marketplace with unsettled ownership and several independent slices.","route":"idea-to-staging","sequence":["clarify-work","define-done","decompose-to-issues"],"excluded_steps":["subagent-pipeline"],"rationale":"clarify creates a safe boundary"},
+  {"name":"claimed-non-trivial-github-issue","request":"Run this claimed non-trivial GitHub issue through delivery.","route":"claimed-github-issue","sequence":["subagent-pipeline","CI","staging PR"],"rationale":"issue-sized boundary"},
+  {"name":"claimed-trivial-github-issue","request":"Fix this claimed trivial GitHub issue.","route":"small-feature","sequence":["define done","tdd","test-first change","simplify","review-gate","staging PR"],"excluded_steps":["subagent-pipeline"],"rationale":"already bounded"},
+  {"name":"release","request":"Release the reviewed build to production.","route":"release","sequence":["release-gate"],"rationale":"reviewed artifact"},
+  {"name":"human-only-blocker","request":"The deploy is blocked because the DNS account needs a human approval.","route":"human-held-blocker","sequence":["hitl-blocker"],"rationale":"visible owner"}
+]

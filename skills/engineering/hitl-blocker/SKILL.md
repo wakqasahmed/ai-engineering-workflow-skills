@@ -27,6 +27,6 @@ Use this before reporting a blocker back to the user.
 
 ## Guardrails
 
-- Never include secret values in the issue.
+- Public issues, PRs, comments, and handovers must never include credential values or local credential-file paths. Use `Credential details: [redacted]`.
 - Do not bury human-only blockers in chat only.
 - Do not keep retrying automation when credentials or account permissions are missing.
