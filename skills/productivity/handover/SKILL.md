@@ -31,7 +31,7 @@ Skip it when ample context remains and work is progressing, or when the work is 
 3. Do not audit the filesystem or git history to reconstruct this. It's a synthesis of this session, not a fresh investigation.
 4. Include a "suggested skills" section listing skills the next agent should invoke.
 5. Do not duplicate content already captured in other artifacts (PRDs, plans, ADRs, issues, commits, diffs). Reference them by path or URL.
-6. Redact secrets, API keys, passwords, and personally identifiable information.
+6. Redact secrets, API keys, passwords, personally identifiable information, credential values, and local credential-file paths as `Credential details: [redacted]`.
 7. If the user passed arguments, treat them as what the next session will focus on and tailor the doc accordingly.
 
 ## Publish to the issue
