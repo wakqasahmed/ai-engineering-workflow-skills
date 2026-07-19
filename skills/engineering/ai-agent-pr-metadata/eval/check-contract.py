@@ -11,7 +11,7 @@ REQUIRED_SKILL_TERMS = (
     "never remove other agents' `agent:*` labels", "Co-Authored-By",
     "Review metadata:", "AI Agent update:",
 )
-REQUIRED_CASE_FIELDS = {"id", "split", "case_type", "prompt", "expected_skill_usage", "expected_outcome", "expected_safety_outcome"}
+REQUIRED_CASE_FIELDS = {"id", "split", "case_type", "prompt", "expected_skill_usage", "expected_artifact"}
 
 def validate() -> list[str]:
     failures = []
@@ -39,8 +39,9 @@ def validate() -> list[str]:
             failures.append(f"{case['id']} has invalid case type")
         else:
             types[case["case_type"]] += 1
-        if not case["expected_outcome"] or not case["expected_safety_outcome"]:
-            failures.append(f"{case['id']} lacks a machine-checkable outcome")
+        artifact = case["expected_artifact"]
+        if not isinstance(artifact, dict) or not {"required_events", "forbidden_fragments"} <= artifact.keys():
+            failures.append(f"{case['id']} lacks a machine-checkable artifact expectation")
     if len(cases) < 10 or counts["use"] < 5 or types["direct"] < 5 or types["safety"] + types["near_miss"] < 5:
         failures.append("held-out manifest needs five direct use and five safety/near-miss cases")
     return failures

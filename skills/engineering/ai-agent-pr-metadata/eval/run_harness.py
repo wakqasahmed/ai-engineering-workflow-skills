@@ -10,11 +10,17 @@ from pathlib import Path
 
 EVAL_DIR = Path(__file__).resolve().parent
 CASES = EVAL_DIR / "fixtures" / "held-out.json"
-HARNESS_VERSION = "1"
+HARNESS_VERSION = "2"
 
 def prepare_workspace(workspace: Path, case: dict, condition: str) -> None:
     (workspace / "home").mkdir()
+    (workspace / "artifact").mkdir()
+    (workspace / "bin").mkdir()
     (workspace / "case.json").write_text(json.dumps({"prompt": case["prompt"]}))
+    for tool in ("gh", "git"):
+        shim = workspace / "bin" / tool
+        shutil.copy2(EVAL_DIR / "fake_cli.py", shim)
+        shim.chmod(0o755)
     if condition == "enabled":
         shutil.copy2(EVAL_DIR.parent / "SKILL.md", workspace / "SKILL.md")
 
@@ -24,7 +30,10 @@ def isolated_command(workspace: Path, image: str, command: str, condition: str, 
         "--tmpfs", "/tmp:rw,noexec,nosuid,size=64m",
         "--mount", f"type=bind,source={workspace},target=/workspace,readonly",
         "--mount", f"type=bind,source={workspace / 'home'},target=/home/evaluator",
+        "--mount", f"type=bind,source={workspace / 'artifact'},target=/artifact",
         "--env", "HARNESS_WORKSPACE=/workspace", "--env", "HOME=/home/evaluator",
+        "--env", "HARNESS_ARTIFACT=/artifact/events.jsonl",
+        "--env", "PATH=/workspace/bin:/usr/local/bin:/usr/bin:/bin",
         "--env", f"HARNESS_CONDITION={condition}", "--env", f"HARNESS_TRIAL={trial}",
         "--env", f"HARNESS_MODEL={model}", "--workdir", "/workspace", "--entrypoint", "/bin/sh",
         image, "-ceu", command,
@@ -54,10 +63,12 @@ def main() -> int:
                         text=True, capture_output=True, check=True,
                         env={"PATH": os.environ["PATH"], "HOME": "/nonexistent", "LANG": "C"},
                     )
+                    artifact_path = workspace / "artifact" / "events.jsonl"
+                    events = [json.loads(line) for line in artifact_path.read_text().splitlines()] if artifact_path.exists() else []
                 record = json.loads(result.stdout)
                 if not isinstance(record, dict) or record.get("model") != args.model:
                     raise SystemExit("runner must emit one record with the declared model")
-                records.append({**record, "case_id": case["id"], "condition": condition, "trial": trial,
+                records.append({"artifact": {"events": events}, **record, "case_id": case["id"], "condition": condition, "trial": trial,
                                 "model": args.model, "harness_version": HARNESS_VERSION})
     args.output.write_text(json.dumps(records, indent=2))
     return 0
