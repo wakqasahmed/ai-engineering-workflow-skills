@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-"""Record GitHub and git commands without giving the evaluator real access."""
+"""Send fake GitHub commands to the host-owned offline service."""
 import json
 import os
 import sys
-from pathlib import Path
+import socket
 
 
-artifact = Path(os.environ["HARNESS_ARTIFACT"])
-with artifact.open("a") as stream:
-    stream.write(json.dumps({"tool": Path(sys.argv[0]).name, "argv": sys.argv[1:]}) + "\n")
+with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as client:
+    client.connect(os.environ["HARNESS_GITHUB_SOCKET"])
+    client.sendall(json.dumps({"tool": os.path.basename(sys.argv[0]), "argv": sys.argv[1:]}).encode() + b"\n")
+    client.recv(1024)
