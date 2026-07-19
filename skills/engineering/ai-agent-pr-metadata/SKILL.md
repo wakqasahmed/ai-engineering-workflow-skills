@@ -155,3 +155,12 @@ The `OCR disposition gate` workflow rechecks after Open Code Review completes an
 - Confirm the PR body contains `Agent Metadata`.
 - Confirm the Alibaba review body contains `Review metadata` with the actual LLM model.
 - Run the final OCR disposition gate after the last push and before merge.
+
+## Outcome evaluation
+
+The offline contract checks in `eval/` protect non-negotiable written rules;
+they do not score agent behavior. The separately gated isolated harness compares
+metadata outcomes with this skill enabled and disabled using held-out synthetic
+cases, five trials per condition, an 80% per-case threshold, and a 2% aggregate
+improvement threshold. Retain the comparison artifact; investigate or retire
+the skill if the threshold fails.

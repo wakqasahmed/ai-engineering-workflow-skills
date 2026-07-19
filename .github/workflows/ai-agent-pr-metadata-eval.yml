@@ -1,0 +1,54 @@
+name: AI agent PR metadata evaluation
+
+on:
+  pull_request:
+    paths:
+      - 'skills/engineering/ai-agent-pr-metadata/**'
+      - '.github/workflows/ai-agent-pr-metadata-eval.yml'
+  workflow_dispatch:
+    inputs:
+      image:
+        description: Digest-pinned evaluator image
+        required: true
+        type: string
+      command:
+        description: Evaluator command emitting one JSON record
+        required: true
+        type: string
+      model:
+        description: Resolved evaluator model identifier
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  deterministic:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run offline deterministic contract checks
+        run: bash skills/engineering/ai-agent-pr-metadata/eval/run-eval.sh --dry-run
+  outcome-harness:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run isolated enabled and disabled trials
+        run: >-
+          python3 skills/engineering/ai-agent-pr-metadata/eval/run_harness.py
+          --image '${{ inputs.image }}' --command '${{ inputs.command }}'
+          --model '${{ inputs.model }}' --output results.json
+      - name: Compare outcome results
+        run: >-
+          python3 skills/engineering/ai-agent-pr-metadata/eval/validate-harness-results.py
+          results.json --summary summary.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ai-agent-pr-metadata-outcome-results
+          path: |
+            results.json
+            summary.json

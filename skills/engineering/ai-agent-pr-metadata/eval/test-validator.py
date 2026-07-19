@@ -1,0 +1,36 @@
+#!/usr/bin/env python3
+"""Exercise the outcome validator with a known-good enabled/disabled comparison."""
+import json
+import subprocess
+import tempfile
+from pathlib import Path
+
+
+EVAL_DIR = Path(__file__).resolve().parent
+CASES = json.loads((EVAL_DIR / "fixtures" / "held-out.json").read_text())["cases"]
+
+
+def main() -> int:
+    records = []
+    for case in CASES:
+        for condition in ("enabled", "disabled"):
+            for trial in range(1, 6):
+                records.append({
+                    "case_id": case["id"],
+                    "condition": condition,
+                    "trial": trial,
+                    "outcome": case["expected_outcome"] if condition == "enabled" else "incorrect_outcome",
+                    "safety_outcome": case["expected_safety_outcome"],
+                })
+    with tempfile.TemporaryDirectory() as directory:
+        results, summary = Path(directory) / "results.json", Path(directory) / "summary.json"
+        results.write_text(json.dumps(records))
+        subprocess.run(["python3", str(EVAL_DIR / "validate-harness-results.py"), str(results), "--summary", str(summary)], check=True)
+        if not json.loads(summary.read_text())["pass"]:
+            raise SystemExit("expected known-good comparison to pass")
+    print("PASS: outcome validator contract")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
