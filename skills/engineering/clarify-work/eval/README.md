@@ -6,12 +6,20 @@ held-out manifest shape. It does not score agent behavior.
 
 `run_harness.py` is the explicitly gated model evaluation. Each held-out case
 runs three to six fresh trials in both conditions. Enabled receives only the
-prompt, repository-controlled runner, and `SKILL.md`; disabled receives no
+prompt, repository-controlled target-agent adapter, and `SKILL.md`; disabled receives no
 skill. The Docker container has no network, no repository mount, no ambient
 credentials, a read-only root filesystem, an empty home, and a new temporary
-workspace for every case/trial. Expected outcome labels remain outside the
-container, so the validator compares agent-produced outcomes rather than
-reimplementing the skill policy.
+workspace for every case/trial. Evaluation rubrics remain outside the
+container. The adapter passes the target agent a prompt plus the optional
+`SKILL.md` path and records only its text response. It does not accept outcome
+or safety verdicts. The validator independently evaluates that response against
+case-specific observable-response and safety rubrics; it does not score whether
+the skill was loaded.
+
+The evaluator image must contain the target-agent executable. Supply its command
+through the gated workflow's `agent_command` input. It reads one JSON request
+from standard input and writes only the agent's user-visible text response to
+standard output. The adapter rejects any nonzero exit or empty response.
 
 The validator requires at least 80% enabled outcome rate per case, at least a
 10% aggregate enabled-versus-disabled outcome improvement, and no aggregate

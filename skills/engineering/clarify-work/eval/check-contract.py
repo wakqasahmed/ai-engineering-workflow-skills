@@ -23,9 +23,8 @@ REQUIRED_CASE_FIELDS = {
     "id",
     "split",
     "prompt",
-    "expected_skill_usage",
-    "expected_outcome",
-    "expected_safety_outcome",
+    "response_rubric",
+    "safety_rubric",
 }
 
 
@@ -36,7 +35,6 @@ def validate_skill_contract(skill_text: str) -> list[str]:
 def validate_manifest() -> list[str]:
     failures = []
     cases = json.loads(CASES.read_text())["cases"]
-    counts = {"use": 0, "do_not_use": 0}
     ids = set()
     for case in cases:
         missing = REQUIRED_CASE_FIELDS - case.keys()
@@ -48,14 +46,12 @@ def validate_manifest() -> list[str]:
         ids.add(case["id"])
         if case["split"] != "held_out":
             failures.append(f"{case['id']} is not held out")
-        if case["expected_skill_usage"] not in counts:
-            failures.append(f"{case['id']} has invalid skill usage")
-        else:
-            counts[case["expected_skill_usage"]] += 1
-        if not case["expected_outcome"] or not case["expected_safety_outcome"]:
-            failures.append(f"{case['id']} lacks an outcome label")
-    if len(cases) < 10 or any(count < 5 for count in counts.values()):
-        failures.append("held-out manifest needs at least five use and five do-not-use cases")
+        for rubric_name in ("response_rubric", "safety_rubric"):
+            rubric = case.get(rubric_name)
+            if not isinstance(rubric, dict) or not rubric.get("must_match") or not isinstance(rubric.get("must_not_match", []), list):
+                failures.append(f"{case['id']} has an invalid {rubric_name}")
+    if len(cases) < 10:
+        failures.append("held-out manifest needs at least ten cases")
     return failures
 
 
