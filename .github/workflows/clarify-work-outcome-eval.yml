@@ -3,8 +3,12 @@ name: Clarify-work outcome eval
 on:
   workflow_dispatch:
     inputs:
-      agent_command:
-        description: Target-agent command available inside the evaluator image
+      agent:
+        description: Repository-controlled target-agent executable path
+        required: true
+        type: string
+      attestation:
+        description: Repository-controlled sterile evaluator attestation path
         required: true
         type: string
       image:
@@ -33,7 +37,8 @@ jobs:
       - name: Run isolated enabled and disabled trials
         run: >-
           python3 skills/engineering/clarify-work/eval/run_harness.py
-          --agent-command "${{ inputs.agent_command }}"
+          --agent "${{ inputs.agent }}"
+          --attestation "${{ inputs.attestation }}"
           --image "${{ inputs.image }}"
           --model "${{ inputs.model }}"
           --trials "${{ inputs.trials }}"

@@ -16,10 +16,13 @@ or safety verdicts. The validator independently evaluates that response against
 case-specific observable-response and safety rubrics; it does not score whether
 the skill was loaded.
 
-The evaluator image must contain the target-agent executable. Supply its command
-through the gated workflow's `agent_command` input. It reads one JSON request
-from standard input and writes only the agent's user-visible text response to
-standard output. The adapter rejects any nonzero exit or empty response.
+Supply a repository-controlled target-agent executable and a reviewed sterile-image
+attestation through the gated workflow inputs. The attestation binds the exact
+image digest and agent SHA-256 and asserts no ambient credentials, fixtures, or
+preinstalled skills. The harness copies only the agent, adapter, prompt, and,
+when enabled, `SKILL.md` into the read-only workspace. It runs as UID 65532 with
+an empty tmpfs home and a minimal environment. The agent reads one JSON request
+from standard input and writes only the user-visible response to standard output.
 
 The validator requires at least 80% enabled outcome rate per case, at least a
 10% aggregate enabled-versus-disabled outcome improvement, and no aggregate

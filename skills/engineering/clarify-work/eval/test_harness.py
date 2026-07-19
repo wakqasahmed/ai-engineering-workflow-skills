@@ -38,26 +38,69 @@ class HarnessTests(unittest.TestCase):
         failures, _ = validator.validate(records("I will implement this now."), 3)
         self.assertTrue(any("below the 80% outcome threshold" in failure for failure in failures))
 
-    def test_adapter_returns_only_target_agent_text(self):
+    def test_disabled_adapter_cannot_load_a_skill(self):
         adapter = EVAL_DIR / "target-agent-adapter.py"
         with tempfile.TemporaryDirectory() as directory:
             workspace = Path(directory)
             (workspace / "case.json").write_text(json.dumps({"prompt": "Hello"}))
-            target = workspace / "target.py"
-            target.write_text("import sys; sys.stdin.read(); print('What owner should decide this?')")
+            target = workspace / "target-agent"
+            target.write_text(
+                "#!/usr/bin/env python3\n"
+                "import json, os, pathlib, sys\n"
+                "request = json.load(sys.stdin)\n"
+                "if 'skill_path' in request or pathlib.Path('SKILL.md').exists(): raise SystemExit(1)\n"
+                "if os.getenv('TEST_CREDENTIAL'): raise SystemExit(1)\n"
+                "print('Proceed with the direct change.')\n"
+            )
+            target.chmod(0o755)
             result = subprocess.run(
                 ["python3", str(adapter)], text=True, capture_output=True, check=True,
-                env={"HARNESS_WORKSPACE": str(workspace), "TARGET_AGENT_COMMAND": f"python3 {target}"},
+                env={"HARNESS_WORKSPACE": str(workspace), "TEST_CREDENTIAL": "must-not-reach-agent"},
             )
-        self.assertEqual(json.loads(result.stdout), {"response": "What owner should decide this?"})
+        self.assertEqual(json.loads(result.stdout), {"response": "Proceed with the direct change."})
 
-    def test_isolated_command_hides_trial_and_condition(self):
+    def test_isolated_command_uses_an_empty_home_and_non_root_user(self):
         harness_spec = importlib.util.spec_from_file_location("harness", EVAL_DIR / "run_harness.py")
         harness = importlib.util.module_from_spec(harness_spec)
         harness_spec.loader.exec_module(harness)
-        command = harness.isolated_command(Path("/tmp/workspace"), "agent@sha256:test", "agent --json")
+        command = harness.isolated_command(Path("/tmp/workspace"), "agent@sha256:test")
         self.assertNotIn("HARNESS_CONDITION", " ".join(command))
         self.assertNotIn("HARNESS_TRIAL", " ".join(command))
+        self.assertIn("65532:65532", command)
+        self.assertIn("HOME=/home/agent", command)
+        self.assertIn("/home/agent:rw,noexec,nosuid,size=8m", command)
+
+    def test_disabled_workspace_contains_no_skill_or_fixture(self):
+        harness_spec = importlib.util.spec_from_file_location("harness", EVAL_DIR / "run_harness.py")
+        harness = importlib.util.module_from_spec(harness_spec)
+        harness_spec.loader.exec_module(harness)
+        with tempfile.TemporaryDirectory() as directory:
+            workspace = Path(directory)
+            agent = workspace / "source-agent"
+            agent.write_text("#!/bin/sh\n")
+            agent.chmod(0o755)
+            harness.prepare_workspace(workspace, agent, {"prompt": "Hello"}, "disabled")
+            self.assertEqual({path.name for path in workspace.iterdir()}, {"case.json", "runner", "target-agent", "source-agent"})
+
+    def test_attestation_binds_the_sterile_image_and_agent(self):
+        harness_spec = importlib.util.spec_from_file_location("harness", EVAL_DIR / "run_harness.py")
+        harness = importlib.util.module_from_spec(harness_spec)
+        harness_spec.loader.exec_module(harness)
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            agent = root / "target-agent"
+            agent.write_text("#!/bin/sh\n")
+            image = "agent@sha256:test"
+            attestation = root / "attestation.json"
+            attestation.write_text(json.dumps({
+                "image": image,
+                "agent_sha256": harness.file_sha256(agent),
+                "claims": {name: True for name in ("no_ambient_credentials", "no_held_out_fixtures", "no_preinstalled_skills", "empty_home", "non_root")},
+            }))
+            harness.ROOT = root
+            harness.validate_attestation(attestation, image, agent)
+            with self.assertRaises(SystemExit):
+                harness.validate_attestation(attestation, "other@sha256:test", agent)
 
 
 if __name__ == "__main__":
