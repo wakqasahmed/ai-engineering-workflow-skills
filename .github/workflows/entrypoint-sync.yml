@@ -29,9 +29,9 @@ jobs:
       - name: Run subagent-pipeline behavioral eval
         shell: bash
         run: skills/engineering/subagent-pipeline/eval/run-eval.sh --dry-run
-      - name: Run clarify-work behavioral eval
+      - name: Run clarify-work deterministic contract eval
         shell: bash
-        run: skills/engineering/clarify-work/eval/run-eval.sh
+        run: skills/engineering/clarify-work/eval/run-eval.sh --dry-run
       - name: Run to-prd behavioral eval
         shell: bash
         run: skills/engineering/to-prd/eval/run-eval.sh
