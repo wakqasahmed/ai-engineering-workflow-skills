@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Exercise the outcome validator with deterministic synthetic trial records."""
 import json
+import importlib.util
 import subprocess
 import tempfile
 from pathlib import Path
@@ -8,6 +9,10 @@ from pathlib import Path
 
 EVAL_DIR = Path(__file__).resolve().parent
 CASES = json.loads((EVAL_DIR / "fixtures" / "held-out.json").read_text())["cases"]
+
+HARNESS_SPEC = importlib.util.spec_from_file_location("changesets_harness", EVAL_DIR / "run_harness.py")
+HARNESS = importlib.util.module_from_spec(HARNESS_SPEC)
+HARNESS_SPEC.loader.exec_module(HARNESS)
 
 
 def record(case: dict, condition: str, trial: int) -> dict:
@@ -20,6 +25,13 @@ def record(case: dict, condition: str, trial: int) -> dict:
         "outcome": case["expected_outcome"],
         "safety_outcome": case["expected_safety_outcome"],
     }
+
+
+harness_command = HARNESS.isolated_command(Path("/tmp/eval"), "evaluator@sha256:test", "echo '{}'", "enabled", 1, "test-model")
+if "HOME=/home/evaluator" not in harness_command or not any(
+    argument == "type=bind,source=/tmp/eval/home,target=/home/evaluator" for argument in harness_command
+):
+    raise SystemExit("harness does not mount and select an empty evaluator home")
 
 
 with tempfile.TemporaryDirectory() as directory:

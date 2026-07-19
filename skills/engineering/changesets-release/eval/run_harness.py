@@ -15,6 +15,7 @@ HARNESS_VERSION = "1"
 
 
 def prepare_workspace(workspace: Path, case: dict, condition: str) -> None:
+    (workspace / "home").mkdir()
     (workspace / "case.json").write_text(json.dumps({"prompt": case["prompt"]}))
     if condition == "enabled":
         shutil.copy2(EVAL_DIR.parent / "SKILL.md", workspace / "SKILL.md")
@@ -25,7 +26,9 @@ def isolated_command(workspace: Path, image: str, command: str, condition: str, 
         "docker", "run", "--rm", "--network", "none", "--read-only", "--cap-drop", "ALL",
         "--tmpfs", "/tmp:rw,noexec,nosuid,size=64m",
         "--mount", f"type=bind,source={workspace},target=/workspace,readonly",
+        "--mount", f"type=bind,source={workspace / 'home'},target=/home/evaluator",
         "--env", "HARNESS_WORKSPACE=/workspace",
+        "--env", "HOME=/home/evaluator",
         "--env", f"HARNESS_CONDITION={condition}",
         "--env", f"HARNESS_TRIAL={trial}",
         "--env", f"HARNESS_MODEL={model}",
