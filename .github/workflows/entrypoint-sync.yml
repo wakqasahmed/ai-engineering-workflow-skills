@@ -26,6 +26,12 @@ jobs:
       - name: Verify Changesets release skill
         shell: bash
         run: scripts/test-changesets-release.sh
+      - name: Run Changesets release deterministic eval
+        shell: bash
+        run: skills/engineering/changesets-release/eval/run-eval.sh --dry-run
+      - name: Verify Changesets release outcome validator
+        shell: bash
+        run: python3 skills/engineering/changesets-release/eval/test-validator.py
       - name: Run subagent-pipeline behavioral eval
         shell: bash
         run: skills/engineering/subagent-pipeline/eval/run-eval.sh --dry-run
