@@ -2,7 +2,6 @@
 """Score isolated decomposition responses against held-out observable outcomes."""
 import argparse
 import json
-import re
 from collections import defaultdict
 from pathlib import Path
 
@@ -13,9 +12,49 @@ ENABLED_OUTCOME_THRESHOLD = 0.8
 MINIMUM_ENABLED_OUTCOME_DELTA = 0.1
 
 
-def matches(response: str, rubric: dict) -> bool:
-    return all(re.search(pattern, response, re.IGNORECASE | re.DOTALL) for pattern in rubric["must_match"]) and not any(
-        re.search(pattern, response, re.IGNORECASE | re.DOTALL) for pattern in rubric.get("must_not_match", [])
+ISSUE_FIELDS = {"title", "scope", "acceptance_criteria", "verification", "dependencies", "non_goals"}
+
+
+def non_empty_strings(value: object) -> bool:
+    return isinstance(value, list) and bool(value) and all(isinstance(item, str) and item.strip() for item in value)
+
+
+def outcome_matches(response: str, case: dict) -> bool:
+    try:
+        artifact = json.loads(response)
+    except json.JSONDecodeError:
+        return False
+
+    if case["expected_outcome"] == "direct_action":
+        if set(artifact) != {"direct_action"} or not isinstance(artifact["direct_action"], dict):
+            return False
+        action = artifact["direct_action"]
+        return set(action) == {"scope", "verification", "non_goals"} and isinstance(action["scope"], str) and action["scope"].strip() and all(term.lower() in action["scope"].lower() for term in case["expected_terms"]) and non_empty_strings(action["verification"]) and non_empty_strings(action["non_goals"])
+
+    if set(artifact) != {"issues", "relationships"} or not isinstance(artifact["issues"], list) or len(artifact["issues"]) < 2 or not isinstance(artifact["relationships"], list):
+        return False
+    expected_scopes = case["expected_scopes"]
+    covered_scopes = []
+    for issue in artifact["issues"]:
+        if not isinstance(issue, dict) or set(issue) != ISSUE_FIELDS:
+            return False
+        if not isinstance(issue["title"], str) or not issue["title"].strip() or not isinstance(issue["scope"], str) or not issue["scope"].strip():
+            return False
+        if not all(non_empty_strings(issue[field]) for field in ISSUE_FIELDS - {"title", "scope"}):
+            return False
+        covered_scopes.append(f"{issue['title']} {issue['scope']}".lower())
+    if not all(any(term.lower() in scope for scope in covered_scopes) for term in expected_scopes):
+        return False
+    return any(
+        isinstance(relationship, dict)
+        and set(relationship) == {"from", "to", "type"}
+        and isinstance(relationship["from"], int)
+        and isinstance(relationship["to"], int)
+        and 1 <= relationship["from"] <= len(artifact["issues"])
+        and 1 <= relationship["to"] <= len(artifact["issues"])
+        and relationship["from"] != relationship["to"]
+        and relationship["type"] == "depends_on"
+        for relationship in artifact["relationships"]
     )
 
 
@@ -43,8 +82,8 @@ def validate(records: list[dict], trials: int) -> tuple[list[str], list[str]]:
             if len(results) != trials:
                 failures.append(f"{case_id}/{condition} needs {trials} trials")
                 continue
-            outcomes = sum(matches(record["response"], case["response_rubric"]) for record in results)
-            safeties = sum(matches(record["response"], case["safety_rubric"]) for record in results)
+            outcomes = sum(outcome_matches(record["response"], case) for record in results)
+            safeties = outcomes
             rates[condition] = outcomes / trials
             totals[condition]["outcome"] += outcomes
             totals[condition]["safety"] += safeties

@@ -5,71 +5,71 @@
       "id": "multi-surface-checkout",
       "split": "held_out",
       "prompt": "Plan a new checkout experience spanning cart UI, payment authorization, order confirmation emails, and support tooling.",
-      "response_rubric": {"must_match": ["(?s)issue\\s*1", "(?s)issue\\s*2", "(?s)acceptance criteria", "(?s)verification"], "must_not_match": ["single issue"]},
-      "safety_rubric": {"must_match": ["(?s)(dependenc|non-goal|risk)"], "must_not_match": ["(?s)implement everything in one issue"]}
+      "expected_outcome": "issue_plan",
+      "expected_scopes": ["cart", "payment", "support"]
     },
     {
       "id": "marketplace-integration-roadmap",
       "split": "held_out",
       "prompt": "Break down marketplace seller integration: catalog sync, inventory updates, order ingestion, reconciliation, and operational alerting.",
-      "response_rubric": {"must_match": ["(?s)issue\\s*1", "(?s)issue\\s*2", "(?s)(catalog|inventory)", "(?s)(order|reconciliation)"], "must_not_match": ["backend first.*frontend second"]},
-      "safety_rubric": {"must_match": ["(?s)(dependenc|verification)"], "must_not_match": ["(?s)one giant issue"]}
+      "expected_outcome": "issue_plan",
+      "expected_scopes": ["catalog", "order", "reconciliation"]
     },
     {
       "id": "tenant-audit-program",
       "split": "held_out",
       "prompt": "Turn the tenant audit-log initiative into implementable work: event capture, queryable history, retention controls, exports, and administrator UX.",
-      "response_rubric": {"must_match": ["(?s)issue\\s*1", "(?s)issue\\s*2", "(?s)(event|audit)", "(?s)(retention|export)"], "must_not_match": ["(?:build|implement) (?:the )?backend.*(?:then|and).*frontend"]},
-      "safety_rubric": {"must_match": ["(?s)(risk|non-goal|verification)"], "must_not_match": ["(?s)requires inherited conversation context"]}
+      "expected_outcome": "issue_plan",
+      "expected_scopes": ["event", "retention", "export"]
     },
     {
       "id": "mobile-offline-capability",
       "split": "held_out",
       "prompt": "Create issues for offline mobile support including local data, conflict resolution, sync visibility, analytics, and rollout safeguards.",
-      "response_rubric": {"must_match": ["(?s)issue\\s*1", "(?s)issue\\s*2", "(?s)(conflict|sync)", "(?s)(rollout|analytics)"], "must_not_match": ["one issue"]},
-      "safety_rubric": {"must_match": ["(?s)(dependenc|verification|risk)"], "must_not_match": ["(?s)horizontal slice"]}
+      "expected_outcome": "issue_plan",
+      "expected_scopes": ["conflict", "sync", "rollout"]
     },
     {
       "id": "self-service-billing",
       "split": "held_out",
       "prompt": "Decompose self-service subscription management: plan changes, payment-method updates, invoices, entitlement changes, and customer-support escalation.",
-      "response_rubric": {"must_match": ["(?s)issue\\s*1", "(?s)issue\\s*2", "(?s)(plan|payment)", "(?s)(invoice|entitlement|support)"], "must_not_match": ["single ticket"]},
-      "safety_rubric": {"must_match": ["(?s)(acceptance criteria|verification)"], "must_not_match": ["(?s)ship without review"]}
+      "expected_outcome": "issue_plan",
+      "expected_scopes": ["plan", "payment", "invoice"]
     },
     {
       "id": "readme-typo",
       "split": "held_out",
       "prompt": "Correct the typo 'teh' to 'the' in README.md.",
-      "response_rubric": {"must_match": ["(?s)(README|teh|the)"], "must_not_match": ["(?s)issue\\s*2"]},
-      "safety_rubric": {"must_match": ["(?s)(README|teh|the)"], "must_not_match": ["(?s)requires a roadmap"]}
+      "expected_outcome": "direct_action",
+      "expected_terms": ["README", "teh"]
     },
     {
       "id": "exact-unit-test",
       "split": "held_out",
       "prompt": "Add a unit test showing parseDate('2026-01-01') returns UTC midnight.",
-      "response_rubric": {"must_match": ["(?s)(parseDate|UTC|test)"], "must_not_match": ["(?s)issue\\s*2"]},
-      "safety_rubric": {"must_match": ["(?s)(parseDate|UTC)"], "must_not_match": ["(?s)needs decomposition"]}
+      "expected_outcome": "direct_action",
+      "expected_terms": ["parseDate", "UTC"]
     },
     {
       "id": "approved-css-change",
       "split": "held_out",
       "prompt": "Change the already-approved Button.css padding from 8px to 12px and run the component test.",
-      "response_rubric": {"must_match": ["(?s)(Button\\.css|padding|12px)"], "must_not_match": ["(?s)issue\\s*2"]},
-      "safety_rubric": {"must_match": ["(?s)(test|Button\\.css|padding)"], "must_not_match": ["(?s)requires a PRD"]}
+      "expected_outcome": "direct_action",
+      "expected_terms": ["Button.css", "12px"]
     },
     {
       "id": "single-null-guard",
       "split": "held_out",
       "prompt": "In UserFormatter.format, return 'Unknown user' for null input and add the regression test from issue 42.",
-      "response_rubric": {"must_match": ["(?s)(UserFormatter|Unknown user|null)"], "must_not_match": ["(?s)issue\\s*2"]},
-      "safety_rubric": {"must_match": ["(?s)(regression test|test)"], "must_not_match": ["(?s)split into multiple issues"]}
+      "expected_outcome": "direct_action",
+      "expected_terms": ["UserFormatter", "Unknown user"]
     },
     {
       "id": "dependency-patch",
       "split": "held_out",
       "prompt": "Update lodash from 4.17.20 to 4.17.21 and run npm test.",
-      "response_rubric": {"must_match": ["(?s)(lodash|4\\.17\\.21|npm test)"], "must_not_match": ["(?s)issue\\s*2"]},
-      "safety_rubric": {"must_match": ["(?s)(lodash|npm test)"], "must_not_match": ["(?s)unrelated issues"]}
+      "expected_outcome": "direct_action",
+      "expected_terms": ["lodash", "4.17.21"]
     }
   ]
 }

@@ -14,9 +14,12 @@ root filesystem, no Linux capabilities, and no ambient credentials. Rubrics
 remain outside the container. The adapter forwards only the prompt and optional
 skill path, and returns only the agent's user-visible response.
 
-The validator compares those observable responses with case-specific outcome
-and safety rubrics; it neither scores skill loading nor accepts agent verdict
-fields. It requires an 80% enabled outcome rate for each case, a 10% aggregate
+The validator compares structured observable responses, not keyword matches or
+skill-loading metadata. A decomposition must contain at least two scoped issues
+with acceptance criteria, verification, dependencies, non-goals, and a valid
+dependency relationship. Each direct-action case must instead return a scoped
+direct action, with verification and non-goals; an issue plan fails those cases.
+It requires an 80% enabled outcome rate for each case, a 10% aggregate
 enabled-versus-disabled improvement, and no aggregate safety regression. If a
 threshold fails, revise or retire the skill rather than citing contract checks
 as outcome evidence.

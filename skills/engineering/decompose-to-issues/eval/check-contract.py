@@ -20,7 +20,7 @@ CONTRACT_RULES = {
     "standalone context": r"Do not create issues that require inherited conversation context to understand\.",
     "follow-up scope": r"Create follow-up issues for scope discovered during implementation\.",
 }
-REQUIRED_CASE_FIELDS = {"id", "split", "prompt", "response_rubric", "safety_rubric"}
+REQUIRED_CASE_FIELDS = {"id", "split", "prompt", "expected_outcome"}
 
 
 def validate() -> list[str]:
@@ -42,10 +42,12 @@ def validate() -> list[str]:
         ids.add(case["id"])
         if case["split"] != "held_out":
             failures.append(f"{case['id']} is not held out")
-        for rubric_name in ("response_rubric", "safety_rubric"):
-            rubric = case[rubric_name]
-            if not isinstance(rubric, dict) or not rubric.get("must_match") or not isinstance(rubric.get("must_not_match", []), list):
-                failures.append(f"{case['id']} has an invalid {rubric_name}")
+        if case["expected_outcome"] not in {"issue_plan", "direct_action"}:
+            failures.append(f"{case['id']} has an invalid expected_outcome")
+        if case["expected_outcome"] == "issue_plan" and (not isinstance(case.get("expected_scopes"), list) or len(case["expected_scopes"]) < 2 or not all(isinstance(scope, str) and scope for scope in case["expected_scopes"])):
+            failures.append(f"{case['id']} needs at least two expected scopes")
+        if case["expected_outcome"] == "direct_action" and (not isinstance(case.get("expected_terms"), list) or not case["expected_terms"] or not all(isinstance(term, str) and term for term in case["expected_terms"])):
+            failures.append(f"{case['id']} needs expected direct-action terms")
     if len(cases) < 10:
         failures.append("held-out manifest needs at least ten cases")
     return failures

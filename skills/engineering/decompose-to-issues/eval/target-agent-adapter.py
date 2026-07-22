@@ -7,7 +7,10 @@ from pathlib import Path
 
 
 workspace = Path(os.environ["HARNESS_WORKSPACE"])
-request = {"prompt": json.loads((workspace / "case.json").read_text())["prompt"]}
+request = {
+    "prompt": json.loads((workspace / "case.json").read_text())["prompt"],
+    "response_contract": "Return valid JSON only. For work that needs decomposition, return {\"issues\":[{\"title\":string,\"scope\":string,\"acceptance_criteria\":[string],\"verification\":[string],\"dependencies\":[string],\"non_goals\":[string]}],\"relationships\":[{\"from\":number,\"to\":number,\"type\":\"depends_on\"}]}. For a direct, already-scoped change, return {\"direct_action\":{\"scope\":string,\"verification\":[string],\"non_goals\":[string]}}.",
+}
 skill = workspace / "SKILL.md"
 if skill.exists():
     request["skill_path"] = str(skill)

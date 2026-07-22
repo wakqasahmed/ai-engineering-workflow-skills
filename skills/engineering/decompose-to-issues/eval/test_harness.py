@@ -62,16 +62,36 @@ class HarnessTests(unittest.TestCase):
         failures, _ = validator.validate(records("I will implement this as one issue."), 3)
         self.assertTrue(any("below the 80% outcome threshold" in failure for failure in failures))
 
+    def test_validator_rejects_keyword_soup_without_structured_issues(self):
+        validator = load_module("validator", "validate-harness-results.py")
+        response = "Issue 1. Issue 2. Acceptance criteria. Verification. Dependencies. Catalog inventory order reconciliation event audit retention export conflict sync rollout analytics plan payment invoice entitlement support."
+        failures, _ = validator.validate(records(response), 3)
+        self.assertTrue(any("below the 80% outcome threshold" in failure for failure in failures))
+
+    def test_validator_rejects_issue_plan_for_direct_action_case(self):
+        validator = load_module("validator", "validate-harness-results.py")
+        response = json.dumps({
+            "issues": [
+                {"title": "Change README", "scope": "Correct the typo.", "acceptance_criteria": ["Typo is corrected."], "verification": ["Review README."], "dependencies": ["None."], "non_goals": ["No roadmap."]},
+                {"title": "Review README", "scope": "Review the correction.", "acceptance_criteria": ["Review is complete."], "verification": ["Read the file."], "dependencies": ["Change README."], "non_goals": ["No other edits."]},
+            ],
+            "relationships": [{"from": 1, "to": 2, "type": "depends_on"}],
+        })
+        case = next(case for case in json.loads((EVAL_DIR / "fixtures" / "held-out.json").read_text())["cases"] if case["id"] == "readme-typo")
+        self.assertFalse(validator.outcome_matches(response, case))
+
     def test_validator_accepts_enabled_outcome_delta_without_skill_metadata(self):
         validator = load_module("validator", "validate-harness-results.py")
-        positive = "Issue 1. Issue 2. Acceptance criteria. Verification. Dependencies. Catalog inventory order reconciliation event audit retention export conflict sync rollout analytics plan payment invoice entitlement support."
-        negative = "README teh parseDate UTC Button.css padding 12px UserFormatter Unknown user null lodash 4.17.21 npm test regression test."
+        positive = json.dumps({
+            "issues": [
+                {"title": "Catalog and inventory sync", "scope": "Cart catalog inventory event audit conflict sync plan payment.", "acceptance_criteria": ["Changes are accepted."], "verification": ["Run focused tests."], "dependencies": ["None."], "non_goals": ["No unrelated changes."]},
+                {"title": "Orders and operations", "scope": "Order reconciliation retention export rollout invoice support payment.", "acceptance_criteria": ["Operations are supported."], "verification": ["Run integration tests."], "dependencies": ["Catalog and inventory sync."], "non_goals": ["No manual deployment."]},
+            ],
+            "relationships": [{"from": 1, "to": 2, "type": "depends_on"}],
+        })
         results = []
         for case in json.loads((EVAL_DIR / "fixtures" / "held-out.json").read_text())["cases"]:
-            response = positive if case["id"] in {
-                "multi-surface-checkout", "marketplace-integration-roadmap", "tenant-audit-program",
-                "mobile-offline-capability", "self-service-billing",
-            } else negative
+            response = positive if case["expected_outcome"] == "issue_plan" else json.dumps({"direct_action": {"scope": "Apply " + " and ".join(case["expected_terms"]), "verification": ["Run the requested test."], "non_goals": ["Do not decompose the work."]}})
             for trial in range(1, 4):
                 results.append({"case_id": case["id"], "condition": "enabled", "trial": trial, "model": "test-agent", "harness_version": "1", "response": response})
                 results.append({"case_id": case["id"], "condition": "disabled", "trial": trial, "model": "test-agent", "harness_version": "1", "response": "I will implement this as one issue."})
@@ -102,6 +122,7 @@ class HarnessTests(unittest.TestCase):
                 "import json, pathlib, sys\n"
                 "request = json.load(sys.stdin)\n"
                 "if 'skill_path' in request or pathlib.Path('SKILL.md').exists(): raise SystemExit(1)\n"
+                "if 'response_contract' not in request: raise SystemExit(1)\n"
                 "print('Proceed with the exact requested change.')\n"
             )
             target.chmod(0o755)
