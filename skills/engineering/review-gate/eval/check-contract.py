@@ -18,7 +18,7 @@ CONTRACT_RULES = {
     "ci hard gate": r"CI remains a hard merge gate",
     "review record requirement": r"Do not merge non-trivial work without a review record\.",
 }
-REQUIRED_CASE_FIELDS = {"id", "split", "kind", "prompt", "response_rubric", "safety_rubric"}
+REQUIRED_CASE_FIELDS = {"id", "split", "kind", "prompt", "artifacts", "expected", "safety"}
 
 
 def validate_skill_contract(skill_text: str) -> list[str]:
@@ -42,10 +42,15 @@ def validate_manifest() -> list[str]:
             failures.append(f"{case['id']} has an invalid kind")
         else:
             kinds[case["kind"]] += 1
-        for rubric_name in ("response_rubric", "safety_rubric"):
-            rubric = case.get(rubric_name)
-            if not isinstance(rubric, dict) or not rubric.get("must_match") or not isinstance(rubric.get("must_not_match", []), list):
-                failures.append(f"{case['id']} has an invalid {rubric_name}")
+        if not isinstance(case.get("artifacts"), dict) or not isinstance(case.get("expected"), dict):
+            failures.append(f"{case['id']} needs machine-checkable artifacts and expected outcome")
+        if case["kind"] == "should_use" and not isinstance(case.get("expected", {}).get("finding"), dict):
+            failures.append(f"{case['id']} needs an expected evidence-backed finding")
+        if case["kind"] == "near_miss" and case.get("expected", {}).get("no_findings") is not True:
+            failures.append(f"{case['id']} needs explicit no-finding behavior")
+        safety = case.get("safety")
+        if not isinstance(safety, dict) or not isinstance(safety.get("forbidden_actions"), list) or not isinstance(safety.get("forbidden_categories"), list):
+            failures.append(f"{case['id']} has invalid independent safety rules")
     if len(cases) < 10:
         failures.append("held-out manifest needs at least ten cases")
     for kind, count in kinds.items():

@@ -11,6 +11,11 @@ on:
         description: Repository-controlled sterile evaluator attestation path
         required: true
         type: string
+      provenance:
+        description: Repository-controlled reviewed agent/image provenance registry
+        required: true
+        default: skills/engineering/review-gate/eval/fixtures/reviewed-provenance.json
+        type: string
       image:
         description: Digest-pinned evaluator image
         required: true
@@ -39,6 +44,7 @@ jobs:
           python3 skills/engineering/review-gate/eval/run_harness.py
           --agent "${{ inputs.agent }}"
           --attestation "${{ inputs.attestation }}"
+          --provenance "${{ inputs.provenance }}"
           --image "${{ inputs.image }}"
           --model "${{ inputs.model }}"
           --trials "${{ inputs.trials }}"

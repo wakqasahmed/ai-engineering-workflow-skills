@@ -11,7 +11,7 @@ WORKSPACE = Path(os.environ.get("HARNESS_WORKSPACE", "/workspace"))
 
 def main() -> int:
     case = json.loads((WORKSPACE / "case.json").read_text())
-    request = {"prompt": case["prompt"]}
+    request = {"prompt": case["prompt"], "artifacts": case.get("artifacts", {})}
     skill = WORKSPACE / "SKILL.md"
     if skill.is_file():
         request["skill_path"] = str(skill)

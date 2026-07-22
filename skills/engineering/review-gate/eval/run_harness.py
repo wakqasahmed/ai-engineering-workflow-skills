@@ -19,7 +19,7 @@ ADAPTER = EVAL_DIR / "target-agent-adapter.py"
 
 def prepare_workspace(workspace: Path, agent: Path, case: dict, condition: str) -> None:
     workspace.chmod(0o755)
-    (workspace / "case.json").write_text(json.dumps({"prompt": case["prompt"]}))
+    (workspace / "case.json").write_text(json.dumps({"prompt": case["prompt"], "artifacts": case.get("artifacts", {})}))
     shutil.copy2(ADAPTER, workspace / "runner")
     (workspace / "runner").chmod(0o755)
     shutil.copy2(agent, workspace / "target-agent")
@@ -57,10 +57,25 @@ def validate_attestation(path: Path, image: str, agent: Path) -> None:
         raise SystemExit("attestation does not assert the sterile evaluator contract")
 
 
+def validate_provenance(path: Path, agent: Path, image: str) -> None:
+    if not path.is_file() or not path.is_relative_to(ROOT):
+        raise SystemExit("provenance must be a repository-controlled file")
+    provenance = json.loads(path.read_text())
+    agent_path = str(agent.relative_to(ROOT))
+    agents, images = provenance.get("agents"), provenance.get("images")
+    if not isinstance(agents, list) or not isinstance(images, list):
+        raise SystemExit("provenance must register reviewed agents and images")
+    if not any(entry == {"path": agent_path, "sha256": file_sha256(agent)} for entry in agents):
+        raise SystemExit("agent must be registered from reviewed repository-controlled source")
+    if not any(entry == {"image": image} for entry in images):
+        raise SystemExit("image must be registered from reviewed repository-controlled source")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--agent", type=Path, required=True)
     parser.add_argument("--attestation", type=Path, required=True)
+    parser.add_argument("--provenance", type=Path, required=True)
     parser.add_argument("--image", required=True)
     parser.add_argument("--model", required=True)
     parser.add_argument("--trials", type=int, choices=range(3, 7), default=3)
@@ -72,6 +87,7 @@ def main() -> int:
     if "@sha256:" not in args.image:
         raise SystemExit("image must be pinned by digest")
     validate_attestation(args.attestation.resolve(), args.image, agent)
+    validate_provenance(args.provenance.resolve(), agent, args.image)
 
     records = []
     for case in json.loads(CASES.read_text())["cases"]:
