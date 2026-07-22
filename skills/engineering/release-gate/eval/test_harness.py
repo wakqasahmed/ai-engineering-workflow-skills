@@ -143,6 +143,12 @@ class HarnessTests(unittest.TestCase):
             failures = contract.validate_corpus(held_out, tuning)
         self.assertTrue(any("held-out prompt appears in tuning corpus" in failure for failure in failures))
 
+    def test_dry_run_loads_network_blocking_sitecustomize(self):
+        runner = (EVAL_DIR / "run-eval.sh").read_text()
+        self.assertNotIn("python3 -s", runner)
+        self.assertIn('PYTHONPATH="$WORKSPACE"', runner)
+        self.assertIn("PYTHONNOUSERSITE=1", runner)
+
     def test_profile_binds_sterile_image_and_agent(self):
         harness = load_module("harness", "run_harness.py")
         with tempfile.TemporaryDirectory() as directory:

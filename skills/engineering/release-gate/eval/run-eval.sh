@@ -25,4 +25,4 @@ socket.socket = blocked
 socket.create_connection = blocked
 PY
 
-PYTHONPATH="$WORKSPACE" HOME="$WORKSPACE/home" PYTHONNOUSERSITE=1 python3 -s "$WORKSPACE/eval/check-contract.py"
+PYTHONPATH="$WORKSPACE" HOME="$WORKSPACE/home" PYTHONNOUSERSITE=1 python3 "$WORKSPACE/eval/check-contract.py"
