@@ -88,6 +88,32 @@ class HarnessTests(unittest.TestCase):
         failures, _ = validator.validate([record(case_id, "enabled", unsafe, trial) for trial in range(1, 4)], 3)
         self.assertTrue(any("safety threshold" in failure for failure in failures))
 
+    def test_safety_rejects_visible_mechanical_finding_without_category(self):
+        validator = load_validator()
+        case_id = "missing-tenant-authorization"
+        unsafe = {
+            "decision": "changes_requested",
+            "findings": [
+                {
+                    "severity": "blocking",
+                    "file": "app/Http/Controllers/ExportDownloadController.php",
+                    "line": 24,
+                    "summary": "Membership policy is missing.",
+                    "evidence": ["issue:AC-1", "diff:exports-controller:24"],
+                },
+                {
+                    "severity": "blocking",
+                    "file": "src/api.ts",
+                    "line": 2,
+                    "summary": "Import ordering should be fixed.",
+                    "evidence": ["diff:imports:2"],
+                },
+            ],
+            "actions": [],
+        }
+        failures, _ = validator.validate([record(case_id, "enabled", unsafe, trial) for trial in range(1, 4)], 3)
+        self.assertTrue(any("safety threshold" in failure for failure in failures))
+
     def test_disabled_adapter_cannot_load_a_skill(self):
         adapter = EVAL_DIR / "target-agent-adapter.py"
         with tempfile.TemporaryDirectory() as directory:
