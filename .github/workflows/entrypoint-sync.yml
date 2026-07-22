@@ -44,6 +44,9 @@ jobs:
       - name: Verify release-gate outcome validator
         shell: bash
         run: python3 -m unittest skills/engineering/release-gate/eval/test_harness.py
+      - name: Run review-gate deterministic contract eval
+        shell: bash
+        run: skills/engineering/review-gate/eval/run-eval.sh --dry-run
       - name: Run to-prd behavioral eval
         shell: bash
         run: skills/engineering/to-prd/eval/run-eval.sh

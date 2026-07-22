@@ -1,0 +1,61 @@
+name: Review-gate outcome eval
+
+on:
+  workflow_dispatch:
+    inputs:
+      agent:
+        description: Repository-controlled target-agent executable path
+        required: true
+        type: string
+      attestation:
+        description: Repository-controlled sterile evaluator attestation path
+        required: true
+        type: string
+      provenance:
+        description: Repository-controlled reviewed agent/image provenance registry
+        required: true
+        type: string
+      image:
+        description: Digest-pinned evaluator image
+        required: true
+        type: string
+      model:
+        description: Declared model identifier
+        required: true
+        type: string
+      trials:
+        description: Trials per case and condition (3-6)
+        required: true
+        default: '3'
+        type: choice
+        options: ['3', '4', '5', '6']
+
+jobs:
+  outcome-eval:
+    environment: outcome-evals
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+      - name: Run isolated enabled and disabled trials
+        run: >-
+          python3 skills/engineering/review-gate/eval/run_harness.py
+          --agent "${{ inputs.agent }}"
+          --attestation "${{ inputs.attestation }}"
+          --provenance "${{ inputs.provenance }}"
+          --image "${{ inputs.image }}"
+          --model "${{ inputs.model }}"
+          --trials "${{ inputs.trials }}"
+          --output review-gate-outcome-results.json
+      - name: Validate outcome delta and safety threshold
+        run: >-
+          python3 skills/engineering/review-gate/eval/validate-harness-results.py
+          --results review-gate-outcome-results.json
+          --trials "${{ inputs.trials }}"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: review-gate-outcome-results
+          path: review-gate-outcome-results.json
+          retention-days: 90
