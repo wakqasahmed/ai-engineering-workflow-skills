@@ -1,28 +1,44 @@
-name: Open Code Review
+name: OCR Manual Review
 
-# Auto-runs only for PRs opened by the maintainer (wakqasahmed). PRs from
-# anyone else are not reviewed automatically — the maintainer can trigger a
-# review manually on any PR by commenting `/ocr-review` (see
-# ocr-manual-review.yml), which supports fork PRs safely since it only ever
-# diffs PR content and never checks out or executes PR-supplied code.
+# Lets the maintainer trigger a review on ANY PR (including forks, and
+# including PRs the automatic workflow skipped because they weren't opened
+# by the maintainer) by commenting `/ocr-review`.
+#
+# Safety: this job never checks out, builds, or executes PR-supplied code —
+# it only resolves the PR's base ref / head SHA via the API and hands them
+# to the review action, which diffs content remotely. Gated to the
+# maintainer's own comments only, so an external contributor cannot trigger
+# a review run (or spend LLM budget) by commenting on their own PR.
 on:
-  pull_request:
-    types: [opened, synchronize, reopened]
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
-  cancel-in-progress: true
+  issue_comment:
+    types: [created]
 
 permissions:
   contents: read
   pull-requests: write
+  issues: write
 
 jobs:
-  open-code-review:
-    if: github.event.pull_request.user.login == 'wakqasahmed'
+  manual-review:
+    if: >-
+      github.event.issue.pull_request != null &&
+      github.event.comment.user.login == 'wakqasahmed' &&
+      startsWith(github.event.comment.body, '/ocr-review')
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    concurrency:
+      group: ocr-manual-review-${{ github.event.issue.number }}
+      cancel-in-progress: true
     steps:
+      - name: Resolve PR base ref and head SHA
+        id: pr
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api "repos/${{ github.repository }}/pulls/${{ github.event.issue.number }}" > /tmp/pr.json
+          echo "head_sha=$(jq -r .head.sha /tmp/pr.json)" >> "$GITHUB_OUTPUT"
+          echo "base_ref=$(jq -r .base.ref /tmp/pr.json)" >> "$GITHUB_OUTPUT"
+
       - name: Validate OpenRouter credentials
         shell: bash
         env:
@@ -55,3 +71,5 @@ jobs:
           llm_timeout: '120'
           sticky_summary: 'true'
           incremental: 'true'
+          base_ref: ${{ steps.pr.outputs.base_ref }}
+          head_sha: ${{ steps.pr.outputs.head_sha }}
