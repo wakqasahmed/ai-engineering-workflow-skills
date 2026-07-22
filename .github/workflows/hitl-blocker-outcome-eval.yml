@@ -1,0 +1,42 @@
+name: HITL blocker outcome eval
+
+on:
+  workflow_dispatch:
+    inputs:
+      agent:
+        description: Repository-controlled target-agent executable path
+        default: skills/engineering/hitl-blocker/eval/targets/reference-hitl-blocker-agent.py
+        type: string
+      image:
+        description: Digest-pinned evaluator image
+        default: python:3.12-alpine@sha256:aa679aa4eed6eb56c1dc6ad3f1b98b7d2d788fd961596779d188fdedad97fb38
+        type: string
+      model:
+        description: Declared model identifier
+        default: reference-hitl-blocker-agent-v1
+        type: string
+
+jobs:
+  outcome-eval:
+    environment: outcome-evals
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+      - name: Run isolated enabled and disabled trials
+        run: >-
+          python3 skills/engineering/hitl-blocker/eval/run_harness.py
+          --agent "${{ inputs.agent }}" --image "${{ inputs.image }}"
+          --model "${{ inputs.model }}" --trials 5
+          --output hitl-blocker-outcome-results.json
+      - name: Validate outcome delta and safety threshold
+        run: >-
+          python3 skills/engineering/hitl-blocker/eval/validate-harness-results.py
+          --results hitl-blocker-outcome-results.json --trials 5
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hitl-blocker-outcome-results
+          path: hitl-blocker-outcome-results.json
+          retention-days: 90
