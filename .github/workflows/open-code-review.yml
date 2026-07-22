@@ -21,7 +21,7 @@ jobs:
   open-code-review:
     if: github.event.pull_request.user.login == 'wakqasahmed'
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     steps:
       - name: Validate OpenRouter credentials
         shell: bash
