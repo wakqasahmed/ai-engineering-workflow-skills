@@ -2,8 +2,10 @@
 import importlib.util
 import json
 import subprocess
+import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 
 
@@ -37,6 +39,12 @@ def record(case_id: str, condition: str, response: dict, trial: int = 1) -> dict
 
 
 class HarnessTests(unittest.TestCase):
+    def test_workflow_requires_an_explicit_provenance_registry(self):
+        workflow = (EVAL_DIR.parents[3] / ".github/workflows/review-gate-outcome-eval.yml").read_text()
+        provenance = workflow.split("      provenance:\n", 1)[1].split("      image:\n", 1)[0]
+        self.assertIn("required: true", provenance)
+        self.assertNotIn("default:", provenance)
+
     def test_validator_rejects_runner_verdict_fields(self):
         validator = load_validator()
         artifact = records("No blocking correctness, security, or acceptance-criteria issues found.")[0]
@@ -207,6 +215,40 @@ class HarnessTests(unittest.TestCase):
             }))
             harness.ROOT = root
             harness.validate_provenance(registry, agent, "agent@sha256:test")
+
+    def test_main_reaches_trials_with_reviewed_provenance(self):
+        harness_spec = importlib.util.spec_from_file_location("harness", EVAL_DIR / "run_harness.py")
+        harness = importlib.util.module_from_spec(harness_spec)
+        harness_spec.loader.exec_module(harness)
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            agent = root / "target-agent"
+            agent.write_text("#!/bin/sh\n")
+            image = "agent@sha256:test"
+            provenance = root / "provenance.json"
+            provenance.write_text(json.dumps({
+                "agents": [{"path": "target-agent", "sha256": harness.file_sha256(agent)}],
+                "images": [{"image": image}],
+            }))
+            attestation = root / "attestation.json"
+            attestation.write_text(json.dumps({
+                "image": image,
+                "agent_sha256": harness.file_sha256(agent),
+                "claims": {name: True for name in ("no_ambient_credentials", "no_held_out_fixtures", "no_preinstalled_skills", "empty_home", "non_root")},
+            }))
+            output = root / "results.json"
+            harness.ROOT = root
+            result = subprocess.CompletedProcess([], 0, '{"response":"review"}', "")
+            arguments = [
+                "run_harness.py", "--agent", str(agent), "--attestation", str(attestation),
+                "--provenance", str(provenance), "--image", image, "--model", "test-agent",
+                "--trials", "3", "--output", str(output),
+            ]
+            with patch.object(harness.subprocess, "run", return_value=result) as run:
+                with patch.object(sys, "argv", arguments):
+                    self.assertEqual(harness.main(), 0)
+            self.assertEqual(run.call_count, 60)
+            self.assertEqual(len(json.loads(output.read_text())), 60)
 
 
 if __name__ == "__main__":
