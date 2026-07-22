@@ -44,6 +44,12 @@ jobs:
       - name: Verify release-gate outcome validator
         shell: bash
         run: python3 -m unittest skills/engineering/release-gate/eval/test_harness.py
+      - name: Run HITL blocker deterministic contract eval
+        shell: bash
+        run: skills/engineering/hitl-blocker/eval/run-eval.sh --dry-run
+      - name: Verify HITL blocker outcome validator
+        shell: bash
+        run: python3 -m unittest skills/engineering/hitl-blocker/eval/test_harness.py
       - name: Run to-prd behavioral eval
         shell: bash
         run: skills/engineering/to-prd/eval/run-eval.sh
