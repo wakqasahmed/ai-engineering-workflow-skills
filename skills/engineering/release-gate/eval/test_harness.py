@@ -53,10 +53,14 @@ class HarnessTests(unittest.TestCase):
         failures, _ = validator.validate(artifacts, 5)
         self.assertTrue(any("below the 80% outcome threshold" in failure for failure in failures))
 
-    def test_validator_rejects_response_that_does_not_match_the_outcome(self):
+    def test_validator_scores_disabled_response_mismatches_without_failing_them(self):
         validator = load_module("validator", "validate-harness-results.py")
-        failures, _ = validator.validate(records("Release ready."), 5)
-        self.assertTrue(any("response does not match expected outcome" in failure for failure in failures))
+        artifacts = records("Release ready.")
+        for record in artifacts:
+            if record["condition"] == "enabled":
+                record["response"] = json.dumps(record["artifact"])
+        failures, _ = validator.validate(artifacts, 5)
+        self.assertEqual(failures, [])
 
     def test_validator_rejects_keyword_only_response_without_observable_outcome(self):
         validator = load_module("validator", "validate-harness-results.py")
