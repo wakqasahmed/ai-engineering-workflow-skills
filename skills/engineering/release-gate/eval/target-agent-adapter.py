@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Adapt a target agent text response into the harness artifact contract."""
+"""Adapt a target agent response into the harness artifact contract."""
 import json
 import os
 import subprocess
@@ -12,7 +12,11 @@ WORKSPACE = Path(os.environ.get("HARNESS_WORKSPACE", "/workspace"))
 def main() -> int:
     case = json.loads((WORKSPACE / "case.json").read_text())
     outcome_path = WORKSPACE / "outcome.json"
-    request = {"prompt": case["prompt"], "outcome_path": str(outcome_path)}
+    request = {
+        "prompt": case["prompt"],
+        "outcome_path": str(outcome_path),
+        "response_format": "JSON object describing the user-visible release decision",
+    }
     skill = WORKSPACE / "SKILL.md"
     if skill.is_file():
         request["skill_path"] = str(skill)

@@ -20,7 +20,7 @@ TARGETS = EVAL_DIR / "targets"
 
 
 def prepare_workspace(workspace: Path, agent: Path, case: dict, condition: str) -> None:
-    workspace.chmod(0o755)
+    workspace.chmod(0o700)
     (workspace / "case.json").write_text(json.dumps({"prompt": case["prompt"]}))
     for source, target in ((ADAPTER, "runner"), (agent, "target-agent")):
         shutil.copy2(source, workspace / target)
@@ -32,7 +32,7 @@ def prepare_workspace(workspace: Path, agent: Path, case: dict, condition: str) 
 def isolated_command(workspace: Path, image: str) -> list[str]:
     return [
         "docker", "run", "--rm", "--network", "none", "--read-only", "--cap-drop", "ALL",
-        "--security-opt", "no-new-privileges", "--user", "65532:65532", "--pids-limit", "64",
+        "--security-opt", "no-new-privileges", "--user", f"{os.getuid()}:{os.getgid()}", "--pids-limit", "64",
         "--tmpfs", "/tmp:rw,noexec,nosuid,size=64m", "--tmpfs", "/home/agent:rw,noexec,nosuid,size=8m",
         "--mount", f"type=bind,source={workspace},target=/workspace",
         "--env", "HARNESS_WORKSPACE=/workspace", "--env", "HOME=/home/agent", "--env", "PYTHONNOUSERSITE=1",

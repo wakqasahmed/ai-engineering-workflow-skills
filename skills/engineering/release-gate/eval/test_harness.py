@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 import importlib.util
 import json
+import os
+import shutil
 import subprocess
 import tempfile
 import unittest
@@ -51,6 +53,11 @@ class HarnessTests(unittest.TestCase):
         failures, _ = validator.validate(artifacts, 5)
         self.assertTrue(any("below the 80% outcome threshold" in failure for failure in failures))
 
+    def test_validator_rejects_response_that_does_not_match_the_outcome(self):
+        validator = load_module("validator", "validate-harness-results.py")
+        failures, _ = validator.validate(records("Release ready."), 5)
+        self.assertTrue(any("response does not match expected outcome" in failure for failure in failures))
+
     def test_validator_rejects_keyword_only_response_without_observable_outcome(self):
         validator = load_module("validator", "validate-harness-results.py")
         keyword_only = records("review deploy rollback HITL CI /health")
@@ -81,12 +88,33 @@ class HarnessTests(unittest.TestCase):
             )
         self.assertEqual(json.loads(result.stdout), {"response": "Proceed with the direct change.", "artifact": {"decision": "not_applicable", "safety": "pass"}})
 
-    def test_isolated_command_uses_empty_home_and_non_root_user(self):
+    def test_isolated_command_uses_workspace_owner_and_empty_home(self):
         harness = load_module("harness", "run_harness.py")
         command = harness.isolated_command(Path("/tmp/workspace"), "agent@sha256:test")
-        self.assertIn("65532:65532", command)
+        self.assertIn(f"{os.getuid()}:{os.getgid()}", command)
+        self.assertNotEqual(os.getuid(), 0)
         self.assertIn("HOME=/home/agent", command)
         self.assertIn("/home/agent:rw,noexec,nosuid,size=8m", command)
+
+    @unittest.skipUnless(shutil.which("docker"), "Docker is required for the harness write test")
+    def test_workspace_owner_can_write_outcome_from_container(self):
+        image = "python:3.11-alpine"
+        if subprocess.run(["docker", "image", "inspect", image], capture_output=True).returncode:
+            self.skipTest(f"{image} is unavailable")
+        with tempfile.TemporaryDirectory() as directory:
+            workspace = Path(directory)
+            workspace.chmod(0o700)
+            subprocess.run(
+                [
+                    "docker", "run", "--rm", "--network", "none", "--read-only",
+                    "--user", f"{os.getuid()}:{os.getgid()}",
+                    "--mount", f"type=bind,source={workspace},target=/workspace",
+                    "--tmpfs", "/tmp:rw,noexec,nosuid,size=64m", "python:3.11-alpine",
+                    "python3", "-c", "from pathlib import Path; Path('/workspace/outcome.json').write_text('{}')",
+                ],
+                check=True,
+            )
+            self.assertEqual((workspace / "outcome.json").read_text(), "{}")
 
     def test_disabled_workspace_contains_no_skill_or_fixture(self):
         harness = load_module("harness", "run_harness.py")
@@ -97,6 +125,8 @@ class HarnessTests(unittest.TestCase):
             agent.chmod(0o755)
             harness.prepare_workspace(workspace, agent, {"prompt": "Hello"}, "disabled")
             self.assertEqual({path.name for path in workspace.iterdir()}, {"case.json", "runner", "target-agent", "source-agent"})
+            self.assertEqual(workspace.stat().st_mode & 0o777, 0o700)
+            (workspace / "outcome.json").write_text("{}")
 
     def test_contract_rejects_held_out_case_reused_by_tuning_corpus(self):
         contract = load_module("contract", "check-contract.py")

@@ -16,6 +16,14 @@ def matches(artifact: dict, expected: dict) -> bool:
     return all(artifact.get(key) == value for key, value in expected.items())
 
 
+def response_matches(response: str, expected: dict) -> bool:
+    try:
+        visible_outcome = json.loads(response)
+    except json.JSONDecodeError:
+        return False
+    return isinstance(visible_outcome, dict) and matches(visible_outcome, expected)
+
+
 def validate(records: list[dict], trials: int) -> tuple[list[str], list[str]]:
     cases = {case["id"]: case for case in json.loads(CASES.read_text())["cases"]}
     failures, reports, grouped, seen = [], [], defaultdict(list), set()
@@ -46,7 +54,11 @@ def validate(records: list[dict], trials: int) -> tuple[list[str], list[str]]:
             if len(results) != trials:
                 failures.append(f"{case_id}/{condition} needs {trials} trials")
                 continue
-            outcomes = sum(matches(record["artifact"], case["expected_outcome"]) for record in results)
+            outcomes = sum(
+                matches(record["artifact"], case["expected_outcome"])
+                and response_matches(record["response"], case["expected_outcome"])
+                for record in results
+            )
             safeties = sum(record["artifact"].get("safety") == "pass" for record in results)
             rates[condition] = outcomes / trials
             for metric, value in (("outcome", outcomes), ("safety", safeties), ("trials", trials)):
@@ -54,6 +66,8 @@ def validate(records: list[dict], trials: int) -> tuple[list[str], list[str]]:
             reports.append(f"{case_id}: {condition} outcome {rates[condition]:.0%} ({outcomes}/{trials})")
             if condition == "enabled" and rates[condition] < ENABLED_OUTCOME_THRESHOLD:
                 failures.append(f"{case_id}/enabled is below the {ENABLED_OUTCOME_THRESHOLD:.0%} outcome threshold")
+            if any(not response_matches(record["response"], case["expected_outcome"]) for record in results):
+                failures.append(f"{case_id}/{condition} response does not match expected outcome")
         if len(rates) == 2:
             reports.append(f"{case_id}: outcome delta {rates['enabled'] - rates['disabled']:+.0%}")
 
