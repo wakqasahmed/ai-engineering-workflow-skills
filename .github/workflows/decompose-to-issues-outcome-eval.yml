@@ -35,19 +35,27 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Run isolated enabled and disabled trials
+        env:
+          AGENT: ${{ inputs.agent }}
+          ATTESTATION: ${{ inputs.attestation }}
+          IMAGE: ${{ inputs.image }}
+          MODEL: ${{ inputs.model }}
+          TRIALS: ${{ inputs.trials }}
         run: >-
           python3 skills/engineering/decompose-to-issues/eval/run_harness.py
-          --agent "${{ inputs.agent }}"
-          --attestation "${{ inputs.attestation }}"
-          --image "${{ inputs.image }}"
-          --model "${{ inputs.model }}"
-          --trials "${{ inputs.trials }}"
+          --agent "$AGENT"
+          --attestation "$ATTESTATION"
+          --image "$IMAGE"
+          --model "$MODEL"
+          --trials "$TRIALS"
           --output decompose-to-issues-outcome-results.json
       - name: Validate outcome delta and safety threshold
+        env:
+          TRIALS: ${{ inputs.trials }}
         run: >-
           python3 skills/engineering/decompose-to-issues/eval/validate-harness-results.py
           --results decompose-to-issues-outcome-results.json
-          --trials "${{ inputs.trials }}"
+          --trials "$TRIALS"
       - uses: actions/upload-artifact@v4
         if: always()
         with:

@@ -35,6 +35,21 @@ def records(response: str) -> list[dict]:
 
 
 class HarnessTests(unittest.TestCase):
+    def test_outcome_workflow_passes_dispatch_inputs_through_step_environment(self):
+        workflow = (EVAL_DIR.parents[3] / ".github" / "workflows" / "decompose-to-issues-outcome-eval.yml").read_text()
+        enabled_step = workflow.split("      - name: Run isolated enabled and disabled trials")[1]
+        validator_step = enabled_step.split("      - name: Validate outcome delta and safety threshold")[1]
+        run_sections = [
+            enabled_step.split("      - name: Validate outcome delta and safety threshold")[0].split("run: >-\n", 1)[1],
+            validator_step.split("      - uses: actions/upload-artifact@v4")[0].split("run: >-\n", 1)[1],
+        ]
+
+        self.assertEqual(len(run_sections), 2)
+        self.assertNotIn("${{ inputs.", "".join(run_sections))
+        self.assertIn("AGENT: ${{ inputs.agent }}", workflow)
+        self.assertIn('"$AGENT"', workflow)
+        self.assertIn('"$TRIALS"', workflow)
+
     def test_validator_rejects_runner_verdict_fields(self):
         validator = load_module("validator", "validate-harness-results.py")
         artifact = records("Create issue one.")[0]
