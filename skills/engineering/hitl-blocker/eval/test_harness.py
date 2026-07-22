@@ -90,6 +90,14 @@ class HarnessTests(unittest.TestCase):
             with self.assertRaisesRegex(SystemExit, "reviewed sterile profile"):
                 harness.validate_profile(profile, "agent@sha256:test", agent)
 
+    def test_profile_admits_the_checked_in_reference_target(self):
+        harness = load_module("harness", "run_harness.py")
+        profile = json.loads(harness.PROFILE.read_text())
+        agent = harness.TARGETS / "reference-hitl-blocker-agent.py"
+
+        self.assertTrue(agent.is_file())
+        harness.validate_profile(harness.PROFILE, profile["images"][0], agent)
+
 
 if __name__ == "__main__":
     unittest.main()
