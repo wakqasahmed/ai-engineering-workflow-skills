@@ -38,6 +38,12 @@ jobs:
       - name: Run clarify-work deterministic contract eval
         shell: bash
         run: skills/engineering/clarify-work/eval/run-eval.sh --dry-run
+      - name: Run release-gate deterministic contract eval
+        shell: bash
+        run: skills/engineering/release-gate/eval/run-eval.sh --dry-run
+      - name: Verify release-gate outcome validator
+        shell: bash
+        run: python3 -m unittest skills/engineering/release-gate/eval/test_harness.py
       - name: Run to-prd behavioral eval
         shell: bash
         run: skills/engineering/to-prd/eval/run-eval.sh

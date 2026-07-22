@@ -1,0 +1,49 @@
+name: Release-gate outcome eval
+
+on:
+  workflow_dispatch:
+    inputs:
+      agent:
+        description: Repository-controlled target-agent executable path
+        required: true
+        type: string
+      attestation:
+        description: Repository-controlled sterile evaluator attestation path
+        required: true
+        type: string
+      image:
+        description: Digest-pinned evaluator image
+        required: true
+        type: string
+      model:
+        description: Declared model identifier
+        required: true
+        type: string
+
+jobs:
+  outcome-eval:
+    environment: outcome-evals
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+      - name: Run isolated enabled and disabled trials
+        run: >-
+          python3 skills/engineering/release-gate/eval/run_harness.py
+          --agent "${{ inputs.agent }}"
+          --attestation "${{ inputs.attestation }}"
+          --image "${{ inputs.image }}"
+          --model "${{ inputs.model }}"
+          --trials 5
+          --output release-gate-outcome-results.json
+      - name: Validate outcome delta and safety threshold
+        run: >-
+          python3 skills/engineering/release-gate/eval/validate-harness-results.py
+          --results release-gate-outcome-results.json --trials 5
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: release-gate-outcome-results
+          path: release-gate-outcome-results.json
+          retention-days: 90
