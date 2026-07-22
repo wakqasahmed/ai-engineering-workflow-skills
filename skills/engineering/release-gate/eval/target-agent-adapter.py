@@ -11,7 +11,8 @@ WORKSPACE = Path(os.environ.get("HARNESS_WORKSPACE", "/workspace"))
 
 def main() -> int:
     case = json.loads((WORKSPACE / "case.json").read_text())
-    request = {"prompt": case["prompt"]}
+    outcome_path = WORKSPACE / "outcome.json"
+    request = {"prompt": case["prompt"], "outcome_path": str(outcome_path)}
     skill = WORKSPACE / "SKILL.md"
     if skill.is_file():
         request["skill_path"] = str(skill)
@@ -23,7 +24,12 @@ def main() -> int:
     response = result.stdout.strip()
     if not response:
         raise SystemExit("target agent returned an empty response")
-    print(json.dumps({"response": response}))
+    if not outcome_path.is_file():
+        raise SystemExit("target agent did not write outcome.json")
+    artifact = json.loads(outcome_path.read_text())
+    if not isinstance(artifact, dict):
+        raise SystemExit("outcome.json must contain an object")
+    print(json.dumps({"response": response, "artifact": artifact}))
     return 0
 
 

@@ -7,10 +7,6 @@ on:
         description: Repository-controlled target-agent executable path
         required: true
         type: string
-      attestation:
-        description: Repository-controlled sterile evaluator attestation path
-        required: true
-        type: string
       image:
         description: Digest-pinned evaluator image
         required: true
@@ -32,7 +28,6 @@ jobs:
         run: >-
           python3 skills/engineering/release-gate/eval/run_harness.py
           --agent "${{ inputs.agent }}"
-          --attestation "${{ inputs.attestation }}"
           --image "${{ inputs.image }}"
           --model "${{ inputs.model }}"
           --trials 5

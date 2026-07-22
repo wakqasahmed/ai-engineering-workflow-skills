@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Offline contract checks for the release-gate skill."""
+import hashlib
 import json
 from pathlib import Path
 
@@ -7,6 +8,7 @@ from pathlib import Path
 EVAL_DIR = Path(__file__).resolve().parent
 SKILL = EVAL_DIR.parent / "SKILL.md"
 CASES = EVAL_DIR / "fixtures" / "held-out.json"
+TUNING_CASES = EVAL_DIR / "fixtures" / "tuning.json"
 REQUIRED_SKILL_TERMS = (
     "Confirm the reviewed commit or artifact being released.",
     "Confirm environment and deployment mechanism.",
@@ -16,7 +18,25 @@ REQUIRED_SKILL_TERMS = (
     "Create a HITL issue if deployment needs missing human-held access.",
     "Do not deploy production from unreviewed PRs.",
 )
-REQUIRED_CASE_FIELDS = {"id", "split", "prompt", "response_rubric", "safety_rubric"}
+REQUIRED_CASE_FIELDS = {"id", "split", "prompt", "expected_outcome"}
+
+
+def prompt_digest(prompt: str) -> str:
+    return hashlib.sha256(" ".join(prompt.lower().split()).encode()).hexdigest()
+
+
+def validate_corpus(held_out_path: Path, tuning_path: Path) -> list[str]:
+    held_out = json.loads(held_out_path.read_text())["cases"]
+    tuning = json.loads(tuning_path.read_text())["cases"]
+    held_out_ids = {case.get("id") for case in held_out}
+    tuning_ids = {case.get("id") for case in tuning}
+    failures = []
+    if overlap := held_out_ids & tuning_ids:
+        failures.append(f"held-out ids appear in tuning corpus: {sorted(overlap)}")
+    held_out_prompts = {prompt_digest(case["prompt"]) for case in held_out if isinstance(case.get("prompt"), str)}
+    if any(prompt_digest(case["prompt"]) in held_out_prompts for case in tuning if isinstance(case.get("prompt"), str)):
+        failures.append("held-out prompt appears in tuning corpus")
+    return failures
 
 
 def validate() -> list[str]:
@@ -27,6 +47,7 @@ def validate() -> list[str]:
             failures.append(f"SKILL.md is missing required contract text: {term}")
 
     cases = json.loads(CASES.read_text())["cases"]
+    failures.extend(validate_corpus(CASES, TUNING_CASES))
     ids = set()
     for case in cases:
         missing = REQUIRED_CASE_FIELDS - case.keys()
@@ -38,10 +59,9 @@ def validate() -> list[str]:
         ids.add(case["id"])
         if case["split"] != "held_out":
             failures.append(f"{case['id']} is not held out")
-        for rubric_name in ("response_rubric", "safety_rubric"):
-            rubric = case[rubric_name]
-            if not isinstance(rubric, dict) or not rubric.get("must_match") or not isinstance(rubric.get("must_not_match", []), list):
-                failures.append(f"{case['id']} has an invalid {rubric_name}")
+        outcome = case["expected_outcome"]
+        if not isinstance(outcome, dict) or not outcome.get("decision") or outcome.get("safety") not in {"pass", "block"}:
+            failures.append(f"{case['id']} has an invalid expected outcome")
     if len(cases) < 10:
         failures.append("held-out manifest needs at least ten cases")
     return failures

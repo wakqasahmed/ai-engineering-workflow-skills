@@ -14,8 +14,9 @@ EVAL_DIR = Path(__file__).resolve().parent
 ROOT = EVAL_DIR.parents[3]
 CASES = EVAL_DIR / "fixtures" / "held-out.json"
 ADAPTER = EVAL_DIR / "target-agent-adapter.py"
-HARNESS_VERSION = "1"
-REQUIRED_CLAIMS = {"no_ambient_credentials", "no_held_out_fixtures", "no_preinstalled_skills", "empty_home", "non_root"}
+HARNESS_VERSION = "2"
+PROFILE = EVAL_DIR / "sterile-profile.json"
+TARGETS = EVAL_DIR / "targets"
 
 
 def prepare_workspace(workspace: Path, agent: Path, case: dict, condition: str) -> None:
@@ -33,7 +34,7 @@ def isolated_command(workspace: Path, image: str) -> list[str]:
         "docker", "run", "--rm", "--network", "none", "--read-only", "--cap-drop", "ALL",
         "--security-opt", "no-new-privileges", "--user", "65532:65532", "--pids-limit", "64",
         "--tmpfs", "/tmp:rw,noexec,nosuid,size=64m", "--tmpfs", "/home/agent:rw,noexec,nosuid,size=8m",
-        "--mount", f"type=bind,source={workspace},target=/workspace,readonly",
+        "--mount", f"type=bind,source={workspace},target=/workspace",
         "--env", "HARNESS_WORKSPACE=/workspace", "--env", "HOME=/home/agent", "--env", "PYTHONNOUSERSITE=1",
         "--env", "PATH=/usr/local/bin:/usr/bin:/bin", "--workdir", "/workspace", image, "/workspace/runner",
     ]
@@ -43,20 +44,18 @@ def file_sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def validate_attestation(path: Path, image: str, agent: Path) -> None:
-    if not path.is_file() or not path.is_relative_to(ROOT):
-        raise SystemExit("attestation must be a repository-controlled file")
-    attestation = json.loads(path.read_text())
-    if attestation.get("image") != image or attestation.get("agent_sha256") != file_sha256(agent):
-        raise SystemExit("attestation does not match the evaluator image and target agent")
-    if not isinstance(attestation.get("claims"), dict) or any(attestation["claims"].get(name) is not True for name in REQUIRED_CLAIMS):
-        raise SystemExit("attestation does not assert the sterile evaluator contract")
+def validate_profile(path: Path, image: str, agent: Path) -> None:
+    if not agent.is_relative_to(TARGETS):
+        raise SystemExit("target agent must be in eval/targets")
+    profile = json.loads(path.read_text())
+    agent_entry = {"path": str(agent.relative_to(ROOT)), "sha256": file_sha256(agent)}
+    if image not in profile.get("images", []) or agent_entry not in profile.get("targets", []):
+        raise SystemExit("agent and image must be admitted by the reviewed sterile profile")
 
 
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--agent", type=Path, required=True)
-    parser.add_argument("--attestation", type=Path, required=True)
     parser.add_argument("--image", required=True)
     parser.add_argument("--model", required=True)
     parser.add_argument("--trials", type=int, choices=range(3, 7), default=5)
@@ -67,7 +66,7 @@ def main() -> int:
         raise SystemExit("agent must be a repository-controlled file")
     if "@sha256:" not in args.image:
         raise SystemExit("image must be pinned by digest")
-    validate_attestation(args.attestation.resolve(), args.image, agent)
+    validate_profile(PROFILE, args.image, agent)
 
     records = []
     for case in json.loads(CASES.read_text())["cases"]:
@@ -79,8 +78,8 @@ def main() -> int:
                     result = subprocess.run(isolated_command(workspace, args.image), text=True, capture_output=True, check=True,
                         env={"PATH": os.environ["PATH"], "HOME": "/nonexistent", "LANG": "C"})
                 record = json.loads(result.stdout)
-                if set(record) != {"response"} or not isinstance(record["response"], str):
-                    raise SystemExit("target-agent adapter must emit only a text response")
+                if set(record) != {"response", "artifact"} or not isinstance(record["response"], str) or not isinstance(record["artifact"], dict):
+                    raise SystemExit("target-agent adapter must emit text plus an outcome artifact")
                 records.append({**record, "case_id": case["id"], "condition": condition, "trial": trial, "model": args.model, "harness_version": HARNESS_VERSION})
     args.output.write_text(json.dumps(records, indent=2))
     return 0

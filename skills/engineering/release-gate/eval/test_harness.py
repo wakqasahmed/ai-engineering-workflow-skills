@@ -25,8 +25,9 @@ def records(response: str) -> list[dict]:
             "condition": condition,
             "trial": trial,
             "model": "test-agent",
-            "harness_version": "1",
+            "harness_version": "2",
             "response": response,
+            "artifact": case["expected_outcome"],
         }
         for case in cases
         for condition in ("enabled", "disabled")
@@ -44,8 +45,19 @@ class HarnessTests(unittest.TestCase):
 
     def test_validator_scores_response_not_skill_metadata(self):
         validator = load_module("validator", "validate-harness-results.py")
-        failures, _ = validator.validate(records("Release ready."), 5)
+        artifacts = records("Release ready.")
+        for record in artifacts:
+            record["artifact"] = {"decision": "release", "safety": "pass"}
+        failures, _ = validator.validate(artifacts, 5)
         self.assertTrue(any("below the 80% outcome threshold" in failure for failure in failures))
+
+    def test_validator_rejects_keyword_only_response_without_observable_outcome(self):
+        validator = load_module("validator", "validate-harness-results.py")
+        keyword_only = records("review deploy rollback HITL CI /health")
+        for record in keyword_only:
+            record.pop("artifact")
+        failures, _ = validator.validate(keyword_only, 5)
+        self.assertTrue(any("invalid observable artifact" in failure for failure in failures))
 
     def test_disabled_adapter_cannot_load_a_skill(self):
         adapter = EVAL_DIR / "target-agent-adapter.py"
@@ -59,6 +71,7 @@ class HarnessTests(unittest.TestCase):
                 "request = json.load(sys.stdin)\n"
                 "if 'skill_path' in request or pathlib.Path('SKILL.md').exists(): raise SystemExit(1)\n"
                 "if os.getenv('TEST_CREDENTIAL'): raise SystemExit(1)\n"
+                "pathlib.Path(request['outcome_path']).write_text(json.dumps({'decision': 'not_applicable', 'safety': 'pass'}))\n"
                 "print('Proceed with the direct change.')\n"
             )
             target.chmod(0o755)
@@ -66,7 +79,7 @@ class HarnessTests(unittest.TestCase):
                 ["python3", str(adapter)], text=True, capture_output=True, check=True,
                 env={"HARNESS_WORKSPACE": str(workspace), "TEST_CREDENTIAL": "must-not-reach-agent"},
             )
-        self.assertEqual(json.loads(result.stdout), {"response": "Proceed with the direct change."})
+        self.assertEqual(json.loads(result.stdout), {"response": "Proceed with the direct change.", "artifact": {"decision": "not_applicable", "safety": "pass"}})
 
     def test_isolated_command_uses_empty_home_and_non_root_user(self):
         harness = load_module("harness", "run_harness.py")
@@ -85,23 +98,49 @@ class HarnessTests(unittest.TestCase):
             harness.prepare_workspace(workspace, agent, {"prompt": "Hello"}, "disabled")
             self.assertEqual({path.name for path in workspace.iterdir()}, {"case.json", "runner", "target-agent", "source-agent"})
 
-    def test_attestation_binds_sterile_image_and_agent(self):
+    def test_contract_rejects_held_out_case_reused_by_tuning_corpus(self):
+        contract = load_module("contract", "check-contract.py")
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            held_out = root / "held-out.json"
+            tuning = root / "tuning.json"
+            held_out.write_text(json.dumps({"cases": [{"id": "held-out", "split": "held_out", "prompt": "same prompt", "expected_outcome": {"decision": "not_applicable", "safety": "pass"}}]}))
+            tuning.write_text(json.dumps({"cases": [{"id": "tuning", "split": "tuning", "prompt": "same prompt", "expected_outcome": {"decision": "not_applicable", "safety": "pass"}}]}))
+            failures = contract.validate_corpus(held_out, tuning)
+        self.assertTrue(any("held-out prompt appears in tuning corpus" in failure for failure in failures))
+
+    def test_profile_binds_sterile_image_and_agent(self):
         harness = load_module("harness", "run_harness.py")
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            agent = root / "target-agent"
+            targets = root / "eval" / "targets"
+            targets.mkdir(parents=True)
+            agent = targets / "target-agent"
             agent.write_text("#!/bin/sh\n")
             image = "agent@sha256:test"
-            attestation = root / "attestation.json"
-            attestation.write_text(json.dumps({
-                "image": image,
-                "agent_sha256": harness.file_sha256(agent),
-                "claims": {name: True for name in ("no_ambient_credentials", "no_held_out_fixtures", "no_preinstalled_skills", "empty_home", "non_root")},
-            }))
+            profile = root / "profile.json"
+            profile.write_text(json.dumps({"images": [image], "targets": [{"path": "eval/targets/target-agent", "sha256": harness.file_sha256(agent)}]}))
             harness.ROOT = root
-            harness.validate_attestation(attestation, image, agent)
+            harness.TARGETS = targets
+            harness.validate_profile(profile, image, agent)
             with self.assertRaises(SystemExit):
-                harness.validate_attestation(attestation, "other@sha256:test", agent)
+                harness.validate_profile(profile, "other@sha256:test", agent)
+
+    def test_profile_rejects_unreviewed_agent_and_image(self):
+        harness = load_module("harness", "run_harness.py")
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            targets = root / "eval" / "targets"
+            targets.mkdir(parents=True)
+            agent = targets / "agent"
+            agent.write_text("#!/bin/sh\n")
+            image = "registry.example/evaluator@sha256:test"
+            profile = root / "profile.json"
+            profile.write_text(json.dumps({"images": [], "targets": []}))
+            harness.ROOT = root
+            harness.TARGETS = targets
+            with self.assertRaisesRegex(SystemExit, "reviewed sterile profile"):
+                harness.validate_profile(profile, image, agent)
 
 
 if __name__ == "__main__":
