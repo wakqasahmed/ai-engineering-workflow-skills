@@ -18,6 +18,7 @@ This file mirrors `AGENTS.md` for compatibility.
 - Use `diagnose` when something is broken, throwing, or regressing.
 - Use `security-review` before PRs touching auth, payments, secrets, or external APIs.
 - Use `ai-agent-pr-metadata` when configuring PR templates, PR update comments, or AI review comments to disclose agent/model/run metadata outside commit messages.
+- Use `open-code-review-setup` when creating a new repository or onboarding an existing repo to automated AI code review (OCR), or when OCR reviews are not running on PRs.
 - Use `handover` when context crosses an agent or session boundary, when only 5-10% of the session limit remains with work unfinished, or when context usage passes 40% on unfinished multi-step work.
 
 ## Summary
