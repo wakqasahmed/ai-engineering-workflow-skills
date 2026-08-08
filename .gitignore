@@ -1,1 +1,25 @@
 .claude/
+
+# Dependencies
+node_modules/
+.vendor/
+.venv/
+
+# Build artifacts
+dist/
+build/
+out/
+
+# IDE/config files
+.idea/
+.vscode/
+.DS_Store
+
+# Logs and temp files
+*.log
+*.tmp
+
+# Environment files
+.env
+.env.local
+.env.*.local

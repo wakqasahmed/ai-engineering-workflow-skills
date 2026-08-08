@@ -22,12 +22,12 @@ jobs:
   manual-review:
     if: >-
       github.event.issue.pull_request != null &&
-      github.event.comment.user.login == 'wakqasahmed' &&
+      github.event.comment.user.login == '${{ vars.MAINTAINER_USERNAME }}' &&
       startsWith(github.event.comment.body, '/ocr-review')
     runs-on: ubuntu-latest
     timeout-minutes: 10
     concurrency:
-      group: ocr-manual-review-${{ github.event.issue.number }}
+      group: ${{ github.workflow }}-${{ github.event.issue.number }}
       cancel-in-progress: true
     steps:
       - name: Resolve PR base ref and head SHA
@@ -59,6 +59,12 @@ jobs:
 
           if [[ "$status_code" != 2* ]]; then
             echo "OpenRouter preflight returned HTTP ${status_code}."
+            exit 1
+          fi
+          
+          # Validate response content
+          if ! jq -e '.choices[0].message.content == "OK"' /tmp/openrouter-preflight.json >/dev/null 2>&1; then
+            echo "OpenRouter preflight returned unexpected response."
             exit 1
           fi
 
