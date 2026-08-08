@@ -7,6 +7,7 @@
     "./skills/engineering/define-done",
     "./skills/engineering/review-gate",
     "./skills/engineering/ai-agent-pr-metadata",
+    "./skills/engineering/open-code-review-setup",
     "./skills/engineering/subagent-pipeline",
     "./skills/engineering/hitl-blocker",
     "./skills/engineering/release-gate",

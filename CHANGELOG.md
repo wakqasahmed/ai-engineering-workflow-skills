@@ -8,6 +8,7 @@ The goal is transparency over time: what changed, why it changed, and when the w
 
 ### Added
 
+- `open-code-review-setup` skill for installing or auditing Alibaba Open Code Review on new/existing repositories: detection, workflow + `rule.json` templates, OpenRouter vars/secret configuration (default free `nvidia/nemotron-3-super-120b-a12b:free`), HITL path for missing keys, and self-trigger verification (#81)
 - `changesets-release` skill for release intent, SemVer selection, generated changelogs, version-package PRs, and cross-artifact version checks for independently distributed packages (#48)
 - `ai-agent-pr-metadata` skill for keeping AI agent, review tool, LLM model, and run metadata visible in PR bodies/comments/reviews without adding AI attribution to commit messages (#28)
 - `subagent-pipeline` skill codifying the cold-start implementer/reviewer/fixer chain, CI gate, and staging auto-merge rule used for issue execution
