@@ -36,12 +36,14 @@ Branch per git workflow (`feature/issue-N-open-code-review`, PR to the default i
 Repo variables (non-secret):
 
 ```sh
-gh variable set OCR_LLM_URL        --repo <owner>/<repo> --body "https://openrouter.ai/api/v1"
-gh variable set OCR_LLM_MODEL      --repo <owner>/<repo> --body "nvidia/nemotron-3-super-120b-a12b:free"
-gh variable set OCR_USE_ANTHROPIC  --repo <owner>/<repo> --body "false"
+gh variable set OCR_LLM_URL              --repo <owner>/<repo> --body "https://openrouter.ai/api/v1"
+gh variable set OCR_LLM_MODEL_FREE       --repo <owner>/<repo> --body "nvidia/nemotron-3-super-120b-a12b:free"
+gh variable set OCR_LLM_MODEL_FALLBACK   --repo <owner>/<repo> --body "<paid-model-id>"
+gh variable set OCR_USE_ANTHROPIC        --repo <owner>/<repo> --body "false"
 ```
 
-- Default model: `nvidia/nemotron-3-super-120b-a12b:free` (OpenRouter free tier, 262k ctx). Override per repo only when asked; verify any model ID against `https://openrouter.ai/api/v1/models` first.
+- Default free model: `nvidia/nemotron-3-super-120b-a12b:free` (OpenRouter free tier, 262k ctx). Override per repo only when asked; verify any model ID against `https://openrouter.ai/api/v1/models` first.
+- Fallback model: use a known-working paid model already proven for this deployment context if one exists, otherwise a cheap general-purpose paid model — verify against `https://openrouter.ai/api/v1/models` first, same as the free model. The preflight probes `OCR_LLM_MODEL_FREE` first and falls back to `OCR_LLM_MODEL_FALLBACK` on any non-2xx response (quota exhaustion, outage, etc.).
 - Secret: `OCR_LLM_AUTH_TOKEN` = OpenRouter key. Pipe it from the local secrets store straight into `gh secret set` — never print, log, or commit the value:
 
 ```sh
@@ -57,6 +59,7 @@ grep -m1 '^OPENROUTER_API_KEY=' <env-file> | cut -d= -f2- | tr -d '\r' | gh secr
 3. Confirm the review comment lands on the PR and ends with the `Review metadata` footer per `ai-agent-pr-metadata`.
 4. Compare `tool_calls`/`input_tokens` in the workflow log's `=== OCR result ===` block after tuning `rule.json` to confirm spend dropped.
 5. `ocr rules check --rule .opencodereview/rule.json <path>` verifies a path matches before relying on it (no LLM call).
+6. Confirm both probe branches are exercised at least once: the free-model probe should succeed under normal conditions; to test the fallback branch deliberately, temporarily set `OCR_LLM_MODEL_FREE` to an invalid model ID via `gh variable set` in a throwaway test, confirm the workflow logs "Free model unavailable ... falling back to paid model", then revert the variable to its real value.
 
 ## Guardrails
 
