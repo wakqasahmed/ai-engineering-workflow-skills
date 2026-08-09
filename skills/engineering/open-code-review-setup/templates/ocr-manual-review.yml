@@ -25,7 +25,7 @@ jobs:
       github.event.comment.user.login == '${{ vars.MAINTAINER_USERNAME }}' &&
       startsWith(github.event.comment.body, '/ocr-review')
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     concurrency:
       group: ${{ github.workflow }}-${{ github.event.issue.number }}
       cancel-in-progress: true
@@ -81,7 +81,7 @@ jobs:
           llm_auth_token: ${{ secrets.OCR_LLM_AUTH_TOKEN }}
           llm_model: ${{ steps.ocr_model.outputs.model }}
           llm_use_anthropic: ${{ vars.OCR_USE_ANTHROPIC }}
-          llm_timeout: '120'
+          llm_timeout: '300'
           sticky_summary: 'true'
           incremental: 'true'
           base_ref: ${{ steps.pr.outputs.base_ref }}

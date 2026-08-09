@@ -60,6 +60,7 @@ grep -m1 '^OPENROUTER_API_KEY=' <env-file> | cut -d= -f2- | tr -d '\r' | gh secr
 4. Compare `tool_calls`/`input_tokens` in the workflow log's `=== OCR result ===` block after tuning `rule.json` to confirm spend dropped.
 5. `ocr rules check --rule .opencodereview/rule.json <path>` verifies a path matches before relying on it (no LLM call).
 6. Confirm both probe branches are exercised at least once: the free-model probe should succeed under normal conditions; to test the fallback branch deliberately, temporarily set `OCR_LLM_MODEL_FREE` to an invalid model ID via `gh variable set` in a throwaway test, confirm the workflow logs "Free model unavailable ... falling back to paid model", then revert the variable to its real value.
+7. The preflight probe only proves the model is reachable (1-token reply) — it does not prove a real review will finish within `llm_timeout`. A free-tier model can pass the probe and still time out mid-review on a large diff, and since fallback only triggers on a failed probe (not a failed review), a slow-but-reachable free model gets no fallback. `llm_timeout: '300'` is the template default and a starting point, not a guarantee — raise it further per repo if reviews are timing out on large diffs.
 
 ## Guardrails
 
