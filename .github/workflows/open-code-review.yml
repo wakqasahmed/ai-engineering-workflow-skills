@@ -65,6 +65,6 @@ jobs:
           llm_auth_token: ${{ secrets.OCR_LLM_AUTH_TOKEN }}
           llm_model: ${{ steps.ocr_model.outputs.model }}
           llm_use_anthropic: ${{ vars.OCR_USE_ANTHROPIC }}
-          llm_timeout: '120'
+          llm_timeout: '300'
           sticky_summary: 'true'
           incremental: 'true'
