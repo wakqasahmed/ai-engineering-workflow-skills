@@ -28,22 +28,22 @@ jobs:
         run: scripts/test-changesets-release.sh
       - name: Run Changesets release deterministic eval
         shell: bash
-        run: skills/engineering/changesets-release/eval/run-eval.sh --dry-run
+        run: eval/engineering/changesets-release/run-eval.sh --dry-run
       - name: Verify Changesets release outcome validator
         shell: bash
-        run: python3 skills/engineering/changesets-release/eval/test-validator.py
+        run: python3 eval/engineering/changesets-release/test-validator.py
       - name: Run subagent-pipeline behavioral eval
         shell: bash
-        run: skills/engineering/subagent-pipeline/eval/run-eval.sh --dry-run
+        run: eval/engineering/subagent-pipeline/run-eval.sh --dry-run
       - name: Run clarify-work deterministic contract eval
         shell: bash
-        run: skills/engineering/clarify-work/eval/run-eval.sh --dry-run
+        run: eval/engineering/clarify-work/run-eval.sh --dry-run
       - name: Run release-gate deterministic contract eval
         shell: bash
-        run: skills/engineering/release-gate/eval/run-eval.sh --dry-run
+        run: eval/engineering/release-gate/run-eval.sh --dry-run
       - name: Verify release-gate outcome validator
         shell: bash
-        run: python3 -m unittest skills/engineering/release-gate/eval/test_harness.py
+        run: python3 -m unittest eval/engineering/release-gate/test_harness.py
       - name: Run to-prd behavioral eval
         shell: bash
-        run: skills/engineering/to-prd/eval/run-eval.sh
+        run: eval/engineering/to-prd/run-eval.sh

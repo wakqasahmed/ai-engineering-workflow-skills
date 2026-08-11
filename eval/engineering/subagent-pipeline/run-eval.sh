@@ -3,7 +3,7 @@ set -euo pipefail
 
 EVAL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 FIXTURES_DIR="${EVAL_DIR}/fixtures"
-SKILL_MD="${EVAL_DIR}/../SKILL.md"
+SKILL_MD="${EVAL_DIR}/../../../skills/engineering/subagent-pipeline/SKILL.md"
 WORKSPACE="$(mktemp -d)"
 trap 'rm -rf "$WORKSPACE"' EXIT
 

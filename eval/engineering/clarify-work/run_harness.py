@@ -25,7 +25,7 @@ def prepare_workspace(workspace: Path, agent: Path, case: dict, condition: str) 
     shutil.copy2(agent, workspace / "target-agent")
     (workspace / "target-agent").chmod(0o755)
     if condition == "enabled":
-        shutil.copy2(EVAL_DIR.parent / "SKILL.md", workspace / "SKILL.md")
+        shutil.copy2(EVAL_DIR.parent.parent.parent / "skills" / "engineering" / "clarify-work" / "SKILL.md", workspace / "SKILL.md")
 
 
 def isolated_command(workspace: Path, image: str) -> list[str]:

@@ -36,7 +36,7 @@ jobs:
       - uses: actions/checkout@v6
       - name: Run isolated enabled and disabled trials
         run: >-
-          python3 skills/engineering/clarify-work/eval/run_harness.py
+          python3 eval/engineering/clarify-work/run_harness.py
           --agent "${{ inputs.agent }}"
           --attestation "${{ inputs.attestation }}"
           --image "${{ inputs.image }}"
@@ -45,7 +45,7 @@ jobs:
           --output clarify-work-outcome-results.json
       - name: Validate outcome delta and safety threshold
         run: >-
-          python3 skills/engineering/clarify-work/eval/validate-harness-results.py
+          python3 eval/engineering/clarify-work/validate-harness-results.py
           --results clarify-work-outcome-results.json
           --trials "${{ inputs.trials }}"
       - uses: actions/upload-artifact@v4
