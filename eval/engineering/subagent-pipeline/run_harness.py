@@ -10,7 +10,7 @@ from pathlib import Path
 
 
 EVAL_DIR = Path(__file__).resolve().parent
-ROOT = EVAL_DIR.parents[3]
+ROOT = EVAL_DIR.parents[2]
 CASES = EVAL_DIR / "fixtures" / "held-out.json"
 HARNESS_VERSION = "1"
 
@@ -20,7 +20,7 @@ def prepare_workspace(workspace: Path, runner: Path, case: dict, condition: str)
     shutil.copy2(runner, workspace / "runner")
     (workspace / "runner").chmod(0o755)
     if condition == "enabled":
-        shutil.copy2(EVAL_DIR.parent.parent.parent / "skills" / "engineering" / "subagent-pipeline" / "SKILL.md", workspace / "SKILL.md")
+        shutil.copy2(ROOT / "skills" / "engineering" / "subagent-pipeline" / "SKILL.md", workspace / "SKILL.md")
 
 
 def isolated_command(workspace: Path, image: str, condition: str, trial: int, model: str) -> list[str]:

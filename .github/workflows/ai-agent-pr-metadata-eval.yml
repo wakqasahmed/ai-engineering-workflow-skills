@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - 'skills/engineering/ai-agent-pr-metadata/**'
+      - 'eval/engineering/ai-agent-pr-metadata/**'
       - '.github/workflows/ai-agent-pr-metadata-eval.yml'
   workflow_dispatch:
     inputs:
