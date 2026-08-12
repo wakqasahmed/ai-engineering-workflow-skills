@@ -22,4 +22,9 @@ Several skills already have a deterministic eval layer (free, runs on every PR).
 
 ### Fund the real harness runs
 
-This repo is one of five in the same public skills portfolio going through the same outcome-eval build-out. The full portfolio-wide cost breakdown, funding links, and per-repo targets live in [`email-marketing-skills`'s README](https://github.com/wakqasahmed/email-marketing-skills#fund-the-real-harness-runs) — this repo's share of that shared $300 target is $40.
+This skill's deterministic checks run free on every PR. Proving its outcome-eval harness with real, metered model calls costs money:
+
+- **Bitcoin (BTC):** `bc1p5xqamscrz7nu0d8jdmj748rj75sk8khtyxypn3qvsdjms4t4uw2qsjn0he`
+- **Ethereum (ETH) / any ERC-20 including stablecoins:** `0x59bc573e414D62d44461234dEf438247dfc3Cf6A`
+
+Double-check every character against this page before sending. Full portfolio picture and rationale: [wakqasahmed/skills](https://github.com/wakqasahmed/skills#fund-the-real-harness-runs).
