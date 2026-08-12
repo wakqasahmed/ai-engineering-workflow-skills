@@ -13,7 +13,7 @@ fi
 mkdir -p "$WORKSPACE/eval/fixtures" "$WORKSPACE/home"
 cp "$EVAL_DIR/check-contract.py" "$WORKSPACE/eval/"
 cp "$EVAL_DIR/fixtures/held-out.json" "$WORKSPACE/eval/fixtures/"
-cp "$EVAL_DIR/../SKILL.md" "$WORKSPACE/SKILL.md"
+cp "$EVAL_DIR/../../../skills/engineering/changesets-release/SKILL.md" "$WORKSPACE/SKILL.md"
 cat > "$WORKSPACE/sitecustomize.py" <<'PY'
 import socket
 

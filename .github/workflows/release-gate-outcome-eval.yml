@@ -26,7 +26,7 @@ jobs:
       - uses: actions/checkout@v6
       - name: Run isolated enabled and disabled trials
         run: >-
-          python3 skills/engineering/release-gate/eval/run_harness.py
+          python3 eval/engineering/release-gate/run_harness.py
           --agent "${{ inputs.agent }}"
           --image "${{ inputs.image }}"
           --model "${{ inputs.model }}"
@@ -34,7 +34,7 @@ jobs:
           --output release-gate-outcome-results.json
       - name: Validate outcome delta and safety threshold
         run: >-
-          python3 skills/engineering/release-gate/eval/validate-harness-results.py
+          python3 eval/engineering/release-gate/validate-harness-results.py
           --results release-gate-outcome-results.json --trials 5
       - uses: actions/upload-artifact@v4
         if: always()

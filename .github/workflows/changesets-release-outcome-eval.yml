@@ -24,7 +24,7 @@ jobs:
       - name: Run isolated enabled and disabled trials
         shell: bash
         run: >-
-          python3 skills/engineering/changesets-release/eval/run_harness.py
+          python3 eval/engineering/changesets-release/run_harness.py
           --command "${{ inputs.command }}"
           --image "${{ inputs.image }}"
           --model "${{ inputs.model }}"
@@ -33,7 +33,7 @@ jobs:
       - name: Compare held-out outcomes
         shell: bash
         run: >-
-          python3 skills/engineering/changesets-release/eval/validate-harness-results.py
+          python3 eval/engineering/changesets-release/validate-harness-results.py
           changesets-release-outcomes.json
           --summary changesets-release-summary.json
       - name: Retain outcome comparison

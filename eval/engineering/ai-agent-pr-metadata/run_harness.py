@@ -24,7 +24,7 @@ def prepare_workspace(workspace: Path, case: dict, condition: str) -> None:
         shutil.copy2(EVAL_DIR / "fake_cli.py", shim)
         shim.chmod(0o755)
     if condition == "enabled":
-        shutil.copy2(EVAL_DIR.parent / "SKILL.md", workspace / "SKILL.md")
+        shutil.copy2(EVAL_DIR.parent.parent.parent / "skills" / "engineering" / "ai-agent-pr-metadata" / "SKILL.md", workspace / "SKILL.md")
 
 def isolated_command(workspace: Path, image: str, command: str, condition: str, trial: int, model: str) -> list[str]:
     return [

@@ -11,7 +11,7 @@ from pathlib import Path
 
 
 EVAL_DIR = Path(__file__).resolve().parent
-ROOT = EVAL_DIR.parents[3]
+ROOT = EVAL_DIR.parents[2]
 CASES = EVAL_DIR / "fixtures" / "held-out.json"
 HARNESS_VERSION = "1"
 ADAPTER = EVAL_DIR / "target-agent-adapter.py"
@@ -25,7 +25,7 @@ def prepare_workspace(workspace: Path, agent: Path, case: dict, condition: str) 
     shutil.copy2(agent, workspace / "target-agent")
     (workspace / "target-agent").chmod(0o755)
     if condition == "enabled":
-        shutil.copy2(EVAL_DIR.parent / "SKILL.md", workspace / "SKILL.md")
+        shutil.copy2(ROOT / "skills" / "engineering" / "clarify-work" / "SKILL.md", workspace / "SKILL.md")
 
 
 def isolated_command(workspace: Path, image: str) -> list[str]:
