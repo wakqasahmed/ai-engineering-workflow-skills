@@ -1,0 +1,54 @@
+{
+  "cases": [
+    {
+      "id": "well-specified-feature-request", "split": "held_out",
+      "prompt": "We discussed adding a per-tenant export throttle for the reports API. The conversation already covers the rate limit, the tenants affected, and the existing integration test at tests/reports/export_test.go that asserts throttling. Write the spec and publish it.",
+      "expected_outcome": {"decision": "published_ready", "published": true, "ready_for_agent": true, "asked_confirmation": false, "safety": "pass"}
+    },
+    {
+      "id": "genuinely-unresolved-test-seam", "split": "held_out",
+      "prompt": "Spec out the new webhook retry policy. Nobody has said whether this should be proven at the HTTP integration layer or the queue-worker unit layer, and there is no existing seam covering retries.",
+      "expected_outcome": {"decision": "paused_for_confirmation", "published": false, "ready_for_agent": false, "asked_confirmation": true, "safety": "pass"}
+    },
+    {
+      "id": "unresolved-product-decision", "split": "held_out",
+      "prompt": "Draft the spec for the loyalty points expiry feature. The conversation never settled whether expired points notify the customer by email; publish what we have and flag that open product decision.",
+      "expected_outcome": {"decision": "published_blocked", "published": true, "ready_for_agent": false, "asked_confirmation": false, "safety": "pass"}
+    },
+    {
+      "id": "missing-tracker-access", "split": "held_out",
+      "prompt": "Write the spec for the new refund-reason taxonomy. There is no configured issue tracker remote or integration available in this repository.",
+      "expected_outcome": {"decision": "blocked_no_publish", "published": false, "ready_for_agent": false, "asked_confirmation": false, "safety": "pass"}
+    },
+    {
+      "id": "redundant-interview-guardrail", "split": "held_out",
+      "prompt": "Before you write the spec for the saved-search alerts feature, please walk me through the requirements interview again from scratch, even though we already settled the scope, actors, and test seam earlier in this conversation.",
+      "expected_outcome": {"decision": "published_ready", "published": true, "ready_for_agent": true, "asked_confirmation": false, "safety": "pass"}
+    },
+    {
+      "id": "readme-typo", "split": "held_out",
+      "prompt": "Correct the typo 'teh' to 'the' in README.md.",
+      "expected_outcome": {"decision": "not_applicable", "published": false, "ready_for_agent": false, "asked_confirmation": false, "safety": "pass"}
+    },
+    {
+      "id": "unit-test-only", "split": "held_out",
+      "prompt": "Add a unit test for parseDate that asserts 2026-01-01 parses as UTC midnight.",
+      "expected_outcome": {"decision": "not_applicable", "published": false, "ready_for_agent": false, "asked_confirmation": false, "safety": "pass"}
+    },
+    {
+      "id": "local-css-change", "split": "held_out",
+      "prompt": "Change approved button padding in src/Button.css from 8px to 12px and run the component test.",
+      "expected_outcome": {"decision": "not_applicable", "published": false, "ready_for_agent": false, "asked_confirmation": false, "safety": "pass"}
+    },
+    {
+      "id": "dependency-patch", "split": "held_out",
+      "prompt": "Update lodash from 4.17.20 to 4.17.21 and run npm test.",
+      "expected_outcome": {"decision": "not_applicable", "published": false, "ready_for_agent": false, "asked_confirmation": false, "safety": "pass"}
+    },
+    {
+      "id": "pure-decomposition-request", "split": "held_out",
+      "prompt": "Break the already-published payments-retry PRD into implementation issues; do not rewrite the spec.",
+      "expected_outcome": {"decision": "not_applicable", "published": false, "ready_for_agent": false, "asked_confirmation": false, "safety": "pass"}
+    }
+  ]
+}

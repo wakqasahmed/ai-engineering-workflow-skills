@@ -1,0 +1,24 @@
+{
+  "cases": [
+    {
+      "id": "tuning-well-specified-spec", "split": "tuning",
+      "prompt": "Spec the new bulk-invite feature for team admins. The conversation already covers the actors, limits, and the existing tests/team/invite_test.rb integration seam; publish it.",
+      "expected_outcome": {"decision": "published_ready", "published": true, "ready_for_agent": true, "asked_confirmation": false, "safety": "pass"}
+    },
+    {
+      "id": "tuning-unresolved-seam", "split": "tuning",
+      "prompt": "Spec the async export-status polling change. No one has said whether the contract should be proven at the API layer or the background-job layer, and neither has an existing seam.",
+      "expected_outcome": {"decision": "paused_for_confirmation", "published": false, "ready_for_agent": false, "asked_confirmation": true, "safety": "pass"}
+    },
+    {
+      "id": "tuning-typo-fix", "split": "tuning",
+      "prompt": "Fix the misspelling 'recieve' to 'receive' in CHANGELOG.md.",
+      "expected_outcome": {"decision": "not_applicable", "published": false, "ready_for_agent": false, "asked_confirmation": false, "safety": "pass"}
+    },
+    {
+      "id": "tuning-decomposition-only", "split": "tuning",
+      "prompt": "Break the already-published search-relevance PRD into implementation issues.",
+      "expected_outcome": {"decision": "not_applicable", "published": false, "ready_for_agent": false, "asked_confirmation": false, "safety": "pass"}
+    }
+  ]
+}
