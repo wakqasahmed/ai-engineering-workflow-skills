@@ -1,0 +1,56 @@
+name: Filament conventions outcome eval
+
+on:
+  pull_request:
+    paths:
+      - 'skills/filament/filament-conventions/**'
+      - '.github/workflows/filament-conventions-outcome-eval.yml'
+  workflow_dispatch:
+    inputs:
+      agent:
+        description: Repository-controlled target-agent executable path
+        required: true
+        type: string
+      image:
+        description: Digest-pinned evaluator image
+        required: true
+        type: string
+      model:
+        description: Declared model identifier
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  deterministic:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Run offline deterministic contract checks
+        run: bash eval/filament/filament-conventions/run-eval.sh --dry-run
+  outcome-harness:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+      - name: Run isolated enabled and disabled trials
+        run: >-
+          python3 eval/filament/filament-conventions/run_harness.py
+          --agent "${{ inputs.agent }}" --image "${{ inputs.image }}"
+          --model "${{ inputs.model }}" --trials 5
+          --output filament-conventions-outcome-results.json
+      - name: Validate outcome delta and safety threshold
+        run: >-
+          python3 eval/filament/filament-conventions/validate-harness-results.py
+          --results filament-conventions-outcome-results.json --trials 5
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: filament-conventions-outcome-results
+          path: filament-conventions-outcome-results.json
+          retention-days: 90

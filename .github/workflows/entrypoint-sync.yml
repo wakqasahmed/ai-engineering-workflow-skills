@@ -44,6 +44,12 @@ jobs:
       - name: Verify release-gate outcome validator
         shell: bash
         run: python3 -m unittest eval/engineering/release-gate/test_harness.py
+      - name: Run Filament conventions deterministic contract eval
+        shell: bash
+        run: eval/filament/filament-conventions/run-eval.sh --dry-run
+      - name: Verify Filament conventions outcome validator
+        shell: bash
+        run: python3 -m unittest eval/filament/filament-conventions/test_harness.py
       - name: Run HITL blocker deterministic contract eval
         shell: bash
         run: eval/engineering/hitl-blocker/run-eval.sh --dry-run
