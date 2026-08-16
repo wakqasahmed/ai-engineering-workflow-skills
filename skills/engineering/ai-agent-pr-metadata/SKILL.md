@@ -13,6 +13,7 @@ Use this when a repository needs traceable AI assistance metadata in GitHub whil
 - Never guess the model name. Read the authoritative resolved model+version from the runtime or orchestrator; a product alias is not evidence of a model ID.
 - Include a run URL when the work was produced by GitHub Actions or another traceable runner.
 - Public issues, PRs, comments, and review records must never include credential values or local credential-file paths. Use `Credential details: [redacted]` instead.
+- Never paste a full `https://github.com/...` URL to a third-party issue/PR into a private tracker/automation repo's own PR body, commit message, or issue text (e.g. test-plan notes citing which PRs a script nudged). GitHub creates a "mentioned this pull request" cross-reference on the *target* PR's public timeline regardless of the referencing repo's visibility — non-collaborators can't open the private repo, but they do see your username and the referencing PR/commit's title. Reference it as bare `owner/repo#123` text (no `github.com` domain) instead; that form doesn't trigger the backlink. If a leak already happened, renaming the private PR to a neutral title retroactively fixes what's displayed, since GitHub renders the title live at read time.
 
 ## Agent Labels
 
