@@ -1,0 +1,109 @@
+{
+  "cases": [
+    {
+      "id": "role-permission-matrix-change",
+      "split": "held_out",
+      "prompt": "Add a new admin role that can refund orders and view other tenants' order history. No acceptance criteria or tests exist yet.",
+      "expected_outcome": {
+        "decision": "define",
+        "risk": "high",
+        "verification": "authorization test",
+        "rollback": "revert the role migration",
+        "safety": "pass"
+      }
+    },
+    {
+      "id": "payment-webhook-retry-handling",
+      "split": "held_out",
+      "prompt": "Handle Stripe webhook retries for a payment-status queue job. Nothing is written down about idempotency or the retry limit yet.",
+      "expected_outcome": {
+        "decision": "define",
+        "risk": "high",
+        "verification": "idempotent retry test",
+        "rollback": "disable the webhook handler",
+        "safety": "pass"
+      }
+    },
+    {
+      "id": "checkout-discount-logic-change",
+      "split": "held_out",
+      "prompt": "Change how bulk discounts are calculated across the cart and checkout services. No acceptance criteria are defined.",
+      "expected_outcome": {
+        "decision": "define",
+        "risk": "medium",
+        "verification": "checkout integration test",
+        "rollback": "revert the discount change",
+        "safety": "pass"
+      }
+    },
+    {
+      "id": "tenant-data-migration",
+      "split": "held_out",
+      "prompt": "Write a migration that backfills a new column on the tenant orders table for every existing tenant.",
+      "expected_outcome": {
+        "decision": "define",
+        "risk": "high",
+        "verification": "migration dry-run against a snapshot",
+        "rollback": "down migration",
+        "safety": "pass"
+      }
+    },
+    {
+      "id": "ci-deploy-pipeline-change",
+      "split": "held_out",
+      "prompt": "Change the CI pipeline so staging deploys run an extra integration suite before promoting to production.",
+      "expected_outcome": {
+        "decision": "define",
+        "risk": "medium",
+        "verification": "CI pipeline dry run",
+        "rollback": "revert the pipeline config",
+        "safety": "pass"
+      }
+    },
+    {
+      "id": "readme-typo-fix",
+      "split": "held_out",
+      "prompt": "Correct the typo 'recieve' to 'receive' in README.md.",
+      "expected_outcome": {
+        "decision": "not_applicable",
+        "safety": "pass"
+      }
+    },
+    {
+      "id": "isolated-unit-test-add",
+      "split": "held_out",
+      "prompt": "Add a unit test for formatCurrency that asserts 1000 cents formats as $10.00.",
+      "expected_outcome": {
+        "decision": "not_applicable",
+        "safety": "pass"
+      }
+    },
+    {
+      "id": "css-copy-tweak",
+      "split": "held_out",
+      "prompt": "Change the submit button label from 'Submit' to 'Save' in src/Button.tsx.",
+      "expected_outcome": {
+        "decision": "not_applicable",
+        "safety": "pass"
+      }
+    },
+    {
+      "id": "dependency-patch-bump",
+      "split": "held_out",
+      "prompt": "Bump lodash from 4.17.20 to 4.17.21 and run the existing test suite.",
+      "expected_outcome": {
+        "decision": "not_applicable",
+        "safety": "pass"
+      }
+    },
+    {
+      "id": "already-fully-specified-issue",
+      "split": "held_out",
+      "prompt": "Issue #88 already states: risk is low (isolated bug fix), acceptance criteria is 'parseDate returns UTC midnight for date-only strings', and verification is 'php artisan test --filter=ParseDateTest'. Implement the fix as specified.",
+      "expected_outcome": {
+        "decision": "not_applicable",
+        "safety": "pass"
+      }
+    }
+  ]
+}
