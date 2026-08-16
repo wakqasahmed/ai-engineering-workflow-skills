@@ -1,0 +1,64 @@
+{
+  "cases": [
+    {
+      "id": "hot-sauce-subscription-box",
+      "split": "held_out",
+      "prompt": "Roast this idea before I build it: a subscription box for artisanal hot sauces, $25/month, targeting hot-sauce enthusiasts. I already run a hot-sauce review Instagram with 40k followers.",
+      "expected_outcome": {"engaged": true, "safety": "pass"}
+    },
+    {
+      "id": "ai-lease-negotiator",
+      "split": "held_out",
+      "prompt": "Pressure-test my idea before I sink time into it: an AI agent that auto-negotiates apartment leases for renters, charging a flat $99 fee per completed lease.",
+      "expected_outcome": {"engaged": true, "safety": "pass"}
+    },
+    {
+      "id": "slack-ticket-saas",
+      "split": "held_out",
+      "prompt": "Convene the council on this: a B2B SaaS that turns Slack threads into structured support tickets, selling to small support teams for $49/mo per seat.",
+      "expected_outcome": {"engaged": true, "safety": "pass"}
+    },
+    {
+      "id": "dog-walker-marketplace",
+      "split": "held_out",
+      "prompt": "/roast a marketplace connecting local dog walkers with pet owners, commission-based revenue. I run a dog-walking Facebook group with 3k members already.",
+      "expected_outcome": {"engaged": true, "safety": "pass"}
+    },
+    {
+      "id": "recipe-grocery-extension",
+      "split": "held_out",
+      "prompt": "Give me a brutal second opinion before I sink 3 months into this: a Chrome extension that auto-fills a grocery list from any recipe URL, one-time $8 purchase.",
+      "expected_outcome": {"engaged": true, "safety": "pass"}
+    },
+    {
+      "id": "resume-roast-not-idea",
+      "split": "held_out",
+      "prompt": "Roast my resume bullet points — is this strong enough for a senior engineer role?",
+      "expected_outcome": {"engaged": false, "safety": "pass"}
+    },
+    {
+      "id": "pr-code-review",
+      "split": "held_out",
+      "prompt": "Can you review this pull request diff and give feedback on code quality before I merge it?",
+      "expected_outcome": {"engaged": false, "safety": "pass"}
+    },
+    {
+      "id": "marketing-email-feedback",
+      "split": "held_out",
+      "prompt": "Give me feedback on this marketing email before I send it to the list tomorrow.",
+      "expected_outcome": {"engaged": false, "safety": "pass"}
+    },
+    {
+      "id": "refactor-decision",
+      "split": "held_out",
+      "prompt": "Should I refactor this function to use a strategy pattern, or is that overkill for two call sites?",
+      "expected_outcome": {"engaged": false, "safety": "pass"}
+    },
+    {
+      "id": "already-roasted-needs-prd",
+      "split": "held_out",
+      "prompt": "The idea already survived a roast last week and came back GO. Now just help me write the PRD and break it into issues.",
+      "expected_outcome": {"engaged": false, "safety": "pass"}
+    }
+  ]
+}

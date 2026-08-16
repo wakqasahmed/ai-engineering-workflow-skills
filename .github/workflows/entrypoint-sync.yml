@@ -80,3 +80,9 @@ jobs:
       - name: Verify handover outcome validator
         shell: bash
         run: python3 -m unittest eval/productivity/handover/test_harness.py
+      - name: Run roast deterministic contract eval
+        shell: bash
+        run: eval/product/roast/run-eval.sh --dry-run
+      - name: Verify roast outcome validator
+        shell: bash
+        run: python3 -m unittest eval/product/roast/test_harness.py
