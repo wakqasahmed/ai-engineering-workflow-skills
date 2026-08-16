@@ -65,9 +65,12 @@ jobs:
       - name: Verify decompose-to-issues outcome validator
         shell: bash
         run: python3 -m unittest eval/engineering/decompose-to-issues/test_harness.py
-      - name: Run to-prd behavioral eval
+      - name: Run to-prd deterministic contract eval
         shell: bash
-        run: eval/engineering/to-prd/run-eval.sh
+        run: eval/engineering/to-prd/run-eval.sh --dry-run
+      - name: Verify to-prd outcome validator
+        shell: bash
+        run: python3 -m unittest eval/engineering/to-prd/test_harness.py
       - name: Run define-done deterministic contract eval
         shell: bash
         run: eval/engineering/define-done/run-eval.sh --dry-run
