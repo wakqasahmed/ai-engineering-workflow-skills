@@ -1,0 +1,10 @@
+{
+  "cases": [
+    {
+      "id": "tuning-context-boundary-basic",
+      "split": "tuning",
+      "prompt": "Context is nearly exhausted mid-refactor of /repo/src/utils/formatter.py. No background process is running. Verify with `npm test -- formatter`. Deferred: add locale tests. Write the handover.",
+      "expected_outcome": {"decision": "handover", "key_file": "/repo/src/utils/formatter.py", "running_state": "none", "verification": "npm test -- formatter", "deferred": "add locale tests", "safety": "pass"}
+    }
+  ]
+}

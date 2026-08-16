@@ -74,3 +74,9 @@ jobs:
       - name: Verify define-done outcome validator
         shell: bash
         run: python3 -m unittest eval/engineering/define-done/test_harness.py
+      - name: Run handover deterministic contract eval
+        shell: bash
+        run: eval/productivity/handover/run-eval.sh --dry-run
+      - name: Verify handover outcome validator
+        shell: bash
+        run: python3 -m unittest eval/productivity/handover/test_harness.py
