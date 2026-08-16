@@ -68,3 +68,9 @@ jobs:
       - name: Run to-prd behavioral eval
         shell: bash
         run: eval/engineering/to-prd/run-eval.sh
+      - name: Run define-done deterministic contract eval
+        shell: bash
+        run: eval/engineering/define-done/run-eval.sh --dry-run
+      - name: Verify define-done outcome validator
+        shell: bash
+        run: python3 -m unittest eval/engineering/define-done/test_harness.py
