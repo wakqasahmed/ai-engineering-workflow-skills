@@ -11,7 +11,7 @@ Use this whenever opening a PR against a repository we don't own or control — 
 
 Some maintainers reject otherwise-correct, well-tested PRs purely because the description reads as AI-generated: generic section headers ("Root Cause:", "Why This Fix Works:", "Alternatives Considered:"), templated phrasing, over-explained one-line fixes. This is usually not an automated detector — it's a human maintainer pattern-matching by eye and closing with a canned rejection reply, sometimes on a diff that is otherwise correct and tested.
 
-Confirmed directly: Taylor Otwell across laravel/cashier-stripe, laravel/socialite, laravel/horizon, and laravel/telescope has closed multiple PRs this way, including one with an identical fix and real tests to a version that was later accepted once the description was rewritten.
+Confirmed directly across several upstream contribution sessions: individual maintainers of some well-known PHP/JS ecosystem repos have closed multiple PRs this way, including one with an identical fix and real tests to a version that was later accepted once the description was rewritten. This pattern is maintainer-specific, not universal — always check a target repo's recent closed-PR history for this signature before assuming it applies.
 
 ## Rules
 
