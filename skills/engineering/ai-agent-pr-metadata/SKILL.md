@@ -148,6 +148,12 @@ Open Code Review emits latest-head inline findings as `github-actions[bot]` comm
 
 The `OCR disposition gate` workflow rechecks after Open Code Review completes and whenever a PR comment is created or edited. An active repository ruleset must require its exact `OCR disposition gate` status context on the default branch; do not rely on an agent manually running the command above. The gate accepts retained labels only when they are present in the base-ref `support/ai-engineering-workflow/legacy-agent-labels.json` audit baseline and recorded as legacy data. It validates every other label against the resolved model ID and rejects any unrecorded agent label. Never add a legacy label in the PR body to bypass this check.
 
+## Compression pass
+
+Technique adapted from [mattpocock/skills — caveman](https://github.com/mattpocock/skills/blob/main/skills/misc/caveman/SKILL.md) (filler/hedge/pleasantry stripping), applied to natural prose rather than caveman's fragment style — added 2026-08-26 alongside the same addition to `external-pr-style`.
+
+Every prose field this skill produces — PR update comments, OCR disposition `Reason:` lines, metadata limitation notes — gets a compression pass before posting: strip pleasantries/hedging ("I'd be happy to", "please note that", "it's worth mentioning", "certainly"), filler intensifiers ("just", "really", "basically", "actually", "simply"), and restated context the reader already has. Keep full sentences and natural grammar — this is a compression pass on the draft, not a fragment-dropping rewrite. The disposition `Reason:` field is explicitly one concise sentence already; apply the same discipline to every other free-text field this skill writes, including the PR update comment body.
+
 ## Verification
 
 - Confirm `git log --format=%B -n 5` has no `Co-Authored-By` or AI attribution lines.
