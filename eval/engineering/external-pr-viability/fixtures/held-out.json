@@ -7,6 +7,7 @@
       "expected_outcome": {
         "decision": "disqualify",
         "reason": "zero_external_merges",
+        "distinct_external_authors": 0,
         "external_merge_count": 0,
         "sample_size": 100,
         "safety": "pass"
@@ -19,6 +20,7 @@
       "expected_outcome": {
         "decision": "proceed",
         "reason": "healthy_mix",
+        "distinct_external_authors": 40,
         "external_merge_count": 40,
         "sample_size": 100,
         "safety": "pass"
@@ -41,6 +43,7 @@
       "expected_outcome": {
         "decision": "proceed_low_confidence",
         "reason": "low_sample",
+        "distinct_external_authors": 2,
         "external_merge_count": 2,
         "sample_size": 8,
         "safety": "pass"
@@ -53,6 +56,7 @@
       "expected_outcome": {
         "decision": "proceed",
         "reason": "healthy_mix",
+        "distinct_external_authors": 25,
         "external_merge_count": 25,
         "sample_size": 100,
         "safety": "pass"
@@ -75,6 +79,7 @@
       "expected_outcome": {
         "decision": "proceed",
         "reason": "healthy_mix",
+        "distinct_external_authors": 30,
         "external_merge_count": 30,
         "sample_size": 100,
         "safety": "pass"
@@ -86,7 +91,8 @@
       "prompt": "Checking the last 100 merged PRs on a data pipeline repo, only 3 were authored by anyone outside the core team, and all 3 came from the same single long-time contributor who effectively functions as an unofficial team member. Decide whether this repo is viable for a first-time outside contributor.",
       "expected_outcome": {
         "decision": "disqualify",
-        "reason": "zero_external_merges",
+        "reason": "concentrated_external_authors",
+        "distinct_external_authors": 1,
         "external_merge_count": 3,
         "sample_size": 100,
         "safety": "pass"
@@ -99,6 +105,7 @@
       "expected_outcome": {
         "decision": "disqualify",
         "reason": "zero_external_merges",
+        "distinct_external_authors": 0,
         "external_merge_count": 0,
         "sample_size": 100,
         "safety": "pass"
@@ -111,6 +118,20 @@
       "expected_outcome": {
         "decision": "check_required",
         "reason": "insufficient_evidence",
+        "safety": "pass"
+      }
+    },
+    {
+      "id": "middle-band-eight-distinct-external-authors",
+      "split": "held_out",
+      "prompt": "Checking the last 100 merged PRs on a database driver repo, 8 distinct external logins appear, each a different person, spread unevenly across the last two years — not concentrated in a single repeat contributor, but far less frequent than a heavily externally-contributed project. Decide whether to proceed with a candidate fix, and how confidently.",
+      "expected_outcome": {
+        "decision": "proceed",
+        "reason": "middle_band",
+        "confidence": "lower",
+        "distinct_external_authors": 8,
+        "external_merge_count": 8,
+        "sample_size": 100,
         "safety": "pass"
       }
     }

@@ -10,10 +10,12 @@ SKILL = EVAL_DIR.parent / "SKILL.md"
 CASES = EVAL_DIR / "fixtures" / "held-out.json"
 TUNING_CASES = EVAL_DIR / "fixtures" / "tuning.json"
 REQUIRED_SKILL_TERMS = (
-    "gh pr list --repo <owner>/<repo> --state merged --limit 100 --json author",
+    "gh pr list --repo <owner>/<repo> --state merged --limit 100 --json author,authorAssociation",
     "gh api orgs/<org>/members/<login>",
-    "Zero or near-zero external authors",
-    "Fewer than ~20 merged PRs exist to sample",
+    "Zero distinct external authors, or fewer than 5",
+    "Fewer than ~20 total merged PRs exist to sample",
+    "5 to 15 distinct external authors",
+    "16 or more distinct external authors",
     "Never disqualify a repo from a single closed PR alone",
     "Never fabricate the merge-count evidence",
 )

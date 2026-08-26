@@ -17,15 +17,16 @@ Confirmed directly: a PR fixing a real, independently-verified one-line bug — 
 
 Before implementing a fix for an unsolicited external PR, run this check:
 
-1. `gh pr list --repo <owner>/<repo> --state merged --limit 100 --json author` — collect the unique author logins.
-2. For each unique login, confirm org membership: `gh api orgs/<org>/members/<login>` (204 = member, 404 = not a member) — or use employer/bio signals when the repo isn't org-owned.
-3. Count how many of the last 100 merged PRs came from a genuinely external author (not an org member, not a bot).
+1. `gh pr list --repo <owner>/<repo> --state merged --limit 100 --json author,authorAssociation` — collect the unique author logins together with GitHub's own `authorAssociation` for each (`MEMBER`/`OWNER`/`COLLABORATOR` vs `CONTRIBUTOR`/`FIRST_TIME_CONTRIBUTOR`/`NONE`). Treat `authorAssociation` as the primary signal — it comes from GitHub's own view of the relationship, not an inference.
+2. Only when `authorAssociation` doesn't resolve a login clearly, cross-check org membership: `gh api orgs/<org>/members/<login>` (204 = member, 404 = not a member) — or use employer/bio signals when the repo isn't org-owned. Treat that call's own result with caution: `GET /orgs/{org}/members/{username}` only reports a *private* membership correctly when the caller is themselves an org member. Called from outside — which this skill always is — a privately-set member reads back as 404 and gets miscounted as external, biasing the whole check toward the wrong, unsafe conclusion (a real core-team repo reading as a healthy mix). Never let this call override a `MEMBER`/`OWNER` `authorAssociation` from step 1.
+3. Count how many **distinct people** among those authors are genuinely external (not a member/owner/collaborator, not a bot) — not how many external-authored PRs there are. Note separately whether those merges are spread across many different people or concentrated in one or two: a dozen merged PRs from one long-time contributor who behaves like an unofficial team member is a different, weaker signal than a dozen merged PRs from a dozen different first-time contributors.
 
-Decision:
+Decision, checked in this order:
 
-- **Fewer than ~20 merged PRs exist to sample** — inconclusive. State the small sample size and proceed with lower confidence rather than disqualifying; this check needs history to mean anything.
-- **Zero or near-zero external authors** (a small handful out of 100, or zero) — disqualify the repo. Do not implement, do not open a PR. Record the finding with its evidence (author list, counts) so a later scouting pass doesn't repeat the mistake.
-- **A healthy, recurring mix of external and internal authors** — proceed normally.
+- **Fewer than ~20 total merged PRs exist to sample** — inconclusive regardless of the distinct-author count. State the small sample size and proceed with lower confidence rather than disqualifying; this check needs history to mean anything.
+- **Zero distinct external authors, or fewer than 5** — disqualify the repo, even if the raw external-authored PR count is higher than that (concentration in one or two people is still a near-zero signal, not a healthy one). Do not implement, do not open a PR. Record the finding with its evidence (author list, counts) so a later scouting pass doesn't repeat the mistake.
+- **5 to 15 distinct external authors** — a genuine middle band. Proceed, but note the lower confidence explicitly rather than treating it the same as a clearly healthy repo.
+- **16 or more distinct external authors**, spread across different people rather than dominated by one repeat contributor — proceed normally.
 
 Also check `CONTRIBUTING.md` / the README for an explicit stated policy against external or AI-assisted contributions. An explicit policy disqualifies immediately regardless of merge-rate and doesn't need the count.
 

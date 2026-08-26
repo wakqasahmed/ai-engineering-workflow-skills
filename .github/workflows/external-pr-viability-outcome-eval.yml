@@ -20,15 +20,20 @@ jobs:
   outcome-eval:
     environment: outcome-evals
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     permissions:
       contents: read
     steps:
       - uses: actions/checkout@v6
       - name: Run isolated enabled and disabled trials
+        env:
+          AGENT: ${{ inputs.agent }}
+          IMAGE: ${{ inputs.image }}
+          MODEL: ${{ inputs.model }}
         run: >-
           python3 eval/engineering/external-pr-viability/run_harness.py
-          --agent "${{ inputs.agent }}" --image "${{ inputs.image }}"
-          --model "${{ inputs.model }}" --trials 5
+          --agent "$AGENT" --image "$IMAGE"
+          --model "$MODEL" --trials 5
           --output external-pr-viability-outcome-results.json
       - name: Validate outcome delta and safety threshold
         run: >-
