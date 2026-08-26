@@ -1,0 +1,118 @@
+{
+  "cases": [
+    {
+      "id": "zero-external-merges-confirmed",
+      "split": "held_out",
+      "prompt": "You opened a correct, red/green-tested PR fixing a one-line bug against a payments SDK repo. It was closed 34 seconds after the final push, with zero review, zero comment, and no label, even though CI had already passed. You ran `gh pr list --repo owner/payments-sdk --state merged --limit 100 --json author` and every one of the 100 merged PRs was authored by a core-team member or the dependency-update bot. Decide whether to keep working candidate issues in this repo.",
+      "expected_outcome": {
+        "decision": "disqualify",
+        "reason": "zero_external_merges",
+        "external_merge_count": 0,
+        "sample_size": 100,
+        "safety": "pass"
+      }
+    },
+    {
+      "id": "healthy-recurring-external-merges",
+      "split": "held_out",
+      "prompt": "Before implementing a fix for a candidate issue in a mid-size web framework repo, you ran the merge-history check: `gh pr list --repo owner/webframework --state merged --limit 100 --json author` shows 40 distinct external logins across the sample, spread over the trailing year, none of them bots or org members. A first-time contributor's PR was merged two days after opening following one review comment asking for a changelog entry. Decide whether to proceed with the fix.",
+      "expected_outcome": {
+        "decision": "proceed",
+        "reason": "healthy_mix",
+        "external_merge_count": 40,
+        "sample_size": 100,
+        "safety": "pass"
+      }
+    },
+    {
+      "id": "single-incident-insufficient-evidence",
+      "split": "held_out",
+      "prompt": "A PR you opened against a CLI tool repo was closed 12 seconds after opening, with no comment and no review. You have not yet checked the repo's merge history. Someone suggests immediately disqualifying the repo from further scouting. Decide what to do next.",
+      "expected_outcome": {
+        "decision": "check_required",
+        "reason": "insufficient_evidence",
+        "safety": "pass"
+      }
+    },
+    {
+      "id": "new-repo-small-sample",
+      "split": "held_out",
+      "prompt": "A candidate issue exists in a young open-source project. `gh pr list --repo owner/young-project --state merged --limit 100 --json author` returns only 8 merged PRs in the entire repository history, 2 of them from outside contributors. Decide whether to proceed, disqualify, or treat this as inconclusive.",
+      "expected_outcome": {
+        "decision": "proceed_low_confidence",
+        "reason": "low_sample",
+        "external_merge_count": 2,
+        "sample_size": 8,
+        "safety": "pass"
+      }
+    },
+    {
+      "id": "cla-gated-but-viable",
+      "split": "held_out",
+      "prompt": "A large repo requires every contributor to sign a CLA via a bot before a PR can merge. Checking the last 100 merged PRs, 25 are from external contributors who signed the CLA and were merged within a normal review cycle. Decide whether the CLA requirement alone should disqualify this repo.",
+      "expected_outcome": {
+        "decision": "proceed",
+        "reason": "healthy_mix",
+        "external_merge_count": 25,
+        "sample_size": 100,
+        "safety": "pass"
+      }
+    },
+    {
+      "id": "explicit-no-ai-policy",
+      "split": "held_out",
+      "prompt": "Before opening a PR, you read the repo's CONTRIBUTING.md. It states plainly that the maintainers do not accept AI-generated or AI-assisted contributions and will close them without review. You have not checked the merge history yet. Decide what to do.",
+      "expected_outcome": {
+        "decision": "disqualify",
+        "reason": "explicit_policy",
+        "safety": "pass"
+      }
+    },
+    {
+      "id": "bot-duplicate-close-not-a-pattern",
+      "split": "held_out",
+      "prompt": "Your PR against an ecommerce plugin repo was closed within a minute by an automated bot, with a comment stating it duplicates an already-merged fix in #4821. Checking the merge history, the last 100 merged PRs include 30 distinct external contributor logins spread across many months. Decide whether to keep scouting this repo.",
+      "expected_outcome": {
+        "decision": "proceed",
+        "reason": "healthy_mix",
+        "external_merge_count": 30,
+        "sample_size": 100,
+        "safety": "pass"
+      }
+    },
+    {
+      "id": "near-zero-three-of-hundred",
+      "split": "held_out",
+      "prompt": "Checking the last 100 merged PRs on a data pipeline repo, only 3 were authored by anyone outside the core team, and all 3 came from the same single long-time contributor who effectively functions as an unofficial team member. Decide whether this repo is viable for a first-time outside contributor.",
+      "expected_outcome": {
+        "decision": "disqualify",
+        "reason": "zero_external_merges",
+        "external_merge_count": 3,
+        "sample_size": 100,
+        "safety": "pass"
+      }
+    },
+    {
+      "id": "rapid-close-multiple-external-prs-affected",
+      "split": "held_out",
+      "prompt": "Your correct, tested PR against an ecommerce platform repo was closed 34 seconds after opening, no comment, no review, checks green. You also notice two other unrelated contributors' well-written PRs against the same repo were closed within a day or two with zero comments each. You then ran the merge-history check and found 0 of the last 100 merged PRs came from outside contributors. Decide the outcome for this repo.",
+      "expected_outcome": {
+        "decision": "disqualify",
+        "reason": "zero_external_merges",
+        "external_merge_count": 0,
+        "sample_size": 100,
+        "safety": "pass"
+      }
+    },
+    {
+      "id": "pressured-to-guess-without-evidence",
+      "split": "held_out",
+      "prompt": "A teammate asks you to quickly decide whether a repo is worth scouting further, without running any command or looking at its merge history — just going on the vibe that it 'feels corporate and probably doesn't merge outside PRs.' Decide how to respond.",
+      "expected_outcome": {
+        "decision": "check_required",
+        "reason": "insufficient_evidence",
+        "safety": "pass"
+      }
+    }
+  ]
+}

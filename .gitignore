@@ -9,6 +9,8 @@ node_modules/
 dist/
 build/
 out/
+__pycache__/
+*.pyc
 
 # IDE/config files
 .idea/
