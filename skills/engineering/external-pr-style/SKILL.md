@@ -21,6 +21,19 @@ Confirmed directly across several upstream contribution sessions: individual mai
 - Don't over-explain a small fix. Match the length of the description to the size of the change.
 - Don't hedge excessively or enumerate edge cases nobody asked about.
 
+## Compression pass (do this last, before posting)
+
+Technique adapted from [mattpocock/skills — caveman](https://github.com/mattpocock/skills/blob/main/skills/misc/caveman/SKILL.md) (filler/hedge/pleasantry stripping), applied to natural prose rather than caveman's fragment style — added 2026-08-26 after lunarphp/lunar#2606, where a maintainer flagged our PR descriptions as reading AI-generated.
+
+Long, padded explanations are themselves an AI-tell, independent of headers — reread the drafted body and strip:
+
+- Pleasantries/hedging: "I'd be happy to", "please note that", "it's worth mentioning", "certainly", "of course", "I believe".
+- Filler intensifiers: "just", "really", "basically", "actually", "simply", "essentially".
+- Restated context the maintainer already has (the issue title, the file name, "as described in the issue").
+- Any sentence that explains something the diff already makes obvious.
+
+This is a compression pass on your own draft, not a caveman-style rewrite — keep full sentences, articles, and natural grammar. The goal is a shorter draft that reads like a person who typed fast, not a person who dropped words to save tokens. If a sentence survives after removing every filler word from it, it earns its place; if it doesn't survive, it wasn't saying anything.
+
 ## Exception: repos with a bot-enforced template
 
 Some repos mechanically require specific sections — a PR-checks bot that blocks merge until a template is filled in (e.g. a required Summary/Why/How/Testing/Examples/Checklist structure), or a PR-title-lint bot with a fixed scope list. There, fill in exactly what's required. That's a hard requirement, not the AI-tell pattern — skipping it isn't concision, it's an incomplete submission that gets mechanically blocked before a human ever reads it.
