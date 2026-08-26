@@ -128,10 +128,18 @@ ask_secret() {
 # write_env KEY VALUE upserts KEY=VALUE into ENV_FILE (creates it; replaces
 # any existing line). Idempotent.
 write_env() {
-  local key="$1" value="$2" tmp
+  local key="$1" value="$2" tmp rc
   touch "$ENV_FILE"
   tmp=$(mktemp)
-  grep -vE "^${key}=" "$ENV_FILE" > "$tmp" || true
+  grep -vE "^${key}=" "$ENV_FILE" > "$tmp" && rc=0 || rc=$?
+  # rc 1 = no existing KEY= line, expected on first write. Any other rc (2+)
+  # means grep couldn't read ENV_FILE — stop instead of silently overwriting
+  # it with just the new line and losing every other saved value.
+  if [[ $rc -gt 1 ]]; then
+    warn "couldn't read $ENV_FILE (grep exit $rc) — not overwriting it"
+    rm -f "$tmp"
+    return 1
+  fi
   printf '%s=%s\n' "$key" "$value" >> "$tmp"
   mv "$tmp" "$ENV_FILE"
   WRITTEN_ENV+=("$key")
