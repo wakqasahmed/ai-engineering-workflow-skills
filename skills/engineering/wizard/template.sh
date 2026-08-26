@@ -43,6 +43,7 @@ banner() {
   printf '%s  You drive the browser; this wizard tells you exactly what to do and\n' "$DIM"
   printf '  captures the values you copy back. Stop any time with Ctrl-C and re-run\n'
   printf '  later, since it remembers values already saved.%s\n' "$RESET"
+  printf '%s  ⚠ Never commit %s to version control — it may hold secrets.%s\n' "$YELLOW" "$ENV_FILE" "$RESET"
   pause "Ready to start?"
 }
 
