@@ -14,6 +14,7 @@
     "./skills/engineering/changesets-release",
     "./skills/filament/filament-conventions",
     "./skills/product/roast",
-    "./skills/productivity/handover"
+    "./skills/productivity/handover",
+    "./skills/engineering/write-prompt-guide"
   ]
 }

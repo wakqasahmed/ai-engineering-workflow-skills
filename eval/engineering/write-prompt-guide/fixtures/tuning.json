@@ -1,0 +1,64 @@
+{
+  "cases": [
+    {
+      "id": "tuning-minimal-passing-guide",
+      "split": "tuning",
+      "notes": "shortest guide that still satisfies every structural rule",
+      "known_capabilities": [
+        "ai-visibility-audit",
+        "robots-ai-crawler-audit",
+        "sitemap-discovery-audit",
+        "schema-markup-audit",
+        "ai-search-remediation-plan"
+      ],
+      "allowed_terms": [
+        "prompt-guide",
+        "llms-txt",
+        "robots-txt",
+        "well-known",
+        "copy-pasteable",
+        "en-nz",
+        "json-ld",
+        "x-default",
+        "read-only",
+        "multi-phase"
+      ],
+      "guide": "# Prompt Guide\n\n## Quick start\n\n```\nRun ai-visibility-audit against https://example.com.\n```\n\n## Giving useful context\n\nSupply the URL, because site type drives which checks run.\n\n## Structuring a complex request\n\n```\n# Instructions\n1. Audit.\n2. Plan.\n```\n\n## Good vs. less-effective prompts\n\nLess effective: `audit me`. More effective: `Run ai-visibility-audit against https://example.com`.\n\nLess effective: `fix it`. More effective: `Turn the P0 findings into tickets`.\n\n## Known limitations\n\nHydration verification is open and unmerged in PR #104.\n\n## Where to go deeper\n\nSKILL.md.\n",
+      "expected_outcome": {
+        "verdict": "pass",
+        "failure_kinds": []
+      }
+    },
+    {
+      "id": "tuning-generic-tutorial",
+      "split": "tuning",
+      "notes": "generic prompt-engineering advice with no pack specifics",
+      "known_capabilities": [
+        "ai-visibility-audit",
+        "robots-ai-crawler-audit",
+        "sitemap-discovery-audit",
+        "schema-markup-audit",
+        "ai-search-remediation-plan"
+      ],
+      "allowed_terms": [
+        "prompt-guide",
+        "llms-txt",
+        "robots-txt",
+        "well-known",
+        "copy-pasteable",
+        "en-nz",
+        "json-ld",
+        "x-default",
+        "read-only",
+        "multi-phase"
+      ],
+      "guide": "# Prompt Guide\n\nBe clear. Be specific. Give examples.\n",
+      "expected_outcome": {
+        "verdict": "fail",
+        "failure_kinds": [
+          "missing required section: quick_start"
+        ]
+      }
+    }
+  ]
+}

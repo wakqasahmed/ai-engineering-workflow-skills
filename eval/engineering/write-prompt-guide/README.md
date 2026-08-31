@@ -1,0 +1,9 @@
+# Write prompt guide outcome evaluation
+
+`bash run-eval.sh --dry-run` is the offline PR-CI layer. It validates the non-negotiable `SKILL.md` contract, checks that all four cited provider-documentation URLs are still present in the repo-level `SOURCES.md`, and runs `validate-guide.py` over the held-out corpus in a disposable, network-disabled workspace. It does not score agent behavior.
+
+`validate-guide.py` is the structural validator the skill's own step 4 refers to. Given a generated `PROMPT_GUIDE.md` and the set of capabilities the target pack actually ships, it reports: missing required sections (quick start, context, structuring, prompt pairs, limitations, where to go deeper), fewer than two less-effective/more-effective prompt pairs, an absent copy-pasteable fenced prompt, a limitations section with no traceable issue/PR reference, a fix claimed without its merge state, and backtick-quoted capability names that do not exist in the target pack. It is importable, so the same validator can be pointed at a real guide rather than only at fixtures.
+
+The ten held-out cases exercise: a complete passing guide, a happy-path-only guide with no limitations section, a guide with no quick start, a guide with only one prompt pair, a guide naming a skill the target pack does not ship, a guide presenting an unmerged PR's fix as shipped, a limitations section with only vague prose and no issue links, a guide whose prompts are prose rather than copy-pasteable blocks, a guide with no multi-phase structuring section, and a guide that never points back at the pack's own docs. Both the fabricated-capability and unmerged-fix cases are required by `check-contract.py` — they are the two guardrails whose absence would make a guide actively misleading rather than merely thin.
+
+Held-out fixtures are synthetic and must not be used to tune `SKILL.md`; `tuning.json` is separate, and a guide whose normalized text appears in both corpora is rejected.

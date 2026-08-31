@@ -4,6 +4,12 @@ All notable changes to this workflow repository should be documented here.
 
 The goal is transparency over time: what changed, why it changed, and when the workflow evolved.
 
+## 2026-08
+
+### Added
+
+- `write-prompt-guide` skill: turns a target Agent Skill pack's own `SKILL.md`, README, and open issues into a user-facing `PROMPT_GUIDE.md` (quick start, context to supply, multi-phase structuring, good vs. less-effective prompt pairs, known limitations traced to real issues, where to go deeper). Methodology is cited against the official prompting documentation of Anthropic, OpenAI, Google, and BytePlus in a new repo-level `SOURCES.md` ledger, with the three-of-four cross-provider convergence points called out explicitly. Ships a deterministic eval layer: a `SKILL.md`/`SOURCES.md` contract check plus a reusable structural validator over ten held-out generated-guide fixtures, including a fabricated-capability case and an unmerged-fix-claimed-as-shipped case (#106)
+
 ## 2026-07
 
 ### Added

@@ -1,0 +1,20 @@
+name: Write prompt guide evaluation
+
+on:
+  pull_request:
+    paths:
+      - 'skills/engineering/write-prompt-guide/**'
+      - 'eval/engineering/write-prompt-guide/**'
+      - 'SOURCES.md'
+      - '.github/workflows/write-prompt-guide-eval.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  deterministic:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run offline deterministic contract checks
+        run: bash eval/engineering/write-prompt-guide/run-eval.sh --dry-run

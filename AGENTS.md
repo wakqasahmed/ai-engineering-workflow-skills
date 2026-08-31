@@ -23,6 +23,7 @@ This repository contains my AI-assisted engineering workflow and agent operating
 - Use `resolving-merge-conflicts` when you need to resolve an in-progress git merge/rebase conflict.
 - Use `wizard` when a manual procedure needs a human to click through a dashboard or enter credentials — generates a guided script instead of leaving `hitl-blocker`'s bare issue description to figure out alone.
 - Use `git-guardrails-claude-code` to set up or audit the PreToolUse hook that blocks force-push, direct push to main/master/staging, `reset --hard`, `clean -f/-fd`, `branch -D`, and bare `checkout .`/`restore .`.
+- Use `write-prompt-guide` when a skill pack needs a user-facing `PROMPT_GUIDE.md` telling people what to type to get a good run out of it.
 - Use `handover` when context crosses an agent or session boundary, when only 5-10% of the session limit remains with work unfinished, or when context usage passes 40% on unfinished multi-step work.
 
 ## Summary
