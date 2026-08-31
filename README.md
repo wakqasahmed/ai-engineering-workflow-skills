@@ -56,12 +56,17 @@ No installer, no dependency — just files your agent already knows how to read.
 | [`subagent-pipeline`](skills/engineering/subagent-pipeline/SKILL.md) | Run a cold-start implementer, reviewer, and fixer subagent chain for one issue, gated by CI, ending in a staging PR. |
 | [`to-prd`](skills/engineering/to-prd/SKILL.md) | Synthesize the current conversation and repository context into a concise product and engineering spec, publish it to the project issue tracker, and gate agent readiness before decomposition. |
 | [`workflow-router`](skills/engineering/workflow-router/SKILL.md) | Routes a software-work request to the smallest applicable delivery workflow and records repository conventions once. |
+| [`write-prompt-guide`](skills/engineering/write-prompt-guide/SKILL.md) | Produce a pack-specific `PROMPT_GUIDE.md` that teaches end users what to type to get a good run out of one Agent Skill pack, from that pack's own `SKILL.md`, README, and open issues. |
 | [`roast`](skills/product/roast/SKILL.md) | Use when someone asks to roast an idea, pressure-test or stress-test an idea, validate a business idea, "convene the council", get a brutal second opinion before building something, or says "/roast". |
 | [`handover`](skills/productivity/handover/SKILL.md) | Compact the current conversation into a handover document a fresh agent can pick up and continue seamlessly. |
 
 ## Contents
 
 The installable skills live in [`skills/engineering/`](skills/engineering/), [`skills/filament/`](skills/filament/), [`skills/product/`](skills/product/), and [`skills/productivity/`](skills/productivity/).
+
+## Sources
+
+Skills whose methodology rests on first-party vendor documentation cite it in [`SOURCES.md`](SOURCES.md), a ledger of publisher, URL, and the specific claims each source supports.
 
 ## Aggregate catalogue
 
