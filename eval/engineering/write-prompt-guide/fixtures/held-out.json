@@ -2,311 +2,190 @@
   "cases": [
     {
       "id": "complete-guide-passes",
-      "notes": "all six sections, two pairs, issue-linked limitations with merge state stated",
+      "split": "held_out",
+      "pack_docs": "# ai-search-visibility-skills\n\nSkills this pack ships:\n\n- `ai-visibility-audit` - six-pillar AI visibility scoring for a site.\n- `robots-ai-crawler-audit` - checks `robots-txt` and `well-known` paths for AI crawler access.\n- `sitemap-discovery-audit` - sitemap and `llms-txt` discovery, including non-default filenames.\n- `schema-markup-audit` - `json-ld` structured data, `x-default` and `en-nz` hreflang pairs.\n- `ai-search-remediation-plan` - turns ranked findings into prioritized tickets.\n\nEvery audit is read-only. Nothing in this pack writes to the target site, opens a pull\nrequest, or submits anything to a third-party console.\n",
       "guide": "# Prompt Guide\n\n## Quick start\n\n```\nRun ai-visibility-audit against https://example.com and give me the prioritized action plan.\n```\n\n## Giving useful context\n\n- The target URL, because the pack classifies the site type from it before choosing checks.\n- Whether you already have analytics access, because that changes measured vs. derived findings.\n- Who reads the report, because an executive summary and a developer ticket list are different deliverables.\n\n## Structuring a complex or multi-phase request\n\n```\n# Instructions\n1. Audit https://example.com with ai-visibility-audit.\n2. Hand the ranked findings to ai-search-remediation-plan.\n\n# Context\nEcommerce storefront, 400 SKUs, no server logs available.\n```\n\nPut the bulk material first and the actual ask last.\n\n## Good vs. less-effective prompt examples\n\nLess effective:\n\n```\ncheck my seo\n```\n\nMore effective:\n\n```\nRun ai-visibility-audit against https://example.com and report Pillar 1 findings only.\n```\n\nNaming the skill and the scope stops the run from wandering across all six pillars.\n\nLess effective:\n\n```\nalso fix it\n```\n\nMore effective:\n\n```\nConvert the critical findings into P0 tickets using ai-search-remediation-plan.\n```\n\nNaming the downstream skill produces tickets instead of prose.\n\n## Known limitations to mention explicitly\n\n- Hydrated-DOM verification (#102) is not on main yet: the fix is open in PR #104 and unmerged, so raw-HTML false negatives are still possible today.\n- Sitemap discovery misses non-default filenames (#103), fix pending in #105.\n\n## Where to go deeper\n\nSee the pack's SKILL.md and README.md.\n",
       "expected_outcome": {
         "verdict": "pass",
         "failure_kinds": []
-      },
-      "split": "held_out",
-      "known_capabilities": [
-        "ai-visibility-audit",
-        "robots-ai-crawler-audit",
-        "sitemap-discovery-audit",
-        "schema-markup-audit",
-        "ai-search-remediation-plan"
-      ],
-      "allowed_terms": [
-        "prompt-guide",
-        "llms-txt",
-        "robots-txt",
-        "well-known",
-        "copy-pasteable",
-        "en-nz",
-        "json-ld",
-        "x-default",
-        "read-only",
-        "multi-phase"
-      ]
+      }
     },
     {
       "id": "missing-limitations-section",
-      "notes": "happy-path-only guide \u2014 the exact failure this skill exists to prevent",
+      "split": "held_out",
+      "pack_docs": "# ai-search-visibility-skills\n\nSkills this pack ships:\n\n- `ai-visibility-audit` - six-pillar AI visibility scoring for a site.\n- `robots-ai-crawler-audit` - checks `robots-txt` and `well-known` paths for AI crawler access.\n- `sitemap-discovery-audit` - sitemap and `llms-txt` discovery, including non-default filenames.\n- `schema-markup-audit` - `json-ld` structured data, `x-default` and `en-nz` hreflang pairs.\n- `ai-search-remediation-plan` - turns ranked findings into prioritized tickets.\n\nEvery audit is read-only. Nothing in this pack writes to the target site, opens a pull\nrequest, or submits anything to a third-party console.\n",
       "guide": "# Prompt Guide\n\n## Quick start\n\n```\nRun ai-visibility-audit against https://example.com and give me the prioritized action plan.\n```\n\n## Giving useful context\n\n- The target URL, because the pack classifies the site type from it before choosing checks.\n- Whether you already have analytics access, because that changes measured vs. derived findings.\n- Who reads the report, because an executive summary and a developer ticket list are different deliverables.\n\n## Structuring a complex or multi-phase request\n\n```\n# Instructions\n1. Audit https://example.com with ai-visibility-audit.\n2. Hand the ranked findings to ai-search-remediation-plan.\n\n# Context\nEcommerce storefront, 400 SKUs, no server logs available.\n```\n\nPut the bulk material first and the actual ask last.\n\n## Good vs. less-effective prompt examples\n\nLess effective:\n\n```\ncheck my seo\n```\n\nMore effective:\n\n```\nRun ai-visibility-audit against https://example.com and report Pillar 1 findings only.\n```\n\nNaming the skill and the scope stops the run from wandering across all six pillars.\n\nLess effective:\n\n```\nalso fix it\n```\n\nMore effective:\n\n```\nConvert the critical findings into P0 tickets using ai-search-remediation-plan.\n```\n\nNaming the downstream skill produces tickets instead of prose.\n\n## Where to go deeper\n\nSee the pack's SKILL.md.\n",
       "expected_outcome": {
         "verdict": "fail",
         "failure_kinds": [
           "missing required section: limitations"
         ]
-      },
-      "split": "held_out",
-      "known_capabilities": [
-        "ai-visibility-audit",
-        "robots-ai-crawler-audit",
-        "sitemap-discovery-audit",
-        "schema-markup-audit",
-        "ai-search-remediation-plan"
-      ],
-      "allowed_terms": [
-        "prompt-guide",
-        "llms-txt",
-        "robots-txt",
-        "well-known",
-        "copy-pasteable",
-        "en-nz",
-        "json-ld",
-        "x-default",
-        "read-only",
-        "multi-phase"
-      ]
+      }
     },
     {
       "id": "missing-quick-start",
-      "notes": "guide opens straight into context with no minimal prompt",
+      "split": "held_out",
+      "pack_docs": "# ai-search-visibility-skills\n\nSkills this pack ships:\n\n- `ai-visibility-audit` - six-pillar AI visibility scoring for a site.\n- `robots-ai-crawler-audit` - checks `robots-txt` and `well-known` paths for AI crawler access.\n- `sitemap-discovery-audit` - sitemap and `llms-txt` discovery, including non-default filenames.\n- `schema-markup-audit` - `json-ld` structured data, `x-default` and `en-nz` hreflang pairs.\n- `ai-search-remediation-plan` - turns ranked findings into prioritized tickets.\n\nEvery audit is read-only. Nothing in this pack writes to the target site, opens a pull\nrequest, or submits anything to a third-party console.\n",
       "guide": "# Prompt Guide\n\n## Overview\n\n```\nRun ai-visibility-audit against https://example.com and give me the prioritized action plan.\n```\n\n## Giving useful context\n\n- The target URL, because the pack classifies the site type from it before choosing checks.\n- Whether you already have analytics access, because that changes measured vs. derived findings.\n- Who reads the report, because an executive summary and a developer ticket list are different deliverables.\n\n## Structuring a complex or multi-phase request\n\n```\n# Instructions\n1. Audit https://example.com with ai-visibility-audit.\n2. Hand the ranked findings to ai-search-remediation-plan.\n\n# Context\nEcommerce storefront, 400 SKUs, no server logs available.\n```\n\nPut the bulk material first and the actual ask last.\n\n## Good vs. less-effective prompt examples\n\nLess effective:\n\n```\ncheck my seo\n```\n\nMore effective:\n\n```\nRun ai-visibility-audit against https://example.com and report Pillar 1 findings only.\n```\n\nNaming the skill and the scope stops the run from wandering across all six pillars.\n\nLess effective:\n\n```\nalso fix it\n```\n\nMore effective:\n\n```\nConvert the critical findings into P0 tickets using ai-search-remediation-plan.\n```\n\nNaming the downstream skill produces tickets instead of prose.\n\n## Known limitations to mention explicitly\n\n- Hydrated-DOM verification (#102) is not on main yet: the fix is open in PR #104 and unmerged, so raw-HTML false negatives are still possible today.\n- Sitemap discovery misses non-default filenames (#103), fix pending in #105.\n\n## Where to go deeper\n\nSee the pack's SKILL.md and README.md.\n",
       "expected_outcome": {
         "verdict": "fail",
         "failure_kinds": [
           "missing required section: quick_start"
         ]
-      },
-      "split": "held_out",
-      "known_capabilities": [
-        "ai-visibility-audit",
-        "robots-ai-crawler-audit",
-        "sitemap-discovery-audit",
-        "schema-markup-audit",
-        "ai-search-remediation-plan"
-      ],
-      "allowed_terms": [
-        "prompt-guide",
-        "llms-txt",
-        "robots-txt",
-        "well-known",
-        "copy-pasteable",
-        "en-nz",
-        "json-ld",
-        "x-default",
-        "read-only",
-        "multi-phase"
-      ]
+      }
     },
     {
       "id": "single-prompt-pair",
-      "notes": "only one less-effective/more-effective pair",
+      "split": "held_out",
+      "pack_docs": "# ai-search-visibility-skills\n\nSkills this pack ships:\n\n- `ai-visibility-audit` - six-pillar AI visibility scoring for a site.\n- `robots-ai-crawler-audit` - checks `robots-txt` and `well-known` paths for AI crawler access.\n- `sitemap-discovery-audit` - sitemap and `llms-txt` discovery, including non-default filenames.\n- `schema-markup-audit` - `json-ld` structured data, `x-default` and `en-nz` hreflang pairs.\n- `ai-search-remediation-plan` - turns ranked findings into prioritized tickets.\n\nEvery audit is read-only. Nothing in this pack writes to the target site, opens a pull\nrequest, or submits anything to a third-party console.\n",
       "guide": "# Prompt Guide\n\n## Quick start\n\n```\nRun ai-visibility-audit against https://example.com and give me the prioritized action plan.\n```\n\n## Giving useful context\n\n- The target URL, because the pack classifies the site type from it before choosing checks.\n- Whether you already have analytics access, because that changes measured vs. derived findings.\n- Who reads the report, because an executive summary and a developer ticket list are different deliverables.\n\n## Structuring a complex or multi-phase request\n\n```\n# Instructions\n1. Audit https://example.com with ai-visibility-audit.\n2. Hand the ranked findings to ai-search-remediation-plan.\n\n# Context\nEcommerce storefront, 400 SKUs, no server logs available.\n```\n\nPut the bulk material first and the actual ask last.\n\n## Good vs. less-effective prompt examples\n\nLess effective:\n\n```\ncheck my seo\n```\n\nMore effective:\n\n```\nRun ai-visibility-audit against https://example.com and report Pillar 1 findings only.\n```\n\nNaming the skill and the scope stops the run from wandering across all six pillars.\n\n\n## Known limitations to mention explicitly\n\n- Hydration fix is open and unmerged in PR #104.\n\n## Where to go deeper\n\nSKILL.md.\n",
       "expected_outcome": {
         "verdict": "fail",
         "failure_kinds": [
-          "needs at least two less-effective/more-effective prompt pairs, found 1"
+          "needs at least two less-effective/more-effective prompt pairs, found 1",
+          "limitations section needs at least 2 disclosed limitations, found 1",
+          "limitations section is too thin to be a disclosure: 10 words, needs 25"
         ]
-      },
-      "split": "held_out",
-      "known_capabilities": [
-        "ai-visibility-audit",
-        "robots-ai-crawler-audit",
-        "sitemap-discovery-audit",
-        "schema-markup-audit",
-        "ai-search-remediation-plan"
-      ],
-      "allowed_terms": [
-        "prompt-guide",
-        "llms-txt",
-        "robots-txt",
-        "well-known",
-        "copy-pasteable",
-        "en-nz",
-        "json-ld",
-        "x-default",
-        "read-only",
-        "multi-phase"
-      ]
+      }
     },
     {
       "id": "fabricated-capability",
-      "notes": "invents a skill the target pack does not ship",
+      "split": "held_out",
+      "pack_docs": "# ai-search-visibility-skills\n\nSkills this pack ships:\n\n- `ai-visibility-audit` - six-pillar AI visibility scoring for a site.\n- `robots-ai-crawler-audit` - checks `robots-txt` and `well-known` paths for AI crawler access.\n- `sitemap-discovery-audit` - sitemap and `llms-txt` discovery, including non-default filenames.\n- `schema-markup-audit` - `json-ld` structured data, `x-default` and `en-nz` hreflang pairs.\n- `ai-search-remediation-plan` - turns ranked findings into prioritized tickets.\n\nEvery audit is read-only. Nothing in this pack writes to the target site, opens a pull\nrequest, or submits anything to a third-party console.\n",
       "guide": "# Prompt Guide\n\n## Quick start\n\n```\nRun `ai-visibility-audit` then `core-web-vitals-lab-runner` against https://example.com.\n```\n\n## Giving useful context\n\n- The target URL, because the pack classifies the site type from it before choosing checks.\n- Whether you already have analytics access, because that changes measured vs. derived findings.\n- Who reads the report, because an executive summary and a developer ticket list are different deliverables.\n\n## Structuring a complex or multi-phase request\n\n```\n# Instructions\n1. Audit https://example.com with ai-visibility-audit.\n2. Hand the ranked findings to ai-search-remediation-plan.\n\n# Context\nEcommerce storefront, 400 SKUs, no server logs available.\n```\n\nPut the bulk material first and the actual ask last.\n\n## Good vs. less-effective prompt examples\n\nLess effective:\n\n```\ncheck my seo\n```\n\nMore effective:\n\n```\nRun ai-visibility-audit against https://example.com and report Pillar 1 findings only.\n```\n\nNaming the skill and the scope stops the run from wandering across all six pillars.\n\nLess effective:\n\n```\nalso fix it\n```\n\nMore effective:\n\n```\nConvert the critical findings into P0 tickets using ai-search-remediation-plan.\n```\n\nNaming the downstream skill produces tickets instead of prose.\n\n## Known limitations to mention explicitly\n\n- Hydrated-DOM verification (#102) is not on main yet: the fix is open in PR #104 and unmerged, so raw-HTML false negatives are still possible today.\n- Sitemap discovery misses non-default filenames (#103), fix pending in #105.\n\n## Where to go deeper\n\nSee the pack's SKILL.md and README.md.\n",
       "expected_outcome": {
         "verdict": "fail",
         "failure_kinds": [
           "names capabilities absent from the target pack: ['core-web-vitals-lab-runner']"
         ]
-      },
-      "split": "held_out",
-      "known_capabilities": [
-        "ai-visibility-audit",
-        "robots-ai-crawler-audit",
-        "sitemap-discovery-audit",
-        "schema-markup-audit",
-        "ai-search-remediation-plan"
-      ],
-      "allowed_terms": [
-        "prompt-guide",
-        "llms-txt",
-        "robots-txt",
-        "well-known",
-        "copy-pasteable",
-        "en-nz",
-        "json-ld",
-        "x-default",
-        "read-only",
-        "multi-phase"
-      ]
+      }
     },
     {
       "id": "unmerged-fix-claimed-as-shipped",
-      "notes": "states a pending PR's fix as done, with no merge-state qualifier",
+      "split": "held_out",
+      "pack_docs": "# ai-search-visibility-skills\n\nSkills this pack ships:\n\n- `ai-visibility-audit` - six-pillar AI visibility scoring for a site.\n- `robots-ai-crawler-audit` - checks `robots-txt` and `well-known` paths for AI crawler access.\n- `sitemap-discovery-audit` - sitemap and `llms-txt` discovery, including non-default filenames.\n- `schema-markup-audit` - `json-ld` structured data, `x-default` and `en-nz` hreflang pairs.\n- `ai-search-remediation-plan` - turns ranked findings into prioritized tickets.\n\nEvery audit is read-only. Nothing in this pack writes to the target site, opens a pull\nrequest, or submits anything to a third-party console.\n",
       "guide": "# Prompt Guide\n\n## Quick start\n\n```\nRun ai-visibility-audit against https://example.com and give me the prioritized action plan.\n```\n\n## Giving useful context\n\n- The target URL, because the pack classifies the site type from it before choosing checks.\n- Whether you already have analytics access, because that changes measured vs. derived findings.\n- Who reads the report, because an executive summary and a developer ticket list are different deliverables.\n\n## Structuring a complex or multi-phase request\n\n```\n# Instructions\n1. Audit https://example.com with ai-visibility-audit.\n2. Hand the ranked findings to ai-search-remediation-plan.\n\n# Context\nEcommerce storefront, 400 SKUs, no server logs available.\n```\n\nPut the bulk material first and the actual ask last.\n\n## Good vs. less-effective prompt examples\n\nLess effective:\n\n```\ncheck my seo\n```\n\nMore effective:\n\n```\nRun ai-visibility-audit against https://example.com and report Pillar 1 findings only.\n```\n\nNaming the skill and the scope stops the run from wandering across all six pillars.\n\nLess effective:\n\n```\nalso fix it\n```\n\nMore effective:\n\n```\nConvert the critical findings into P0 tickets using ai-search-remediation-plan.\n```\n\nNaming the downstream skill produces tickets instead of prose.\n\n## Known limitations to mention explicitly\n\n- Hydrated-DOM false negatives (#102) are fixed, so nothing to check by hand.\n\n## Where to go deeper\n\nSee the pack's SKILL.md and README.md.\n",
       "expected_outcome": {
         "verdict": "fail",
         "failure_kinds": [
-          "limitations section claims a fix without stating its merge state"
+          "limitations section needs at least 2 disclosed limitations, found 1",
+          "limitations section is too thin to be a disclosure: 13 words, needs 25",
+          "fix claimed without its merge state in the same claim: 'Hydrated-DOM false negatives (#102) are fixed, so nothing to check by hand.'"
         ]
-      },
-      "split": "held_out",
-      "known_capabilities": [
-        "ai-visibility-audit",
-        "robots-ai-crawler-audit",
-        "sitemap-discovery-audit",
-        "schema-markup-audit",
-        "ai-search-remediation-plan"
-      ],
-      "allowed_terms": [
-        "prompt-guide",
-        "llms-txt",
-        "robots-txt",
-        "well-known",
-        "copy-pasteable",
-        "en-nz",
-        "json-ld",
-        "x-default",
-        "read-only",
-        "multi-phase"
-      ]
+      }
     },
     {
       "id": "limitations-without-issue-links",
-      "notes": "vague limitations prose with no traceable issue or PR",
+      "split": "held_out",
+      "pack_docs": "# ai-search-visibility-skills\n\nSkills this pack ships:\n\n- `ai-visibility-audit` - six-pillar AI visibility scoring for a site.\n- `robots-ai-crawler-audit` - checks `robots-txt` and `well-known` paths for AI crawler access.\n- `sitemap-discovery-audit` - sitemap and `llms-txt` discovery, including non-default filenames.\n- `schema-markup-audit` - `json-ld` structured data, `x-default` and `en-nz` hreflang pairs.\n- `ai-search-remediation-plan` - turns ranked findings into prioritized tickets.\n\nEvery audit is read-only. Nothing in this pack writes to the target site, opens a pull\nrequest, or submits anything to a third-party console.\n",
       "guide": "# Prompt Guide\n\n## Quick start\n\n```\nRun ai-visibility-audit against https://example.com and give me the prioritized action plan.\n```\n\n## Giving useful context\n\n- The target URL, because the pack classifies the site type from it before choosing checks.\n- Whether you already have analytics access, because that changes measured vs. derived findings.\n- Who reads the report, because an executive summary and a developer ticket list are different deliverables.\n\n## Structuring a complex or multi-phase request\n\n```\n# Instructions\n1. Audit https://example.com with ai-visibility-audit.\n2. Hand the ranked findings to ai-search-remediation-plan.\n\n# Context\nEcommerce storefront, 400 SKUs, no server logs available.\n```\n\nPut the bulk material first and the actual ask last.\n\n## Good vs. less-effective prompt examples\n\nLess effective:\n\n```\ncheck my seo\n```\n\nMore effective:\n\n```\nRun ai-visibility-audit against https://example.com and report Pillar 1 findings only.\n```\n\nNaming the skill and the scope stops the run from wandering across all six pillars.\n\nLess effective:\n\n```\nalso fix it\n```\n\nMore effective:\n\n```\nConvert the critical findings into P0 tickets using ai-search-remediation-plan.\n```\n\nNaming the downstream skill produces tickets instead of prose.\n\n## Known limitations to mention explicitly\n\n- Some checks can be unreliable on JavaScript-heavy sites.\n\n## Where to go deeper\n\nSee the pack's SKILL.md and README.md.\n",
       "expected_outcome": {
         "verdict": "fail",
         "failure_kinds": [
+          "limitations section needs at least 2 disclosed limitations, found 1",
+          "limitations section is too thin to be a disclosure: 9 words, needs 25",
           "limitations section cites no issue or PR reference"
         ]
-      },
-      "split": "held_out",
-      "known_capabilities": [
-        "ai-visibility-audit",
-        "robots-ai-crawler-audit",
-        "sitemap-discovery-audit",
-        "schema-markup-audit",
-        "ai-search-remediation-plan"
-      ],
-      "allowed_terms": [
-        "prompt-guide",
-        "llms-txt",
-        "robots-txt",
-        "well-known",
-        "copy-pasteable",
-        "en-nz",
-        "json-ld",
-        "x-default",
-        "read-only",
-        "multi-phase"
-      ]
+      }
     },
     {
       "id": "no-copy-pasteable-prompt",
-      "notes": "describes prompts in prose without a fenced block a user can copy",
+      "split": "held_out",
+      "pack_docs": "# ai-search-visibility-skills\n\nSkills this pack ships:\n\n- `ai-visibility-audit` - six-pillar AI visibility scoring for a site.\n- `robots-ai-crawler-audit` - checks `robots-txt` and `well-known` paths for AI crawler access.\n- `sitemap-discovery-audit` - sitemap and `llms-txt` discovery, including non-default filenames.\n- `schema-markup-audit` - `json-ld` structured data, `x-default` and `en-nz` hreflang pairs.\n- `ai-search-remediation-plan` - turns ranked findings into prioritized tickets.\n\nEvery audit is read-only. Nothing in this pack writes to the target site, opens a pull\nrequest, or submits anything to a third-party console.\n",
       "guide": "# Prompt Guide\n\n## Quick start\n\n\nRun ai-visibility-audit against https://example.com and give me the prioritized action plan.\n\n\n## Giving useful context\n\n- The target URL, because the pack classifies the site type from it before choosing checks.\n- Whether you already have analytics access, because that changes measured vs. derived findings.\n- Who reads the report, because an executive summary and a developer ticket list are different deliverables.\n\n## Structuring a complex or multi-phase request\n\n\n# Instructions\n1. Audit https://example.com with ai-visibility-audit.\n2. Hand the ranked findings to ai-search-remediation-plan.\n\n# Context\nEcommerce storefront, 400 SKUs, no server logs available.\n\n\nPut the bulk material first and the actual ask last.\n\n## Good vs. less-effective prompt examples\n\nLess effective:\n\n\ncheck my seo\n\n\nMore effective:\n\n\nRun ai-visibility-audit against https://example.com and report Pillar 1 findings only.\n\n\nNaming the skill and the scope stops the run from wandering across all six pillars.\n\nLess effective:\n\n\nalso fix it\n\n\nMore effective:\n\n\nConvert the critical findings into P0 tickets using ai-search-remediation-plan.\n\n\nNaming the downstream skill produces tickets instead of prose.\n\n## Known limitations to mention explicitly\n\n- Hydrated-DOM verification (#102) is not on main yet: the fix is open in PR #104 and unmerged, so raw-HTML false negatives are still possible today.\n- Sitemap discovery misses non-default filenames (#103), fix pending in #105.\n\n## Where to go deeper\n\nSee the pack's SKILL.md and README.md.\n",
       "expected_outcome": {
         "verdict": "fail",
         "failure_kinds": [
           "no fenced code block: prompts must be copy-pasteable"
         ]
-      },
-      "split": "held_out",
-      "known_capabilities": [
-        "ai-visibility-audit",
-        "robots-ai-crawler-audit",
-        "sitemap-discovery-audit",
-        "schema-markup-audit",
-        "ai-search-remediation-plan"
-      ],
-      "allowed_terms": [
-        "prompt-guide",
-        "llms-txt",
-        "robots-txt",
-        "well-known",
-        "copy-pasteable",
-        "en-nz",
-        "json-ld",
-        "x-default",
-        "read-only",
-        "multi-phase"
-      ]
+      }
     },
     {
       "id": "missing-structuring-section",
-      "notes": "no guidance on Markdown/XML sectioning for a multi-phase request",
+      "split": "held_out",
+      "pack_docs": "# ai-search-visibility-skills\n\nSkills this pack ships:\n\n- `ai-visibility-audit` - six-pillar AI visibility scoring for a site.\n- `robots-ai-crawler-audit` - checks `robots-txt` and `well-known` paths for AI crawler access.\n- `sitemap-discovery-audit` - sitemap and `llms-txt` discovery, including non-default filenames.\n- `schema-markup-audit` - `json-ld` structured data, `x-default` and `en-nz` hreflang pairs.\n- `ai-search-remediation-plan` - turns ranked findings into prioritized tickets.\n\nEvery audit is read-only. Nothing in this pack writes to the target site, opens a pull\nrequest, or submits anything to a third-party console.\n",
       "guide": "# Prompt Guide\n\n## Quick start\n\n```\nRun ai-visibility-audit against https://example.com and give me the prioritized action plan.\n```\n\n## Giving useful context\n\n- The target URL, because the pack classifies the site type from it before choosing checks.\n- Whether you already have analytics access, because that changes measured vs. derived findings.\n- Who reads the report, because an executive summary and a developer ticket list are different deliverables.\n\n## More prompts\n\n```\n# Instructions\n1. Audit https://example.com with ai-visibility-audit.\n2. Hand the ranked findings to ai-search-remediation-plan.\n\n# Context\nEcommerce storefront, 400 SKUs, no server logs available.\n```\n\nPut the bulk material first and the actual ask last.\n\n## Good vs. less-effective prompt examples\n\nLess effective:\n\n```\ncheck my seo\n```\n\nMore effective:\n\n```\nRun ai-visibility-audit against https://example.com and report Pillar 1 findings only.\n```\n\nNaming the skill and the scope stops the run from wandering across all six pillars.\n\nLess effective:\n\n```\nalso fix it\n```\n\nMore effective:\n\n```\nConvert the critical findings into P0 tickets using ai-search-remediation-plan.\n```\n\nNaming the downstream skill produces tickets instead of prose.\n\n## Known limitations to mention explicitly\n\n- Hydrated-DOM verification (#102) is not on main yet: the fix is open in PR #104 and unmerged, so raw-HTML false negatives are still possible today.\n- Sitemap discovery misses non-default filenames (#103), fix pending in #105.\n\n## Where to go deeper\n\nSee the pack's SKILL.md and README.md.\n",
       "expected_outcome": {
         "verdict": "fail",
         "failure_kinds": [
           "missing required section: structuring"
         ]
-      },
-      "split": "held_out",
-      "known_capabilities": [
-        "ai-visibility-audit",
-        "robots-ai-crawler-audit",
-        "sitemap-discovery-audit",
-        "schema-markup-audit",
-        "ai-search-remediation-plan"
-      ],
-      "allowed_terms": [
-        "prompt-guide",
-        "llms-txt",
-        "robots-txt",
-        "well-known",
-        "copy-pasteable",
-        "en-nz",
-        "json-ld",
-        "x-default",
-        "read-only",
-        "multi-phase"
-      ]
+      }
     },
     {
       "id": "missing-where-to-go-deeper",
-      "notes": "no pointer back to the pack's own docs, inviting a drifting duplicate",
+      "split": "held_out",
+      "pack_docs": "# ai-search-visibility-skills\n\nSkills this pack ships:\n\n- `ai-visibility-audit` - six-pillar AI visibility scoring for a site.\n- `robots-ai-crawler-audit` - checks `robots-txt` and `well-known` paths for AI crawler access.\n- `sitemap-discovery-audit` - sitemap and `llms-txt` discovery, including non-default filenames.\n- `schema-markup-audit` - `json-ld` structured data, `x-default` and `en-nz` hreflang pairs.\n- `ai-search-remediation-plan` - turns ranked findings into prioritized tickets.\n\nEvery audit is read-only. Nothing in this pack writes to the target site, opens a pull\nrequest, or submits anything to a third-party console.\n",
       "guide": "# Prompt Guide\n\n## Quick start\n\n```\nRun ai-visibility-audit against https://example.com and give me the prioritized action plan.\n```\n\n## Giving useful context\n\n- The target URL, because the pack classifies the site type from it before choosing checks.\n- Whether you already have analytics access, because that changes measured vs. derived findings.\n- Who reads the report, because an executive summary and a developer ticket list are different deliverables.\n\n## Structuring a complex or multi-phase request\n\n```\n# Instructions\n1. Audit https://example.com with ai-visibility-audit.\n2. Hand the ranked findings to ai-search-remediation-plan.\n\n# Context\nEcommerce storefront, 400 SKUs, no server logs available.\n```\n\nPut the bulk material first and the actual ask last.\n\n## Good vs. less-effective prompt examples\n\nLess effective:\n\n```\ncheck my seo\n```\n\nMore effective:\n\n```\nRun ai-visibility-audit against https://example.com and report Pillar 1 findings only.\n```\n\nNaming the skill and the scope stops the run from wandering across all six pillars.\n\nLess effective:\n\n```\nalso fix it\n```\n\nMore effective:\n\n```\nConvert the critical findings into P0 tickets using ai-search-remediation-plan.\n```\n\nNaming the downstream skill produces tickets instead of prose.\n\n## Known limitations to mention explicitly\n\n- Hydrated-DOM verification (#102) is not on main yet: the fix is open in PR #104 and unmerged, so raw-HTML false negatives are still possible today.\n- Sitemap discovery misses non-default filenames (#103), fix pending in #105.\n\n## Closing notes\n\nSee the pack's SKILL.md and README.md.\n",
       "expected_outcome": {
         "verdict": "fail",
         "failure_kinds": [
           "missing required section: deeper"
         ]
-      },
+      }
+    },
+    {
+      "id": "fix-claimed-with-synonym-verb",
       "split": "held_out",
-      "known_capabilities": [
-        "ai-visibility-audit",
-        "robots-ai-crawler-audit",
-        "sitemap-discovery-audit",
-        "schema-markup-audit",
-        "ai-search-remediation-plan"
-      ],
-      "allowed_terms": [
-        "prompt-guide",
-        "llms-txt",
-        "robots-txt",
-        "well-known",
-        "copy-pasteable",
-        "en-nz",
-        "json-ld",
-        "x-default",
-        "read-only",
-        "multi-phase"
-      ]
+      "pack_docs": "# ai-search-visibility-skills\n\nSkills this pack ships:\n\n- `ai-visibility-audit` - six-pillar AI visibility scoring for a site.\n- `robots-ai-crawler-audit` - checks `robots-txt` and `well-known` paths for AI crawler access.\n- `sitemap-discovery-audit` - sitemap and `llms-txt` discovery, including non-default filenames.\n- `schema-markup-audit` - `json-ld` structured data, `x-default` and `en-nz` hreflang pairs.\n- `ai-search-remediation-plan` - turns ranked findings into prioritized tickets.\n\nEvery audit is read-only. Nothing in this pack writes to the target site, opens a pull\nrequest, or submits anything to a third-party console.\n",
+      "guide": "# Prompt Guide\n\n## Quick start\n\n```\nRun ai-visibility-audit against https://example.com and give me the prioritized action plan.\n```\n\n## Giving useful context\n\n- The target URL, because the pack classifies the site type from it before choosing checks.\n- Whether you already have analytics access, because that changes measured vs. derived findings.\n- Who reads the report, because an executive summary and a developer ticket list are different deliverables.\n\n## Structuring a complex or multi-phase request\n\n```\n# Instructions\n1. Audit https://example.com with ai-visibility-audit.\n2. Hand the ranked findings to ai-search-remediation-plan.\n\n# Context\nEcommerce storefront, 400 SKUs, no server logs available.\n```\n\nPut the bulk material first and the actual ask last.\n\n## Good vs. less-effective prompt examples\n\nLess effective:\n\n```\ncheck my seo\n```\n\nMore effective:\n\n```\nRun ai-visibility-audit against https://example.com and report Pillar 1 findings only.\n```\n\nNaming the skill and the scope stops the run from wandering across all six pillars.\n\nLess effective:\n\n```\nalso fix it\n```\n\nMore effective:\n\n```\nConvert the critical findings into P0 tickets using ai-search-remediation-plan.\n```\n\nNaming the downstream skill produces tickets instead of prose.\n\n## Known limitations to mention explicitly\n\n- Hydrated-DOM verification: resolved in PR #104, so raw-HTML false negatives are no longer a concern.\n- Sitemap discovery: shipped in #105, non-default filenames are handled now.\n\n## Where to go deeper\n\nSee the pack's SKILL.md and README.md.\n",
+      "expected_outcome": {
+        "verdict": "fail",
+        "failure_kinds": [
+          "fix claimed without its merge state in the same claim: 'Hydrated-DOM verification: resolved in PR #104, so raw-HTML false negatives are no longer a concern.'",
+          "fix claimed without its merge state in the same claim: 'Sitemap discovery: shipped in #105, non-default filenames are handled now.'"
+        ]
+      }
+    },
+    {
+      "id": "hedge-laundered-across-bullets",
+      "split": "held_out",
+      "pack_docs": "# ai-search-visibility-skills\n\nSkills this pack ships:\n\n- `ai-visibility-audit` - six-pillar AI visibility scoring for a site.\n- `robots-ai-crawler-audit` - checks `robots-txt` and `well-known` paths for AI crawler access.\n- `sitemap-discovery-audit` - sitemap and `llms-txt` discovery, including non-default filenames.\n- `schema-markup-audit` - `json-ld` structured data, `x-default` and `en-nz` hreflang pairs.\n- `ai-search-remediation-plan` - turns ranked findings into prioritized tickets.\n\nEvery audit is read-only. Nothing in this pack writes to the target site, opens a pull\nrequest, or submits anything to a third-party console.\n",
+      "guide": "# Prompt Guide\n\n## Quick start\n\n```\nRun ai-visibility-audit against https://example.com and give me the prioritized action plan.\n```\n\n## Giving useful context\n\n- The target URL, because the pack classifies the site type from it before choosing checks.\n- Whether you already have analytics access, because that changes measured vs. derived findings.\n- Who reads the report, because an executive summary and a developer ticket list are different deliverables.\n\n## Structuring a complex or multi-phase request\n\n```\n# Instructions\n1. Audit https://example.com with ai-visibility-audit.\n2. Hand the ranked findings to ai-search-remediation-plan.\n\n# Context\nEcommerce storefront, 400 SKUs, no server logs available.\n```\n\nPut the bulk material first and the actual ask last.\n\n## Good vs. less-effective prompt examples\n\nLess effective:\n\n```\ncheck my seo\n```\n\nMore effective:\n\n```\nRun ai-visibility-audit against https://example.com and report Pillar 1 findings only.\n```\n\nNaming the skill and the scope stops the run from wandering across all six pillars.\n\nLess effective:\n\n```\nalso fix it\n```\n\nMore effective:\n\n```\nConvert the critical findings into P0 tickets using ai-search-remediation-plan.\n```\n\nNaming the downstream skill produces tickets instead of prose.\n\n## Known limitations to mention explicitly\n\n- Hydrated-DOM verification was fixed in PR #104 and raw-HTML false negatives are gone.\n- Sitemap discovery issue #103 is still open and misses non-default sitemap filenames today.\n\n## Where to go deeper\n\nSee the pack's SKILL.md and README.md.\n",
+      "expected_outcome": {
+        "verdict": "fail",
+        "failure_kinds": [
+          "fix claimed without its merge state in the same claim: 'Hydrated-DOM verification was fixed in PR #104 and raw-HTML false negatives are gone.'"
+        ]
+      }
+    },
+    {
+      "id": "gutted-limitations-section",
+      "split": "held_out",
+      "pack_docs": "# ai-search-visibility-skills\n\nSkills this pack ships:\n\n- `ai-visibility-audit` - six-pillar AI visibility scoring for a site.\n- `robots-ai-crawler-audit` - checks `robots-txt` and `well-known` paths for AI crawler access.\n- `sitemap-discovery-audit` - sitemap and `llms-txt` discovery, including non-default filenames.\n- `schema-markup-audit` - `json-ld` structured data, `x-default` and `en-nz` hreflang pairs.\n- `ai-search-remediation-plan` - turns ranked findings into prioritized tickets.\n\nEvery audit is read-only. Nothing in this pack writes to the target site, opens a pull\nrequest, or submits anything to a third-party console.\n",
+      "guide": "# Prompt Guide\n\n## Quick start\n\n```\nRun ai-visibility-audit against https://example.com and give me the prioritized action plan.\n```\n\n## Giving useful context\n\n- The target URL, because the pack classifies the site type from it before choosing checks.\n- Whether you already have analytics access, because that changes measured vs. derived findings.\n- Who reads the report, because an executive summary and a developer ticket list are different deliverables.\n\n## Structuring a complex or multi-phase request\n\n```\n# Instructions\n1. Audit https://example.com with ai-visibility-audit.\n2. Hand the ranked findings to ai-search-remediation-plan.\n\n# Context\nEcommerce storefront, 400 SKUs, no server logs available.\n```\n\nPut the bulk material first and the actual ask last.\n\n## Good vs. less-effective prompt examples\n\nLess effective:\n\n```\ncheck my seo\n```\n\nMore effective:\n\n```\nRun ai-visibility-audit against https://example.com and report Pillar 1 findings only.\n```\n\nNaming the skill and the scope stops the run from wandering across all six pillars.\n\nLess effective:\n\n```\nalso fix it\n```\n\nMore effective:\n\n```\nConvert the critical findings into P0 tickets using ai-search-remediation-plan.\n```\n\nNaming the downstream skill produces tickets instead of prose.\n\n## Known limitations to mention explicitly\n\nNothing significant. Minor edge cases tracked in #1.\n\n## Where to go deeper\n\nSee the pack's SKILL.md and README.md.\n",
+      "expected_outcome": {
+        "verdict": "fail",
+        "failure_kinds": [
+          "limitations section dismisses limitations instead of disclosing them",
+          "limitations section needs at least 2 disclosed limitations, found 1",
+          "limitations section is too thin to be a disclosure: 8 words, needs 25"
+        ]
+      }
+    },
+    {
+      "id": "prose-fabricated-capability",
+      "split": "held_out",
+      "pack_docs": "# ai-search-visibility-skills\n\nSkills this pack ships:\n\n- `ai-visibility-audit` - six-pillar AI visibility scoring for a site.\n- `robots-ai-crawler-audit` - checks `robots-txt` and `well-known` paths for AI crawler access.\n- `sitemap-discovery-audit` - sitemap and `llms-txt` discovery, including non-default filenames.\n- `schema-markup-audit` - `json-ld` structured data, `x-default` and `en-nz` hreflang pairs.\n- `ai-search-remediation-plan` - turns ranked findings into prioritized tickets.\n\nEvery audit is read-only. Nothing in this pack writes to the target site, opens a pull\nrequest, or submits anything to a third-party console.\n",
+      "guide": "# Prompt Guide\n\n## Quick start\n\n```\nRun ai-visibility-audit against https://example.com and give me the prioritized action plan.\n```\n\n## Giving useful context\n\n- The target URL, because the pack classifies the site type from it before choosing checks.\n- Whether you already have analytics access, because that changes measured vs. derived findings.\n- Who reads the report, because an executive summary and a developer ticket list are different deliverables.\n\n## Structuring a complex or multi-phase request\n\n```\n# Instructions\n1. Audit https://example.com with ai-visibility-audit.\n2. Hand the ranked findings to ai-search-remediation-plan.\n\n# Context\nEcommerce storefront, 400 SKUs, no server logs available.\n```\n\nPut the bulk material first and the actual ask last.\n\n## Good vs. less-effective prompt examples\n\nLess effective:\n\n```\ncheck my seo\n```\n\nMore effective:\n\n```\nRun ai-visibility-audit against https://example.com and report Pillar 1 findings only.\n```\n\nNaming the skill and the scope stops the run from wandering across all six pillars.\n\nLess effective:\n\n```\nalso fix it\n```\n\nMore effective:\n\n```\nConvert the critical findings into P0 tickets using ai-search-remediation-plan.\n```\n\nNaming the downstream skill produces tickets instead of prose.\n\n## Known limitations to mention explicitly\n\n- Hydrated-DOM verification (#102) is not on main yet: the fix is open in PR #104 and unmerged, so raw-HTML false negatives are still possible today.\n- Sitemap discovery misses non-default filenames (#103), fix pending in #105.\n\n## Where to go deeper\n\nSee the pack's SKILL.md and README.md. The pack can also automatically submit your sitemap to Google Search Console and generate schema patches as a pull request.\n",
+      "expected_outcome": {
+        "verdict": "fail",
+        "failure_kinds": [
+          "prose capability claims naming no capability the pack ships: ['The pack can also automatically submit your sitemap to Google Search Console and generate schema patches as a pull request.']"
+        ]
+      }
+    },
+    {
+      "id": "self-declared-allow-list-capability",
+      "split": "held_out",
+      "pack_docs": "# ai-search-visibility-skills\n\nSkills this pack ships:\n\n- `ai-visibility-audit` - six-pillar AI visibility scoring for a site.\n- `robots-ai-crawler-audit` - checks `robots-txt` and `well-known` paths for AI crawler access.\n- `sitemap-discovery-audit` - sitemap and `llms-txt` discovery, including non-default filenames.\n- `schema-markup-audit` - `json-ld` structured data, `x-default` and `en-nz` hreflang pairs.\n- `ai-search-remediation-plan` - turns ranked findings into prioritized tickets.\n\nEvery audit is read-only. Nothing in this pack writes to the target site, opens a pull\nrequest, or submits anything to a third-party console.\n",
+      "guide": "# Prompt Guide\n\n## Quick start\n\nUse `core-web-vitals-lab-runner` for lab performance metrics.\n\n```\nRun ai-visibility-audit against https://example.com and give me the prioritized action plan.\n```\n\n## Giving useful context\n\n- The target URL, because the pack classifies the site type from it before choosing checks.\n- Whether you already have analytics access, because that changes measured vs. derived findings.\n- Who reads the report, because an executive summary and a developer ticket list are different deliverables.\n\n## Structuring a complex or multi-phase request\n\n```\n# Instructions\n1. Audit https://example.com with ai-visibility-audit.\n2. Hand the ranked findings to ai-search-remediation-plan.\n\n# Context\nEcommerce storefront, 400 SKUs, no server logs available.\n```\n\nPut the bulk material first and the actual ask last.\n\n## Good vs. less-effective prompt examples\n\nLess effective:\n\n```\ncheck my seo\n```\n\nMore effective:\n\n```\nRun ai-visibility-audit against https://example.com and report Pillar 1 findings only.\n```\n\nNaming the skill and the scope stops the run from wandering across all six pillars.\n\nLess effective:\n\n```\nalso fix it\n```\n\nMore effective:\n\n```\nConvert the critical findings into P0 tickets using ai-search-remediation-plan.\n```\n\nNaming the downstream skill produces tickets instead of prose.\n\n## Known limitations to mention explicitly\n\n- Hydrated-DOM verification (#102) is not on main yet: the fix is open in PR #104 and unmerged, so raw-HTML false negatives are still possible today.\n- Sitemap discovery misses non-default filenames (#103), fix pending in #105.\n\n## Where to go deeper\n\nSee the pack's SKILL.md and README.md.\n",
+      "expected_outcome": {
+        "verdict": "fail",
+        "failure_kinds": [
+          "names capabilities absent from the target pack: ['core-web-vitals-lab-runner']"
+        ]
+      }
     }
   ]
 }

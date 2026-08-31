@@ -3,26 +3,7 @@
     {
       "id": "tuning-minimal-passing-guide",
       "split": "tuning",
-      "notes": "shortest guide that still satisfies every structural rule",
-      "known_capabilities": [
-        "ai-visibility-audit",
-        "robots-ai-crawler-audit",
-        "sitemap-discovery-audit",
-        "schema-markup-audit",
-        "ai-search-remediation-plan"
-      ],
-      "allowed_terms": [
-        "prompt-guide",
-        "llms-txt",
-        "robots-txt",
-        "well-known",
-        "copy-pasteable",
-        "en-nz",
-        "json-ld",
-        "x-default",
-        "read-only",
-        "multi-phase"
-      ],
+      "pack_docs": "# ai-search-visibility-skills\n\nSkills this pack ships:\n\n- `ai-visibility-audit` - six-pillar AI visibility scoring for a site.\n- `robots-ai-crawler-audit` - checks `robots-txt` and `well-known` paths for AI crawler access.\n- `sitemap-discovery-audit` - sitemap and `llms-txt` discovery, including non-default filenames.\n- `schema-markup-audit` - `json-ld` structured data, `x-default` and `en-nz` hreflang pairs.\n- `ai-search-remediation-plan` - turns ranked findings into prioritized tickets.\n\nEvery audit is read-only. Nothing in this pack writes to the target site, opens a pull\nrequest, or submits anything to a third-party console.\n",
       "guide": "# Prompt Guide\n\n## Quick start\n\n```\nRun ai-visibility-audit against https://example.com.\n```\n\n## Giving useful context\n\nSupply the URL, because site type drives which checks run.\n\n## Structuring a complex request\n\n```\n# Instructions\n1. Audit.\n2. Plan.\n```\n\n## Good vs. less-effective prompts\n\nLess effective: `audit me`. More effective: `Run ai-visibility-audit against https://example.com`.\n\nLess effective: `fix it`. More effective: `Turn the P0 findings into tickets`.\n\n## Known limitations\n\nHydration verification is open and unmerged in PR #104.\n\n## Where to go deeper\n\nSKILL.md.\n",
       "expected_outcome": {
         "verdict": "pass",
@@ -32,26 +13,7 @@
     {
       "id": "tuning-generic-tutorial",
       "split": "tuning",
-      "notes": "generic prompt-engineering advice with no pack specifics",
-      "known_capabilities": [
-        "ai-visibility-audit",
-        "robots-ai-crawler-audit",
-        "sitemap-discovery-audit",
-        "schema-markup-audit",
-        "ai-search-remediation-plan"
-      ],
-      "allowed_terms": [
-        "prompt-guide",
-        "llms-txt",
-        "robots-txt",
-        "well-known",
-        "copy-pasteable",
-        "en-nz",
-        "json-ld",
-        "x-default",
-        "read-only",
-        "multi-phase"
-      ],
+      "pack_docs": "# ai-search-visibility-skills\n\nSkills this pack ships:\n\n- `ai-visibility-audit` - six-pillar AI visibility scoring for a site.\n- `robots-ai-crawler-audit` - checks `robots-txt` and `well-known` paths for AI crawler access.\n- `sitemap-discovery-audit` - sitemap and `llms-txt` discovery, including non-default filenames.\n- `schema-markup-audit` - `json-ld` structured data, `x-default` and `en-nz` hreflang pairs.\n- `ai-search-remediation-plan` - turns ranked findings into prioritized tickets.\n\nEvery audit is read-only. Nothing in this pack writes to the target site, opens a pull\nrequest, or submits anything to a third-party console.\n",
       "guide": "# Prompt Guide\n\nBe clear. Be specific. Give examples.\n",
       "expected_outcome": {
         "verdict": "fail",

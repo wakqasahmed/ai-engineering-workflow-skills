@@ -10,10 +10,11 @@ if [[ "${1:---dry-run}" != "--dry-run" || $# -gt 1 ]]; then
   exit 1
 fi
 
-mkdir -p "$WORKSPACE/eval/fixtures" "$WORKSPACE/home"
-cp "$EVAL_DIR/check-contract.py" "$EVAL_DIR/validate-guide.py" "$WORKSPACE/eval/"
-cp "$EVAL_DIR/fixtures/held-out.json" "$EVAL_DIR/fixtures/tuning.json" "$WORKSPACE/eval/fixtures/"
-cp "$EVAL_DIR/../../../skills/engineering/write-prompt-guide/SKILL.md" "$WORKSPACE/SKILL.md"
+EVAL_REL="eval/engineering/write-prompt-guide"
+mkdir -p "$WORKSPACE/$EVAL_REL/fixtures" "$WORKSPACE/skills/engineering/write-prompt-guide" "$WORKSPACE/home"
+cp "$EVAL_DIR/check-contract.py" "$EVAL_DIR/validate-guide.py" "$WORKSPACE/$EVAL_REL/"
+cp "$EVAL_DIR/fixtures/held-out.json" "$EVAL_DIR/fixtures/tuning.json" "$WORKSPACE/$EVAL_REL/fixtures/"
+cp "$EVAL_DIR/../../../skills/engineering/write-prompt-guide/SKILL.md" "$WORKSPACE/skills/engineering/write-prompt-guide/SKILL.md"
 cp "$EVAL_DIR/../../../SOURCES.md" "$WORKSPACE/SOURCES.md"
 cat > "$WORKSPACE/sitecustomize.py" <<'PY'
 import socket
@@ -23,4 +24,4 @@ socket.socket = blocked
 socket.create_connection = blocked
 PY
 
-PYTHONPATH="$WORKSPACE" HOME="$WORKSPACE/home" PYTHONNOUSERSITE=1 python3 "$WORKSPACE/eval/check-contract.py"
+PYTHONPATH="$WORKSPACE" HOME="$WORKSPACE/home" PYTHONNOUSERSITE=1 python3 "$WORKSPACE/$EVAL_REL/check-contract.py"

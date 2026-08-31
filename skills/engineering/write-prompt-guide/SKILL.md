@@ -13,7 +13,7 @@ This is not a prompt-engineering tutorial. A generic "be specific, give examples
 
 The structure below is not invented. It is the intersection of the official prompting documentation of four model/agent providers — Anthropic, OpenAI, Google, and BytePlus — recorded with URLs and per-claim attribution in this repo's [`SOURCES.md`](../../../SOURCES.md) (`ANTHROPIC-PROMPTING-01`, `OPENAI-PROMPTING-01`, `GOOGLE-PROMPTING-01`, `BYTEPLUS-PROMPTING-01`).
 
-Three techniques appear in all four independently, which is why they are the non-negotiable spine of every guide this skill produces:
+Two techniques appear in all four independently and a third in two of them independently, which is why these three are the non-negotiable spine of every guide this skill produces:
 
 1. **Structural separation of instructions, context, examples, and input** — Anthropic via XML tags (`<instructions>`, `<context>`, `<input>`), OpenAI and BytePlus via the same four Markdown sections (`# Identity`, `# Instructions`, `# Examples`, `# Context`), Google via "XML tags or Markdown". Four sources, one technique.
 2. **Few-shot examples** — Anthropic asks for 3–5, relevant and diverse, wrapped in `<example>`/`<examples>`; OpenAI calls it "a handful of input/output examples"; BytePlus's general-task template requires at least two worked Question/Output pairs; Google contrasts zero-shot with few-shot.

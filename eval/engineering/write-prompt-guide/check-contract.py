@@ -7,8 +7,9 @@ from pathlib import Path
 
 
 EVAL_DIR = Path(__file__).resolve().parent
-SKILL = EVAL_DIR.parent / "SKILL.md"
-SOURCES = EVAL_DIR.parent / "SOURCES.md"
+REPO_ROOT = EVAL_DIR.parents[2]
+SKILL = REPO_ROOT / "skills" / "engineering" / "write-prompt-guide" / "SKILL.md"
+SOURCES = REPO_ROOT / "SOURCES.md"
 CASES = EVAL_DIR / "fixtures" / "held-out.json"
 TUNING_CASES = EVAL_DIR / "fixtures" / "tuning.json"
 
@@ -33,10 +34,10 @@ REQUIRED_SOURCE_URLS = (
     "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices",
     "https://developers.openai.com/api/docs/guides/prompt-engineering",
     "https://ai.google.dev/gemini-api/docs/prompting-strategies",
-    "https://docs.byteplus.com/en/docs/ModelArk/prompt-engineering",
+    "https://docs.byteplus.com/en/docs/ModelArk/1221660",
 )
 
-REQUIRED_CASE_FIELDS = {"id", "split", "guide", "known_capabilities", "allowed_terms", "expected_outcome"}
+REQUIRED_CASE_FIELDS = {"id", "split", "guide", "pack_docs", "expected_outcome"}
 
 
 def load_validator():
@@ -57,6 +58,48 @@ def validate_corpus(held_out: list[dict], tuning: list[dict]) -> list[str]:
     held_out_digests = {guide_digest(c["guide"]) for c in held_out if isinstance(c.get("guide"), str)}
     if any(guide_digest(c["guide"]) in held_out_digests for c in tuning if isinstance(c.get("guide"), str)):
         failures.append("held-out guide appears in tuning corpus")
+    return failures
+
+
+BYPASS_PROBES = (
+    (
+        "fix claimed with a synonym verb",
+        "## Known limitations to mention explicitly\n\n- Hydrated-DOM verification: resolved in PR #104.\n",
+        "fix claimed without its merge state",
+    ),
+    (
+        "hedge laundered from a neighbouring bullet",
+        "## Known limitations to mention explicitly\n\n"
+        "- Hydrated-DOM verification was fixed in PR #104.\n- Sitemap discovery #103 is still open.\n",
+        "fix claimed without its merge state",
+    ),
+    (
+        "limitations section gutted to a throwaway reference",
+        "## Known limitations to mention explicitly\n\nNothing significant. Minor edge cases tracked in #1.\n",
+        "limitations section dismisses limitations",
+    ),
+    (
+        "capability fabricated in prose rather than in backticks",
+        "The pack can also automatically submit your sitemap to Google Search Console.\n",
+        "prose capability claims naming no capability",
+    ),
+    (
+        "capability fabricated in backticks",
+        "Use `core-web-vitals-lab-runner` for lab metrics.\n",
+        "names capabilities absent from the target pack",
+    ),
+)
+
+BYPASS_PACK_DOCS = "This pack ships `ai-visibility-audit` and `sitemap-discovery-audit`. Every audit is read-only.\n"
+
+
+def check_bypass_coverage(validator) -> list[str]:
+    """The validator must reject each known guardrail bypass, regardless of the fixture corpus."""
+    failures = []
+    for name, snippet, expected in BYPASS_PROBES:
+        reported = validator.validate(snippet, BYPASS_PACK_DOCS)
+        if not any(expected in r for r in reported):
+            failures.append(f"validator no longer rejects the '{name}' bypass (got {reported})")
     return failures
 
 
@@ -89,7 +132,7 @@ def validate() -> list[str]:
             failures.append(f"{case['id']} has an invalid expected verdict")
             continue
 
-        actual = validator.validate(case["guide"], set(case["known_capabilities"]), set(case["allowed_terms"]))
+        actual = validator.validate(case["guide"], case["pack_docs"])
         verdict = "fail" if actual else "pass"
         if verdict != expected["verdict"]:
             failures.append(f"{case['id']}: expected {expected['verdict']}, validator said {verdict} ({actual})")
@@ -107,6 +150,7 @@ def validate() -> list[str]:
         failures.append("held-out manifest must include a fabricated-capability case")
     if not any("merge state" in kind for c in held_out for kind in c.get("expected_outcome", {}).get("failure_kinds", [])):
         failures.append("held-out manifest must include an unmerged-fix-claimed-as-shipped case")
+    failures.extend(check_bypass_coverage(validator))
 
     return failures
 
