@@ -54,6 +54,7 @@ No installer, no dependency — just files your agent already knows how to read.
 | [`release-gate`](skills/engineering/release-gate/SKILL.md) | Check deployment, staging, rollback, and health verification before release. |
 | [`review-gate`](skills/engineering/review-gate/SKILL.md) | Run an independent semantic review gate before merging non-trivial work, on top of (not duplicating) Alibaba Code Review and CI. |
 | [`subagent-pipeline`](skills/engineering/subagent-pipeline/SKILL.md) | Run a cold-start implementer, reviewer, and fixer subagent chain for one issue, gated by CI, ending in a staging PR. |
+| [`tmux-orphaned-socket`](skills/engineering/tmux-orphaned-socket/SKILL.md) | Diagnose and recover from an orphaned tmux socket (`error connecting to /tmp/tmux-*/default`) after a `/tmp` cleanup, without assuming the sessions are lost. |
 | [`to-prd`](skills/engineering/to-prd/SKILL.md) | Synthesize the current conversation and repository context into a concise product and engineering spec, publish it to the project issue tracker, and gate agent readiness before decomposition. |
 | [`workflow-router`](skills/engineering/workflow-router/SKILL.md) | Routes a software-work request to the smallest applicable delivery workflow and records repository conventions once. |
 | [`write-prompt-guide`](skills/engineering/write-prompt-guide/SKILL.md) | Produce a pack-specific `PROMPT_GUIDE.md` that teaches end users what to type to get a good run out of one Agent Skill pack, from that pack's own `SKILL.md`, README, and open issues. |
