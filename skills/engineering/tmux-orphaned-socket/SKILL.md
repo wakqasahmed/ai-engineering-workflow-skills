@@ -15,21 +15,39 @@ that didn't exclude `/tmp/tmux-*`.
 ## Diagnose, don't assume
 
 1. Confirm the socket is actually missing, not just misnamed:
-   `ls -la /tmp/tmux-$(id -u)/` — an empty or absent directory confirms it.
-2. Check whether the server process is still alive:
-   `ps aux | grep '[t]mux'` — find its PID.
+   `ls -la /tmp/tmux-$(id -u)/` — expect it empty, not absent: tmux itself recreates
+   `/tmp/tmux-<uid>` (mode 0700) on its own next invocation, including the `tmux ls`/`attach`
+   that surfaced the error, so by the time you're reading this the directory almost always
+   exists again — an "absent" directory is essentially unreachable once any tmux command has
+   run as that uid. `pam_systemd` creates `/run/user/<uid>`, not this directory, and
+   `systemd-tmpfiles` manages `/tmp` broadly rather than per-uid tmux dirs specifically, so
+   don't attribute the recreation to either of them.
+2. Check whether the server process is still alive, and identify the server specifically —
+   `ps aux | grep '[t]mux'` lists clients and the server indistinguishably:
+   `ps -eo pid,ppid,cmd | grep '[t]mux'` and look for the process with no controlling terminal
+   (`?` in a `ps -eo pid,tty,cmd` listing), often shown as `tmux: server`; exact presentation is
+   tmux-version- and platform-dependent, so treat this as a strong hint, not a guarantee. Cross-
+   check by connecting once (`tmux ls`) and then finding who holds the socket:
+   `lsof /tmp/tmux-$(id -u)/default` or `fuser -v /tmp/tmux-$(id -u)/default`.
 3. Check when the socket directory was recreated, to date the event:
    `stat /tmp/tmux-$(id -u)` — a `Birth` timestamp much later than the server's start time means
-   something deleted the directory and it was silently recreated empty (commonly by
-   `pam_systemd`/tmpfiles on next login), not by tmux itself.
+   the directory was deleted and silently recreated. `Birth` isn't always available (tmpfs and
+   some filesystems omit it and print `-`); when it's missing, fall back to `stat -c '%Y'`
+   (mtime) or the server's own start time (`ps -o lstart= -p <server-pid>`) for the same
+   comparison.
 4. Confirm live windows/panes under the orphaned server before deciding anything:
-   `pstree -p <server-pid>` and `ps --ppid <server-pid>`. Panes with clients that were already
-   attached before the deletion keep running — their connection was established before the
-   socket vanished, so they don't need to reconnect.
+   `pstree -p <server-pid>` and `ps --ppid <server-pid>`. All panes under a surviving server
+   process keep running regardless of whether their client is currently attached or detached —
+   survival depends on the server process, not on client attachment. An already-attached
+   client's terminal also stays usable, since its connection was established before the socket
+   vanished; a detached session is not at any extra risk and should be checked with the same
+   care as an attached one.
 5. Rule out the routine suspects before blaming an ad hoc script: check whether
-   `systemd-tmpfiles-clean.timer` actually ages `/tmp` (`cat /usr/lib/tmpfiles.d/tmp.conf` —
-   a bare `-` age field means aging is disabled) and whether a known cleanup cron's schedule
-   lines up with the timestamp from step 3.
+   `systemd-tmpfiles-clean.timer` actually ages `/tmp` with `systemd-tmpfiles --cat-config`
+   (merges `/usr/lib/tmpfiles.d`, `/etc/tmpfiles.d`, and `/run/tmpfiles.d` in override order —
+   checking only the vendor file under `/usr/lib/tmpfiles.d/tmp.conf` can miss an `/etc`
+   override) — a bare `-` age field in the effective config means aging is disabled — and
+   whether a known cleanup cron's schedule lines up with the timestamp from step 3.
 
 ## Recovery is a trade-off, not a fix
 
@@ -52,6 +70,6 @@ losing those panes is fine.
 
 Any cleanup routine that touches `/tmp` broadly — cron job, agent-run script, disk-space
 recovery — must exclude `/tmp/tmux-*` (and other live-process sockets: `/tmp/ssh-*`,
-`X11-unix`, etc.). A directory holding a live process's control socket is not stale just
-because its files look old; staleness has to be judged by whether the owning process still
-exists, not by file age alone.
+`/tmp/.X11-unix`, `/tmp/.ICE-unix`, etc.). A directory holding a live process's control socket
+is not stale just because its files look old; staleness has to be judged by whether the owning
+process still exists, not by file age alone.

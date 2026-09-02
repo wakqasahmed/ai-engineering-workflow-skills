@@ -49,7 +49,7 @@ Solve the stated problem directly. Prefer concrete delivery over speculative arc
 - Prefer backups before symlink normalization.
 - Treat auth, payments, secrets, and deployment paths as high-risk areas.
 - Before adding a production dependency, verify its source, maintenance status, license, and necessity. Require human approval.
-- Any broad `/tmp` cleanup (cron, disk-space sweep, agent-run script) must check for live process handles before deleting — `lsof +D <path>` or `fuser -v <path>` — not just file age or a fixed name list. Socket/lock naming conventions (tmux, ssh, X11, database sockets, systemd `PrivateTmp`, audio/gpg agents, container bind-mounts) drift across tools; a directory a live process still holds open is never stale regardless of mtime. See `tmux-orphaned-socket`.
+- Use `tmux-orphaned-socket` before any broad `/tmp` cleanup — check for live process handles, not just file age, before deleting.
 
 ## Git
 

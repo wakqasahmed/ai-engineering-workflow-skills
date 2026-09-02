@@ -25,6 +25,7 @@ This file mirrors `AGENTS.md` for compatibility.
 - Use `git-guardrails-claude-code` to set up or audit the PreToolUse hook that blocks force-push, direct push to main/master/staging, `reset --hard`, `clean -f/-fd`, `branch -D`, and bare `checkout .`/`restore .`.
 - Use `write-prompt-guide` when a skill pack needs a user-facing `PROMPT_GUIDE.md` telling people what to type to get a good run out of it.
 - Use `handover` when context crosses an agent or session boundary, when only 5-10% of the session limit remains with work unfinished, or when context usage passes 40% on unfinished multi-step work.
+- Use `tmux-orphaned-socket` when `tmux ls`/`attach` fails with a missing-socket error, especially right after any `/tmp` cleanup — check for a live orphaned server before assuming sessions are gone.
 
 ## Summary
 
