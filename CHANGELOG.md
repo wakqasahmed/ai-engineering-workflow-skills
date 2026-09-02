@@ -4,6 +4,12 @@ All notable changes to this workflow repository should be documented here.
 
 The goal is transparency over time: what changed, why it changed, and when the workflow evolved.
 
+## 2026-09
+
+### Added
+
+- `tmux-orphaned-socket` skill for diagnosing and recovering from a missing `/tmp/tmux-*/default` socket after a `/tmp` cleanup, plus a one-line `system-level/core.md` Safety rule and `AGENTS.md`/`CLAUDE.md` trigger-map entries pointing to it (#108)
+
 ## 2026-08
 
 ### Added

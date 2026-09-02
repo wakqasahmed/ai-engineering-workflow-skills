@@ -49,6 +49,7 @@ Solve the stated problem directly. Prefer concrete delivery over speculative arc
 - Prefer backups before symlink normalization.
 - Treat auth, payments, secrets, and deployment paths as high-risk areas.
 - Before adding a production dependency, verify its source, maintenance status, license, and necessity. Require human approval.
+- Use `tmux-orphaned-socket` before any broad `/tmp` cleanup — check for live process handles, not just file age, before deleting.
 
 ## Git
 
