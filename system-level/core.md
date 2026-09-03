@@ -74,7 +74,7 @@ Trivial fixes may omit this structure. Reserve `handover` specifically for conte
 
 - Never commit directly to protected branches.
 - Use feature branches and pull requests for review.
-- Do not add AI co-author metadata unless explicitly required.
+- Do not add AI co-author lines or AI attribution to commit messages.
 
 ## Validation
 

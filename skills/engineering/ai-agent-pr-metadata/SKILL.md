@@ -9,7 +9,7 @@ Use this when a repository needs traceable AI assistance metadata in GitHub whil
 
 ## Rules
 
-- Commit attribution follows `system-level/core.md` (Git: no AI co-author metadata unless explicitly required). This skill governs where the traceable detail goes instead: PR bodies, PR comments, and PR review bodies only.
+- Commit attribution follows `system-level/core.md` (Git: do not add AI co-author lines or AI attribution to commit messages). This skill governs where the traceable detail goes instead: PR bodies, PR comments, and PR review bodies only.
 - Never guess the model name. Read the authoritative resolved model+version from the runtime or orchestrator; a product alias is not evidence of a model ID.
 - Include a run URL when the work was produced by GitHub Actions or another traceable runner.
 - Public issues, PRs, comments, and review records must never include credential values or local credential-file paths. Use `Credential details: [redacted]` instead.
