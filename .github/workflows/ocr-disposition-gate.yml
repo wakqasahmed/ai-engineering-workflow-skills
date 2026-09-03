@@ -1,0 +1,39 @@
+name: OCR disposition gate
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  issue_comment:
+    types: [created, edited]
+  pull_request_review_comment:
+    types: [created, edited]
+
+jobs:
+  ocr-disposition-gate:
+    name: OCR disposition gate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+      issues: read
+    steps:
+      - uses: actions/checkout@v6
+      - name: Verify PR governance and OCR dispositions
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number || github.event.issue.number }}
+        run: |
+          if [ -z "$PR_NUMBER" ]; then
+            echo "Not a pull request context; skipping."
+            exit 0
+          fi
+
+          mkdir -p /tmp/pr-gov
+          gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER/comments?per_page=100" > /tmp/pr-gov/review-comments.json || echo "[]" > /tmp/pr-gov/review-comments.json
+          gh api "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments?per_page=100" > /tmp/pr-gov/issue-comments.json || echo "[]" > /tmp/pr-gov/issue-comments.json
+          gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER/commits?per_page=100" > /tmp/pr-gov/pr-commits.json || echo "[]" > /tmp/pr-gov/pr-commits.json
+
+          python3 support/ai-engineering-workflow/scripts/verify-pr-governance.py \
+            --review-comments /tmp/pr-gov/review-comments.json \
+            --issue-comments /tmp/pr-gov/issue-comments.json \
+            --pr-commits /tmp/pr-gov/pr-commits.json
