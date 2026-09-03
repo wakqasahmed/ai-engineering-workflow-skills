@@ -14,6 +14,12 @@ The goal is transparency over time: what changed, why it changed, and when the w
 
 - `tmux-orphaned-socket` skill for diagnosing and recovering from a missing `/tmp/tmux-*/default` socket after a `/tmp` cleanup, plus a one-line `system-level/core.md` Safety rule and `AGENTS.md`/`CLAUDE.md` trigger-map entries pointing to it (#108)
 
+### Changed
+
+- Documented external skill prerequisite installation for `tdd`, `simplify`, and `security-review` from `addyosmani/agent-skills` in README, AGENTS.md, and CLAUDE.md (#157)
+- Added top-level `eval/README.md` providing architectural context and documenting evaluation status and intentional deferrals across all 23 skills (#157)
+- Removed stray 0-byte template files under `.github/workflows/` (#157)
+
 ## 2026-08
 
 ### Added
@@ -36,13 +42,13 @@ The goal is transparency over time: what changed, why it changed, and when the w
 - `to-prd` now synthesizes conversation and repository context into a concise product-and-engineering spec, reuses the highest existing test seam, publishes to the detected issue tracker, gates `ready-for-agent` on resolved blockers, and hands off cleanly to `decompose-to-issues` (#45)
 - `review-gate` and `subagent-pipeline` now draw an explicit line between mechanical checks (lint, formatting, conventional style, straightforward static analysis — owned by Alibaba Code Review and CI, recorded via `ai-agent-pr-metadata`) and semantic review (requirements compliance, correctness, regressions, security/authorization, contract/integration risk, acceptance-test adequacy — owned by the independent reviewer). The reviewer must read Alibaba Code Review's and CI's output before its own pass and must not repeat resolved mechanical findings; it may revisit one only if it signals an unresolved correctness/security/data-loss/configuration/acceptance-criteria issue. CI remains a hard merge gate and this review does not replace or duplicate it (#31)
 
-- renamed `handoff`/`workflow-handoff` to `handover` and merged in a stricter end-of-session template (chat-only output, running-state and background-process tracking, plan/task/memory sourcing order, anti-patterns); updated all root entrypoint references
+- renamed `handoff`/`workflow-handoff` to `handover` and merged in a stricter end-of-session template (issue-published output, running-state and background-process tracking, plan/task/memory sourcing order, anti-patterns); updated all root entrypoint references
 - routed dangling `grill-with-docs`/`to-issues` references to the in-repo `clarify-work`/`decompose-to-issues` skills so a cold install has no missing skill dependencies
 - reviewer model and reasoning effort are now chosen per PR by risk and complexity (was: always strongest practical); aligned `subagent-pipeline`, role contracts, and entrypoints with `AI_ENGINEERING_WORKFLOW.md`
 - `handover` now triggers when 5-10% of the session limit remains or context usage passes 40% on unfinished work, publishes the handover to the linked issue, and adds a `paused by agent` label so half-done work is discoverable; fixed invalid tab in `argument-hint` and removed `disable-model-invocation` so agents can self-invoke at the thresholds
 - `subagent-pipeline` guardrails now require every subagent prompt to carry the bail-out contract (handover + issue comment + `paused by agent` label instead of stopping silently)
 - replaced remaining `handoff` wording with `handover` outside user-utterance trigger synonyms
-- optional skill prerequisites (`tdd`, `diagnose`, `simplify`, `security-review`) now map to the maintained `addyosmani/agent-skills` pack instead of scattered third-party repos
+- optional skill prerequisites (`tdd`, `simplify`, `security-review`) now map to the maintained `addyosmani/agent-skills` pack instead of scattered third-party repos (`diagnose` is maintained in-repo)
 
 ## 2026-06
 
