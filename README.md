@@ -49,6 +49,7 @@ No installer, no dependency — just files your agent already knows how to read.
 | [`clarify-work`](skills/engineering/clarify-work/SKILL.md) | Clarify non-trivial engineering work before implementation by resolving ambiguity, terminology, constraints, and the smallest viable path. |
 | [`decompose-to-issues`](skills/engineering/decompose-to-issues/SKILL.md) | Break high-level work into independently executable GitHub issues using vertical slices. |
 | [`define-done`](skills/engineering/define-done/SKILL.md) | Define acceptance criteria, risk level, and verification before editing. |
+| [`external-pr-viability`](skills/engineering/external-pr-viability/SKILL.md) | Check whether an upstream repo actually merges outside contributors before investing implementation time in an unsolicited PR. |
 | [`hitl-blocker`](skills/engineering/hitl-blocker/SKILL.md) | Convert human-only blockers into visible GitHub issues. |
 | [`open-code-review-setup`](skills/engineering/open-code-review-setup/SKILL.md) | Set up Alibaba Open Code Review (OCR) on a repository that lacks it, or audit and update an existing setup. |
 | [`release-gate`](skills/engineering/release-gate/SKILL.md) | Check deployment, staging, rollback, and health verification before release. |

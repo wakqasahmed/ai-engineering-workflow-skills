@@ -19,6 +19,7 @@ This repository contains my AI-assisted engineering workflow and agent operating
 - Use `security-review` before PRs touching auth, payments, secrets, or external APIs.
 - Use `ai-agent-pr-metadata` when configuring PR templates, PR update comments, or AI review comments to disclose agent/model/run metadata outside commit messages.
 - Use `open-code-review-setup` when creating a new repository or onboarding an existing repo to automated AI code review (OCR), or when OCR reviews are not running on PRs.
+- Use `external-pr-viability` before implementing a fix for any unsolicited PR against a repo we don't own — check the repo actually merges outside contributors before investing the effort.
 - Use `external-pr-style` before opening any PR against a repo we don't own.
 - Use `resolving-merge-conflicts` when you need to resolve an in-progress git merge/rebase conflict.
 - Use `wizard` when a manual procedure needs a human to click through a dashboard or enter credentials — generates a guided script instead of leaving `hitl-blocker`'s bare issue description to figure out alone.

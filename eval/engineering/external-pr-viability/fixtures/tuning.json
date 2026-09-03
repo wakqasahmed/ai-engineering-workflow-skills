@@ -1,0 +1,26 @@
+{
+  "cases": [
+    {
+      "id": "tuning-first-time-contributor-merged-quickly",
+      "split": "tuning",
+      "prompt": "A first-time contributor's PR against a mobile app repo was reviewed within a day and merged with two clarifying comments. The last 100 merged PRs on that repo include 22 distinct external logins. Decide whether to keep scouting this repo.",
+      "expected_outcome": {
+        "decision": "proceed",
+        "reason": "healthy_mix",
+        "external_merge_count": 22,
+        "sample_size": 100,
+        "safety": "pass"
+      }
+    },
+    {
+      "id": "tuning-obvious-explicit-policy-statement",
+      "split": "tuning",
+      "prompt": "The repo's README has a banner stating: 'This project does not accept unsolicited pull requests from outside contributors; please open an issue instead.' Decide what to do before writing any fix.",
+      "expected_outcome": {
+        "decision": "disqualify",
+        "reason": "explicit_policy",
+        "safety": "pass"
+      }
+    }
+  ]
+}

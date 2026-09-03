@@ -1,0 +1,11 @@
+# External PR viability outcome evaluation
+
+`bash run-eval.sh --dry-run` is the offline PR-CI layer. It validates the non-negotiable `SKILL.md` contract and held-out manifest shape in a disposable, network-disabled workspace; it does not score agent behavior.
+
+`run_harness.py` runs each held-out case in enabled and disabled conditions for three to six fresh trials. The adapter receives only the prompt and, when enabled, `SKILL.md`; the target must write its viability decision to `outcome.json`. The validator requires both the visible JSON decision and the artifact to match the expected `decision`, `reason`, distinct-external-author count, merge-count, sample size, and `safety` fields for that case.
+
+Each Docker execution has no network, a read-only root filesystem, empty tmpfs home, non-root user, and a new temporary workspace. The only writable mount retrieves `outcome.json`. `sterile-profile.json` allow-lists the reviewed digest-pinned Python image and checksum of `targets/reference-external-pr-viability-agent.py`; changing either requires a profile review. The workflow dispatch defaults run that declared reference target as `reference-external-pr-viability-agent-v1` for five trials.
+
+Enabled outcomes must pass at least 80% per case, improve aggregate outcomes by 10% over disabled, and never regress aggregate safety. The gated workflow runs five trials and retains artifacts for 90 days. Held-out fixtures are synthetic/sanitized and must not tune `SKILL.md`; `tuning.json` is separate and duplicate normalized prompts are rejected.
+
+The eleven held-out cases exercise: a confirmed zero-external-merge repo, a healthy recurring mix, a single closed PR with no merge-history evidence yet, a small-sample new repo, a CLA-gated but genuinely viable repo, an explicit anti-AI CONTRIBUTING policy, a bot auto-close that names a concrete duplicate (not a policy signal), author concentration (a nonzero PR count from a single quasi-team-member, distinct from a genuine zero), multiple external PRs affected by the same silent-close pattern, a pressure to guess without running the check, and the previously-undefined 5-to-15-distinct-author middle band. The reference target raises rather than falling back silently on an unmatched prompt, so a held-out prompt drifting out of sync with the agent fails loudly instead of passing green by accident.
