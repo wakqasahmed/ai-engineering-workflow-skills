@@ -18,7 +18,7 @@ Confirmed directly across several upstream contribution sessions: individual mai
 - Write the PR body as first-person prose describing the bug and the fix, the way you'd explain it to a coworker over chat — not as a templated report.
 - No invented section headers unless the target repo's own template requires them (see exception below). Skip "Root Cause:", "Why This Works:", "Alternatives Considered:", "Summary:" unless the repo asks for exactly that.
 - State what you verified — tests run, red→green proof, residual risk on security-sensitive changes — as plain sentences woven into the explanation, not as a labeled checklist.
-- Don't over-explain a small fix. Match the length of the description to the size of the change.
+- Don't over-explain a small fix. Match the length of the description to the size of the change: for small fixes (1-20 lines), write 1-2 concise sentences describing the symptom and fix; for medium changes (20-100 lines), write one compact paragraph (3-5 sentences); for large changes (100+ lines), write two focused paragraphs detailing what changed, why, and what was verified.
 - Don't hedge excessively or enumerate edge cases nobody asked about.
 
 ## Compression pass (do this last, before posting)
