@@ -43,9 +43,9 @@ No installer, no dependency — just files your agent already knows how to read.
 Three workflow skills referenced in this playbook (`tdd`, `simplify`, `security-review`) are external companions maintained in the [`addyosmani/agent-skills`](https://github.com/addyosmani/agent-skills) pack. To install them alongside this repository:
 
 ```bash
-npx skills add addyosmani/agent-skills --skill tdd
-npx skills add addyosmani/agent-skills --skill simplify
-npx skills add addyosmani/agent-skills --skill security-review
+npx skills add addyosmani/agent-skills --skill test-driven-development
+npx skills add addyosmani/agent-skills --skill code-simplification
+npx skills add addyosmani/agent-skills --skill security-and-hardening
 ```
 
 ## Using This Skillpack
@@ -128,11 +128,11 @@ Changes merged to this repository are automatically synchronized to [wakqasahmed
 
 ## Outcome-eval harness status
 
-Several skills already have a deterministic eval layer (free, runs on every PR). The gated model-harness layer — real skill-enabled vs. disabled comparisons against a live model — is still open work for 8 skills: [#57](https://github.com/wakqasahmed/ai-engineering-workflow-skills/issues/57), [#59](https://github.com/wakqasahmed/ai-engineering-workflow-skills/issues/59)–[#65](https://github.com/wakqasahmed/ai-engineering-workflow-skills/issues/65).
+Several skills already have a deterministic eval layer. The gated model-harness layer — real skill-enabled vs. disabled comparisons against a live model — is still open work for 8 skills and is not yet tracked.
 
 ### Fund the real harness runs
 
-This skill's deterministic checks run free on every PR. Proving its outcome-eval harness with real, metered model calls costs money:
+The deterministic checks wired into PR CI run free. Proving the outcome-eval harnesses with real, metered model calls costs money:
 
 - **Bitcoin (BTC):** `bc1p5xqamscrz7nu0d8jdmj748rj75sk8khtyxypn3qvsdjms4t4uw2qsjn0he`
 - **Ethereum (ETH) / any ERC-20 including stablecoins:** `0x59bc573e414D62d44461234dEf438247dfc3Cf6A`
