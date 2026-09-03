@@ -38,7 +38,44 @@ npx skills add https://github.com/wakqasahmed/ai-engineering-workflow-skills/tre
 
 No installer, no dependency — just files your agent already knows how to read.
 
-## Use it — step by step
+## Using This Skillpack
+
+Once installed, your agent discovers and invokes skills automatically when your prompt matches the trigger keywords defined in `AGENTS.md` (or you can invoke them explicitly by name or slash command, e.g. `/roast`, `/clarify-work`).
+
+### Standard Prompt Pattern
+
+To anchor an agent session to this workflow playbook, reference `system-level/core.md` and `AI_ENGINEERING_WORKFLOW.md` in your project's instructions:
+
+> "Follow `system-level/core.md` for invariant operating rules. For non-trivial engineering work, follow `AI_ENGINEERING_WORKFLOW.md` and use the skills in this repository."
+
+### Worked Workflow Examples
+
+#### 1. Building a New Feature from Scratch
+- **Pressure-test the idea**: Run `roast` to stress-test assumptions across product, architectural, and security angles.
+- **Clarify ambiguities**: Run `clarify-work` to resolve requirements, constraints, and the smallest viable scope.
+- **Draft specification**: Run `to-prd` to lock in clear acceptance criteria and verification plans.
+- **Decompose into vertical slices**: Run `decompose-to-issues` to break the plan into independent, issue-sized units.
+- **Implement and verify**: Use `subagent-pipeline` (or an issue-scoped agent followed by `review-gate`) to implement and test each slice.
+- **Ship**: Run `release-gate` before releasing to staging or production.
+
+#### 2. Investigating Hard Bugs & Regressions
+- **Construct feedback loop & minimise**: Run `diagnose` to build a fast, deterministic loop, reproduce the bug, and minimise it to load-bearing inputs.
+- **Test-first fix**: Use `tdd` to turn the minimised repro into a failing regression test and verify the fix.
+- **Semantic review**: Run `review-gate` to check for unintended side effects, contract breaks, or performance regressions.
+
+#### 3. Contributing to an External Upstream Repo
+- **Verify maintainer receptivity**: Run `external-pr-viability` to ensure the repository actively merges outside contributions before investing implementation time.
+- **Test and implement**: Implement the fix following the target repo's exact existing conventions and test suites.
+- **Draft authentic PR text**: Run `external-pr-style` to strip formulaic AI section templates, sycophancy, and verbose filler.
+
+#### 4. Releasing Versioned Packages
+- **Record release intent**: Run `changesets-release` to create changesets, validate semver bumps, and check changelogs.
+- **Pre-release gate**: Run `release-gate` to verify clean build artifacts, green CI, and smoke-tested installation scripts.
+
+#### 5. Context Compaction & Agent Handover
+- **Cross session or agent boundary**: Run `handover` when context usage exceeds 40%, when 5-10% of context remains, or when passing work to a fresh agent.
+
+## Available Skills
 
 **Start with `workflow-router`** if you're not sure which skill applies — it routes a work request to the smallest applicable delivery workflow.
 
