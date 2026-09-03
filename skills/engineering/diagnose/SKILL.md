@@ -5,7 +5,7 @@ description: Disciplined diagnosis loop for hard bugs and performance regression
 
 # Diagnose
 
-Source: adapted from [mattpocock/skills — engineering/diagnosing-bugs](https://github.com/mattpocock/skills/blob/main/skills/engineering/diagnosing-bugs/SKILL.md). Already referenced in this repo's `AGENTS.md` trigger map but never committed here — added 2026-08-26. The `## Redact` section below was missing from the original import and is cited separately.
+Source: adapted from [mattpocock/skills — engineering/diagnosing-bugs](https://github.com/mattpocock/skills/blob/main/skills/engineering/diagnosing-bugs/SKILL.md). Synced 2026-09-03 to bring Phase 1 feedback loop criteria and Phase 2 reproduction & minimisation in line with upstream. The `## Redact` section below was missing from the original import and is cited separately.
 
 A discipline for hard bugs. Skip phases only when explicitly justified.
 
@@ -38,7 +38,15 @@ Spend disproportionate effort here. **Be aggressive. Be creative. Refuse to give
 9. **Differential loop.** Run the same input through old-version vs new-version (or two configs) and diff outputs.
 10. **HITL bash script.** Last resort. If a human must click, drive _them_ with `scripts/hitl-loop.template.sh` so the loop is still structured. Captured output feeds back to you.
 
-Build the right feedback loop, and the bug is 90% fixed.
+### Completion criterion: a tight loop that goes red
+
+A feedback loop is ready only when it meets four concrete criteria:
+- **Red-capable**: It reliably fails on the bug.
+- **Deterministic**: It fails consistently (or at a high enough rate to measure).
+- **Fast**: It completes in seconds, not minutes.
+- **Agent-runnable**: You can run it autonomously without human intervention.
+
+Anti-pattern: If you catch yourself reading code to build a theory before this command exists, stop.
 
 ### Iterate on the loop itself
 
@@ -60,7 +68,9 @@ Stop and say so explicitly. List what you tried. Ask the user for: (a) access to
 
 Do not proceed to Phase 2 until you have a loop you believe in.
 
-## Phase 2 — Reproduce
+## Phase 2 — Reproduce + Minimise
+
+### Reproduce
 
 Run the loop. Watch the bug appear.
 
@@ -70,7 +80,18 @@ Confirm:
 - [ ] The failure is reproducible across multiple runs (or, for non-deterministic bugs, reproducible at a high enough rate to debug against).
 - [ ] You have captured the exact symptom (error message, wrong output, slow timing) so later phases can verify the fix actually addresses it.
 
-Do not proceed until you reproduce the bug.
+### Minimise
+
+Shrink the reproduction to the smallest scenario that still goes red.
+
+- Cut inputs: delete fields, trim payloads, shorten strings until removing one more character makes the bug disappear.
+- Cut callers: bypass intermediate layers, call the failing function directly.
+- Cut config & dependencies: remove flags, plugins, mock external services, strip unrelated database state.
+- Cut data: reduce multi-row tables to single rows, reduce multi-step sequences to the minimal sequence of calls.
+
+You are done minimising when **every remaining element is load-bearing** — removing anything else makes the bug disappear or changes the symptom.
+
+Do not proceed to Phase 3 until the reproduction is minimised.
 
 ## Phase 3 — Hypothesise
 
