@@ -10,7 +10,7 @@ Use this as the entry point; downstream skills own their detailed instructions.
 
 ## Route
 
-Classify the request, choose only the matching sequence below, and state each transition rationale in one line. Do not add steps from another route unless its trigger is present.
+Classify the request, choose only the matching sequence below, and state each transition rationale in one line. Do not add steps from another route unless its trigger is present. In an unfamiliar repository, perform repository reconnaissance first (inspect structure, README/CONTRIBUTING, build/test framework, CI, recent git log, and existing patterns per `AI_ENGINEERING_WORKFLOW.md`).
 
 ### Idea to staging
 
