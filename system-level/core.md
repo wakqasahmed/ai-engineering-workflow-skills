@@ -32,8 +32,14 @@ Solve the stated problem directly. Prefer concrete delivery over speculative arc
 - Use `handover` when context will cross an agent or session boundary, when only 5-10% of the session limit remains with work unfinished, or when context usage passes 40% on unfinished multi-step work.
 - For the full operating model, follow `AI_ENGINEERING_WORKFLOW.md`.
 - Use the playbook's risk levels, definition of done, and failure paths for non-trivial work.
-- Keep always-loaded instructions short. Move conditional workflows into skills and periodically prune rules that do not prevent real mistakes.
-- When the same preventable mistake recurs, prefer CI, hooks, or lint rules over more prose.
+## Instruction Hygiene
+
+- Follow `skills/engineering/writing-for-agents/SKILL.md` when authoring or editing agent instructions, skills, or rules.
+- **Progressive disclosure**: Keep core instructions and top-level entrypoints lean. Offload detailed reference checklists, dictionaries, and domain catalogs to `references/` or companion documents loaded only on demand.
+- **Deterministic verification**: Specify the exact command, expected exit code, or observable output that proves a task is complete. Never end an instruction on an unverified assertion.
+- **Explicit stopping criteria**: Avoid vague qualifiers ("be careful", "make sure it's clean", "apply properly"). Define clear boundaries for done vs. not-done to prevent premature completion or unbounded scope creep.
+- **Single source of truth**: Store each rule in one authoritative location. Never duplicate lengthy checklists across multiple skills.
+- When the same preventable mistake recurs, prefer CI checks, pre-commit hooks, or lint rules over adding more prose.
 
 ## Execution Discipline
 
