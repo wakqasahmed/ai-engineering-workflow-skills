@@ -79,6 +79,7 @@ Definition of done:
 - Acceptance criteria are satisfied.
 - Relevant tests are added or updated, or the issue states why automated tests are not appropriate.
 - The minimum relevant checks have been run and named.
+- Backwards compatibility is assessed: if the change touches a public API, schema, configuration format, supported version, serialized format, or integration contract, state whether it is backwards-compatible; breaking changes must be explicit and justified in the PR, not incidental.
 - Non-trivial work has passed independent review.
 - Risk, rollout, and rollback notes are present when the change warrants them.
 
