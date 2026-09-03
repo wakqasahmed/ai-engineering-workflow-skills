@@ -111,7 +111,7 @@ Definition of done:
 - Treat context-bloat concerns as a heuristic, not a numeric rule.
 - Optimize for quality, correctness, and user value over activity/volume metrics:
   - Do not optimize for throughput signals such as lines of code changed, commit counts, PR volume, or task closure velocity.
-  - Prioritize test validity, backwards compatibility, maintainability, and measurable behavior over superficial velocity.
+  - Prioritize test validity, backwards compatibility, maintainability, reliability, and measurable behavior over superficial velocity.
   - A small, focused, well-verified change that cleanly satisfies acceptance criteria is strictly superior to an extensive speculative implementation.
 
 ## Risk Levels
