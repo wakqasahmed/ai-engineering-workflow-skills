@@ -25,6 +25,17 @@ The workflow is descriptive as a public playbook, but the files under `system-le
 - Standard: non-trivial issue with acceptance criteria, verification plan, and risk level.
 - Deep: ambiguous, architectural, or cross-cutting work. Clarify decisions, use a PRD when helpful, then decompose before implementation.
 
+### 0. Reconnaissance
+
+Before modifying an unfamiliar repository, inspect its standing context to align your change with existing patterns:
+
+- Repository structure: directory layout, workspaces, monorepo packages, and architecture boundaries.
+- Documentation: `README.md`, `CONTRIBUTING.md`, developer guides, and architecture decision records (`docs/adr/` or similar).
+- Tooling and runtime: supported runtime versions, package managers, build system, and environment requirements (`.env.example`).
+- Verification surface: test frameworks, test execution commands, lint/format scripts, and CI configuration (`.github/workflows/`).
+- Recent history: review recent commits (`git log -n 10 --oneline`) to observe commit message conventions, active branch flows, and recent refactors.
+- Pattern reuse: identify existing abstractions, conventions, helper utilities, and test fixture patterns before introducing new ones.
+
 ### 1. Clarify
 
 - Use `clarify-work` for high-level tasks.
