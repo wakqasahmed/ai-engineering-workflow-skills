@@ -13,10 +13,10 @@ This repository contains my AI-assisted engineering workflow and agent operating
 - Use `clarify-work` for high-level task clarification.
 - Use `to-prd` when scope, terminology, or success criteria are still fuzzy.
 - Use `decompose-to-issues` before implementation on high-level work.
-- Use `tdd` when building features or fixing bugs where expected behavior is clear.
-- Use `simplify` after implementing a feature.
+- Use `tdd` (from `addyosmani/agent-skills`) when building features or fixing bugs where expected behavior is clear.
+- Use `simplify` (from `addyosmani/agent-skills`) after implementing a feature.
 - Use `diagnose` when something is broken, throwing, or regressing.
-- Use `security-review` before PRs touching auth, payments, secrets, or external APIs.
+- Use `security-review` (from `addyosmani/agent-skills`) before PRs touching auth, payments, secrets, or external APIs.
 - Use `ai-agent-pr-metadata` when configuring PR templates, PR update comments, or AI review comments to disclose agent/model/run metadata outside commit messages.
 - Use `open-code-review-setup` when creating a new repository or onboarding an existing repo to automated AI code review (OCR), or when OCR reviews are not running on PRs.
 - Use `external-pr-viability` before implementing a fix for any unsolicited PR against a repo we don't own — check the repo actually merges outside contributors before investing the effort.

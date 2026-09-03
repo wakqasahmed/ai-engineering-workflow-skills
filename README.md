@@ -38,6 +38,16 @@ npx skills add https://github.com/wakqasahmed/ai-engineering-workflow-skills/tre
 
 No installer, no dependency — just files your agent already knows how to read.
 
+### External Skill Prerequisites
+
+Three workflow skills referenced in this playbook (`tdd`, `simplify`, `security-review`) are external companions maintained in the [`addyosmani/agent-skills`](https://github.com/addyosmani/agent-skills) pack. To install them alongside this repository:
+
+```bash
+npx skills add addyosmani/agent-skills --skill tdd
+npx skills add addyosmani/agent-skills --skill simplify
+npx skills add addyosmani/agent-skills --skill security-review
+```
+
 ## Using This Skillpack
 
 Once installed, your agent discovers and invokes skills automatically when your prompt matches the trigger keywords defined in `AGENTS.md` (or you can invoke them explicitly by name or slash command, e.g. `/roast`, `/clarify-work`).
