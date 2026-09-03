@@ -64,7 +64,7 @@ No installer, no dependency — just files your agent already knows how to read.
 
 ## Contents
 
-The installable skills live in [`skills/engineering/`](skills/engineering/), [`skills/filament/`](skills/filament/), [`skills/product/`](skills/product/), and [`skills/productivity/`](skills/productivity/).
+The installable skills live in [`skills/engineering/`](skills/engineering/), [`skills/product/`](skills/product/), and [`skills/productivity/`](skills/productivity/).
 
 ## Sources
 
