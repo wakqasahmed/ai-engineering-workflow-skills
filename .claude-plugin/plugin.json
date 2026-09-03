@@ -12,7 +12,6 @@
     "./skills/engineering/hitl-blocker",
     "./skills/engineering/release-gate",
     "./skills/engineering/changesets-release",
-    "./skills/filament/filament-conventions",
     "./skills/product/roast",
     "./skills/productivity/handover",
     "./skills/engineering/write-prompt-guide"
