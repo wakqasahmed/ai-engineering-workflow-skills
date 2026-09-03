@@ -1,7 +1,7 @@
 name: OCR disposition gate
 
 on:
-  pull_request:
+  pull_request_target:
     types: [opened, synchronize, reopened]
   issue_comment:
     types: [created, edited]
@@ -11,29 +11,92 @@ on:
 jobs:
   ocr-disposition-gate:
     name: OCR disposition gate
+    if: github.event_name != 'issue_comment' || github.event.issue.pull_request
     runs-on: ubuntu-latest
     permissions:
       contents: read
       pull-requests: read
       issues: read
+      statuses: write
     steps:
-      - uses: actions/checkout@v6
-      - name: Verify PR governance and OCR dispositions
+      - name: Resolve PR head
+        id: pull_request
         env:
           GH_TOKEN: ${{ github.token }}
-          PR_NUMBER: ${{ github.event.pull_request.number || github.event.issue.number }}
+          PR_NUMBER: ${{ github.event.issue.number || github.event.pull_request.number }}
         run: |
-          if [ -z "$PR_NUMBER" ]; then
-            echo "Not a pull request context; skipping."
-            exit 0
-          fi
-
+          set -euo pipefail
           mkdir -p /tmp/pr-gov
-          gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER/comments?per_page=100" > /tmp/pr-gov/review-comments.json || echo "[]" > /tmp/pr-gov/review-comments.json
-          gh api "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments?per_page=100" > /tmp/pr-gov/issue-comments.json || echo "[]" > /tmp/pr-gov/issue-comments.json
-          gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER/commits?per_page=100" > /tmp/pr-gov/pr-commits.json || echo "[]" > /tmp/pr-gov/pr-commits.json
+          gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER" > /tmp/pr-gov/pull-request.json
+          head_sha=$(jq -er ".head.sha" /tmp/pr-gov/pull-request.json)
+          base_sha=$(jq -er ".base.sha" /tmp/pr-gov/pull-request.json)
+          echo "head_sha=$head_sha" >> "$GITHUB_OUTPUT"
+          echo "base_sha=$base_sha" >> "$GITHUB_OUTPUT"
+          jq '[.labels[]?.name | select(type == "string" and startswith("agent:"))]' \
+            /tmp/pr-gov/pull-request.json > /tmp/pr-gov/agent-labels.json
+
+      - name: Checkout PR head
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ steps.pull_request.outputs.head_sha }}
+          path: pr-head
+          persist-credentials: false
+
+      - name: Checkout trusted base
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ steps.pull_request.outputs.base_sha }}
+          path: trusted-base
+          persist-credentials: false
+
+      - name: Verify PR governance and OCR dispositions
+        working-directory: trusted-base
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HEAD_SHA: ${{ steps.pull_request.outputs.head_sha }}
+          PR_NUMBER: ${{ github.event.issue.number || github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+
+          report_status() {
+            gh api --method POST "repos/$GITHUB_REPOSITORY/statuses/$HEAD_SHA" \
+              -f state="$1" \
+              -f context="OCR disposition gate" \
+              -f description="$2" \
+              -f target_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          }
+
+          finish() {
+            exit_code=$?
+            trap - EXIT
+            if [ "$exit_code" -eq 0 ]; then
+              state=success
+              description="PR governance verification passed."
+            else
+              state=failure
+              description="PR governance verification failed; inspect the workflow run."
+            fi
+            if ! report_status "$state" "$description"; then
+              echo "Failed to report OCR disposition gate status for $HEAD_SHA." >&2
+              exit 1
+            fi
+            exit "$exit_code"
+          }
+
+          trap finish EXIT
+          report_status pending "PR governance verification is running."
+
+          gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER/comments?per_page=100" --paginate --slurp \
+            | jq 'add' > /tmp/pr-gov/review-comments.json
+          gh api "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments?per_page=100" --paginate --slurp \
+            | jq 'add' > /tmp/pr-gov/issue-comments.json
+          gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER/commits?per_page=100" --paginate --slurp \
+            | jq 'add' > /tmp/pr-gov/pr-commits.json
 
           python3 support/ai-engineering-workflow/scripts/verify-pr-governance.py \
+            --head-sha "$HEAD_SHA" \
             --review-comments /tmp/pr-gov/review-comments.json \
             --issue-comments /tmp/pr-gov/issue-comments.json \
-            --pr-commits /tmp/pr-gov/pr-commits.json
+            --pr-commits /tmp/pr-gov/pr-commits.json \
+            --agent-labels /tmp/pr-gov/agent-labels.json \
+            --legacy-baseline support/ai-engineering-workflow/legacy-agent-labels.json
