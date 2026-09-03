@@ -38,7 +38,44 @@ npx skills add https://github.com/wakqasahmed/ai-engineering-workflow-skills/tre
 
 No installer, no dependency — just files your agent already knows how to read.
 
-## Use it — step by step
+## Using This Skillpack
+
+Once installed, your agent discovers and invokes skills automatically when your prompt matches the trigger keywords defined in `AGENTS.md` (or you can invoke them explicitly by name or slash command, e.g. `/roast`, `/clarify-work`).
+
+### Standard Prompt Pattern
+
+To anchor an agent session to this workflow playbook, reference `system-level/core.md` and `AI_ENGINEERING_WORKFLOW.md` in your project's instructions:
+
+> "Follow `system-level/core.md` for invariant operating rules. For non-trivial engineering work, follow `AI_ENGINEERING_WORKFLOW.md` and use the skills in this repository."
+
+### Worked Workflow Examples
+
+#### 1. Building a New Feature from Scratch
+- **Pressure-test the idea**: Run `roast` to stress-test assumptions across product, architectural, and security angles.
+- **Clarify ambiguities**: Run `clarify-work` to resolve requirements, constraints, and the smallest viable scope.
+- **Draft specification**: Run `to-prd` to lock in clear acceptance criteria and verification plans.
+- **Decompose into vertical slices**: Run `decompose-to-issues` to break the plan into independent, issue-sized units.
+- **Implement and verify**: Use `subagent-pipeline` (or an issue-scoped agent followed by `review-gate`) to implement and test each slice.
+- **Ship**: Run `release-gate` before releasing to staging or production.
+
+#### 2. Investigating Hard Bugs & Regressions
+- **Construct feedback loop & minimise**: Run `diagnose` to build a fast, deterministic loop, reproduce the bug, and minimise it to load-bearing inputs.
+- **Test-first fix**: Use `tdd` to turn the minimised repro into a failing regression test and verify the fix.
+- **Semantic review**: Run `review-gate` to check for unintended side effects, contract breaks, or performance regressions.
+
+#### 3. Contributing to an External Upstream Repo
+- **Verify maintainer receptivity**: Run `external-pr-viability` to ensure the repository actively merges outside contributions before investing implementation time.
+- **Test and implement**: Implement the fix following the target repo's exact existing conventions and test suites.
+- **Draft authentic PR text**: Run `external-pr-style` to strip formulaic AI section templates, sycophancy, and verbose filler.
+
+#### 4. Releasing Versioned Packages
+- **Record release intent**: Run `changesets-release` to create changesets, validate semver bumps, and check changelogs.
+- **Pre-release gate**: Run `release-gate` to verify clean build artifacts, green CI, and smoke-tested installation scripts.
+
+#### 5. Context Compaction & Agent Handover
+- **Cross session or agent boundary**: Run `handover` when context usage exceeds 40%, when 5-10% of context remains, or when passing work to a fresh agent.
+
+## Available Skills
 
 **Start with `workflow-router`** if you're not sure which skill applies — it routes a work request to the smallest applicable delivery workflow.
 
@@ -49,14 +86,19 @@ No installer, no dependency — just files your agent already knows how to read.
 | [`clarify-work`](skills/engineering/clarify-work/SKILL.md) | Clarify non-trivial engineering work before implementation by resolving ambiguity, terminology, constraints, and the smallest viable path. |
 | [`decompose-to-issues`](skills/engineering/decompose-to-issues/SKILL.md) | Break high-level work into independently executable GitHub issues using vertical slices. |
 | [`define-done`](skills/engineering/define-done/SKILL.md) | Define acceptance criteria, risk level, and verification before editing. |
+| [`diagnose`](skills/engineering/diagnose/SKILL.md) | Disciplined diagnosis loop for hard bugs and performance regressions: reproduce → minimise → hypothesise → instrument → fix → regression-test. |
+| [`external-pr-style`](skills/engineering/external-pr-style/SKILL.md) | Write PR descriptions for third-party upstream repos in natural human prose to avoid maintainer AI-rejection patterns. |
 | [`external-pr-viability`](skills/engineering/external-pr-viability/SKILL.md) | Check whether an upstream repo actually merges outside contributors before investing implementation time in an unsolicited PR. |
+| [`git-guardrails-claude-code`](skills/engineering/git-guardrails-claude-code/SKILL.md) | Keep agentic git operations safe and deterministic under Claude Code: protect main/master, enforce branch hygiene, and prevent destructive commands. |
 | [`hitl-blocker`](skills/engineering/hitl-blocker/SKILL.md) | Convert human-only blockers into visible GitHub issues. |
 | [`open-code-review-setup`](skills/engineering/open-code-review-setup/SKILL.md) | Set up Alibaba Open Code Review (OCR) on a repository that lacks it, or audit and update an existing setup. |
 | [`release-gate`](skills/engineering/release-gate/SKILL.md) | Check deployment, staging, rollback, and health verification before release. |
+| [`resolving-merge-conflicts`](skills/engineering/resolving-merge-conflicts/SKILL.md) | Resolve git merge conflicts safely by understanding both sides of the diff, preserving intent, and verifying resolution with tests. |
 | [`review-gate`](skills/engineering/review-gate/SKILL.md) | Run an independent semantic review gate before merging non-trivial work, on top of (not duplicating) Alibaba Code Review and CI. |
 | [`subagent-pipeline`](skills/engineering/subagent-pipeline/SKILL.md) | Run a cold-start implementer, reviewer, and fixer subagent chain for one issue, gated by CI, ending in a staging PR. |
 | [`tmux-orphaned-socket`](skills/engineering/tmux-orphaned-socket/SKILL.md) | Diagnose and recover from an orphaned tmux socket (`error connecting to /tmp/tmux-*/default`) after a `/tmp` cleanup, without assuming the sessions are lost. |
 | [`to-prd`](skills/engineering/to-prd/SKILL.md) | Synthesize the current conversation and repository context into a concise product and engineering spec, publish it to the project issue tracker, and gate agent readiness before decomposition. |
+| [`wizard`](skills/engineering/wizard/SKILL.md) | Interactive decision-tree assistant that guides engineers through selecting the right workflow, testing strategy, or decomposition path. |
 | [`workflow-router`](skills/engineering/workflow-router/SKILL.md) | Routes a software-work request to the smallest applicable delivery workflow and records repository conventions once. |
 | [`write-prompt-guide`](skills/engineering/write-prompt-guide/SKILL.md) | Produce a pack-specific `PROMPT_GUIDE.md` that teaches end users what to type to get a good run out of one Agent Skill pack, from that pack's own `SKILL.md`, README, and open issues. |
 | [`roast`](skills/product/roast/SKILL.md) | Use when someone asks to roast an idea, pressure-test or stress-test an idea, validate a business idea, "convene the council", get a brutal second opinion before building something, or says "/roast". |
@@ -64,7 +106,7 @@ No installer, no dependency — just files your agent already knows how to read.
 
 ## Contents
 
-The installable skills live in [`skills/engineering/`](skills/engineering/), [`skills/filament/`](skills/filament/), [`skills/product/`](skills/product/), and [`skills/productivity/`](skills/productivity/).
+The installable skills live in [`skills/engineering/`](skills/engineering/), [`skills/product/`](skills/product/), and [`skills/productivity/`](skills/productivity/).
 
 ## Sources
 

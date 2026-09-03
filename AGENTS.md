@@ -25,14 +25,11 @@ This repository contains my AI-assisted engineering workflow and agent operating
 - Use `wizard` when a manual procedure needs a human to click through a dashboard or enter credentials — generates a guided script instead of leaving `hitl-blocker`'s bare issue description to figure out alone.
 - Use `git-guardrails-claude-code` to set up or audit the PreToolUse hook that blocks force-push, direct push to main/master/staging, `reset --hard`, `clean -f/-fd`, `branch -D`, and bare `checkout .`/`restore .`.
 - Use `write-prompt-guide` when a skill pack needs a user-facing `PROMPT_GUIDE.md` telling people what to type to get a good run out of it.
+- Use `writing-for-agents` when creating or editing skills, or authoring agent instructions.
 - Use `handover` when context crosses an agent or session boundary, when only 5-10% of the session limit remains with work unfinished, or when context usage passes 40% on unfinished multi-step work.
 - Use `tmux-orphaned-socket` when `tmux ls`/`attach` fails with a missing-socket error, especially right after any `/tmp` cleanup — check for a live orphaned server before assuming sessions are gone.
 
 ## Summary
 
-- Keep implementation agents issue-scoped to avoid context bloat.
-- Mark an issue as picked or claimed before an agent starts work on it.
-- Define acceptance criteria and verification before implementation.
-- Run tests only against disposable storage or a dedicated test database; never staging, production, customer, demo, or shared operational databases.
-- Prefer a fresh agent per issue by default.
-- Require independent review with reviewer model/effort chosen by the PR's risk and complexity, and preserve automation/assistance traceability in merged PRs.
+- Follow [`system-level/core.md`](system-level/core.md) for core engineering defaults, execution discipline, safety rules, validation, test database safety, and review traceability.
+- Follow [`AI_ENGINEERING_WORKFLOW.md`](AI_ENGINEERING_WORKFLOW.md) for full planning tracks, issue-scoped execution, verification gates, risk levels, and failure paths.

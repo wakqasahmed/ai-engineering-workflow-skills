@@ -6,6 +6,10 @@ The goal is transparency over time: what changed, why it changed, and when the w
 
 ## 2026-09
 
+### Removed
+
+- Removed `filament-conventions` (`skills/filament/filament-conventions/` and `eval/filament/filament-conventions/`) to maintain repository focus as a generic, technology-agnostic engineering-workflow skill pack; canonical home is `wakqasahmed/php-laravel-filament-skills` (#110)
+
 ### Added
 
 - `tmux-orphaned-socket` skill for diagnosing and recovering from a missing `/tmp/tmux-*/default` socket after a `/tmp` cleanup, plus a one-line `system-level/core.md` Safety rule and `AGENTS.md`/`CLAUDE.md` trigger-map entries pointing to it (#108)
