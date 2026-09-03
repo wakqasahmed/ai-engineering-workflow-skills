@@ -32,6 +32,7 @@ This directory contains deterministic contract evaluations and model-outcome har
 | `write-prompt-guide` | `eval/engineering/write-prompt-guide/` | None | Deterministic check only; verified in path-filtered CI |
 | `external-pr-viability` | `eval/engineering/external-pr-viability/` | Built-in | Verified in CI |
 | `ai-agent-pr-metadata` | `eval/engineering/ai-agent-pr-metadata/` | Built-in | Verified in CI |
+| `external-campaign-triage` | `eval/engineering/external-campaign-triage/` | Built-in | Verified in CI |
 | `roast` | `eval/product/roast/` | Built-in | Verified in CI |
 | `handover` | `eval/productivity/handover/` | Built-in | Verified in CI |
 | `diagnose` | Intentional deferral | Not yet tracked | Upstream-adapted diagnostic loop |

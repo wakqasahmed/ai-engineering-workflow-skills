@@ -7,6 +7,7 @@
     "./skills/engineering/decompose-to-issues",
     "./skills/engineering/define-done",
     "./skills/engineering/diagnose",
+    "./skills/engineering/external-campaign-triage",
     "./skills/engineering/external-pr-style",
     "./skills/engineering/external-pr-viability",
     "./skills/engineering/git-guardrails-claude-code",

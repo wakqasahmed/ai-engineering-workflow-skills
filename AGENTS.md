@@ -21,6 +21,7 @@ This repository contains my AI-assisted engineering workflow and agent operating
 - Use `open-code-review-setup` when creating a new repository or onboarding an existing repo to automated AI code review (OCR), or when OCR reviews are not running on PRs.
 - Use `external-pr-viability` before implementing a fix for any unsolicited PR against a repo we don't own — check the repo actually merges outside contributors before investing the effort.
 - Use `external-pr-style` before opening any PR against a repo we don't own.
+- Use `external-campaign-triage` when tracking state across many candidate issues/PRs/repos in a multi-repo external contribution campaign, and always before posting a status-check comment on a stalled external PR.
 - Use `resolving-merge-conflicts` when you need to resolve an in-progress git merge/rebase conflict.
 - Use `wizard` when a manual procedure needs a human to click through a dashboard or enter credentials — generates a guided script instead of leaving `hitl-blocker`'s bare issue description to figure out alone.
 - Use `git-guardrails-claude-code` to set up or audit the PreToolUse hook that blocks force-push, direct push to main/master/staging, `reset --hard`, `clean -f/-fd`, `branch -D`, and bare `checkout .`/`restore .`.
