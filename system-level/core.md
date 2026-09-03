@@ -29,6 +29,7 @@ Solve the stated problem directly. Prefer concrete delivery over speculative arc
 - Use `security-review` before PRs touching auth, payments, secrets, or external APIs.
 - Mark an issue as picked or claimed before an agent starts work on it.
 - Keep implementation agents issue-scoped to avoid context bloat.
+- Prefer a fresh agent per issue by default.
 - Use `handover` when context will cross an agent or session boundary, when only 5-10% of the session limit remains with work unfinished, or when context usage passes 40% on unfinished multi-step work.
 - For the full operating model, follow `AI_ENGINEERING_WORKFLOW.md`.
 - Use the playbook's risk levels, definition of done, and failure paths for non-trivial work.
