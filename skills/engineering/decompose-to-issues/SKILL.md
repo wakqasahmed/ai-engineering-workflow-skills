@@ -27,6 +27,16 @@ Each issue should include:
 - Links and relevant files
 - Risk level
 
+## Wide-Refactor Exception: Expand / Contract
+
+While feature work must always be decomposed into vertical slices, wide cross-cutting refactors (e.g. database schema migrations affecting multiple services, public API signature changes, or replacing an ORM/library across dozens of callers) cannot be delivered in a single vertical slice without risking regressions or producing unreviewable mega-PRs.
+
+For these wide refactors, decompose using the **Expand / Contract** pattern (branching by abstraction):
+
+1. **Expand Issue**: Introduce the new schema, API, or abstraction alongside the old one. Add dual-writing or compatibility adapters so existing callers continue to work without disruption.
+2. **Migrate Issues (in batches)**: Migrate existing callers in small, independently-releasable batches (e.g. one subsystem or 3-5 callers per issue). Each batch must be verified and merged independently.
+3. **Contract Issue**: Once all callers have migrated and verified in production, remove the deprecated API, adapter shims, or old database columns, leaving clean, non-duplicated code.
+
 ## Guardrails
 
 - Avoid horizontal slices like "build backend" and "build frontend" unless the architecture truly requires it.
