@@ -121,7 +121,7 @@ Definition of done:
 - When appropriate, run independent review passes focused on correctness, security, performance, and regressions.
 - Use the appropriate model and effort level per PR for independent review passes.
 - Use risk-based staging and HITL, not universal staging for every change.
-- Treat context-bloat concerns as a heuristic, not a numeric rule.
+- Treat general context-bloat concerns as a heuristic rather than a numeric rule, with the explicit exception of the 40% and 5-10% session limits defined for `handover` in Step 7.
 - Optimize for quality, correctness, and user value over activity/volume metrics:
   - Do not optimize for throughput signals such as lines of code changed, commit counts, PR volume, or task closure velocity.
   - Prioritize test validity, backwards compatibility, maintainability, reliability, and measurable behavior over superficial velocity.

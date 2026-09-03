@@ -19,7 +19,7 @@ Use this before staging or production release.
 ## Scope & Exemption Rules
 
 Apply this gate selectively based on risk level to prevent release gridlock:
-- **Exempt (Skip this gate)**: Low-risk changes per `AI_ENGINEERING_WORKFLOW.md` (documentation-only edits, comments, minor styling/CSS tweaks, test-only additions, and narrow bug fixes with no data schema, auth, or infrastructure changes) skip the full staging/rollback release gate.
+- **Exempt (Skip this gate)**: Low-risk changes per `AI_ENGINEERING_WORKFLOW.md` (documentation-only edits, comments, minor styling/CSS tweaks, test-only additions, and narrow bug fixes with no business-rule change, data schema, auth, or infrastructure changes) skip the full staging/rollback release gate.
 - **Mandatory (Do not skip)**: Medium and High-risk changes (user-facing features, business logic changes, migrations, authentication/permissions, deployment pipelines, and third-party integrations) must satisfy all checks below before release.
 
 ## Required For Medium/High Risk
