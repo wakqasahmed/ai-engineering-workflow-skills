@@ -18,7 +18,7 @@ Use this after implementation and before merge.
 2. Confirm verification commands and results.
 3. Read Alibaba Code Review's findings and the GitHub CI/check results on the PR before starting the independent review — don't re-derive what's already there.
 4. Review spec compliance before code style.
-5. Check business logic and edge cases, regressions and compatibility, security and authorization, API/database/queue/integration contracts, and test adequacy including missing acceptance tests.
+5. Check business logic and edge cases, regressions and backwards compatibility (explicitly verifying whether public APIs, schemas, configurations, or integrations break), security and authorization, API/database/queue/integration contracts, and test adequacy including missing acceptance tests.
 6. Revisit an Alibaba Code Review or CI finding only when it indicates an unresolved correctness, security, data-loss, configuration, or acceptance-criteria issue — not to relitigate style or formatting.
 7. Post concrete findings or explicitly state no blocking issues. Do not repeat resolved lint, formatting, conventional-style, or straightforward static-analysis findings Alibaba Code Review or CI already covered.
 8. Apply review findings before merge.
