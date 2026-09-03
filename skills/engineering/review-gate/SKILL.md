@@ -1,6 +1,6 @@
 ---
 name: review-gate
-description: Run an independent semantic review gate before merging non-trivial work, on top of (not duplicating) Alibaba Code Review and CI. Use after implementation and verification, especially for medium/high-risk changes.
+description: Run an independent semantic review gate before merging non-trivial work, alongside CI and any configured automated code review tool.
 ---
 
 # Review Gate
