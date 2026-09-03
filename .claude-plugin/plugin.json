@@ -1,19 +1,28 @@
 {
   "name": "ai-engineering-workflow-skills",
   "skills": [
+    "./skills/engineering/ai-agent-pr-metadata",
+    "./skills/engineering/changesets-release",
     "./skills/engineering/clarify-work",
-    "./skills/engineering/to-prd",
     "./skills/engineering/decompose-to-issues",
     "./skills/engineering/define-done",
-    "./skills/engineering/review-gate",
-    "./skills/engineering/ai-agent-pr-metadata",
-    "./skills/engineering/open-code-review-setup",
-    "./skills/engineering/subagent-pipeline",
+    "./skills/engineering/diagnose",
+    "./skills/engineering/external-pr-style",
+    "./skills/engineering/external-pr-viability",
+    "./skills/engineering/git-guardrails-claude-code",
     "./skills/engineering/hitl-blocker",
+    "./skills/engineering/open-code-review-setup",
     "./skills/engineering/release-gate",
-    "./skills/engineering/changesets-release",
+    "./skills/engineering/resolving-merge-conflicts",
+    "./skills/engineering/review-gate",
+    "./skills/engineering/subagent-pipeline",
+    "./skills/engineering/tmux-orphaned-socket",
+    "./skills/engineering/to-prd",
+    "./skills/engineering/wizard",
+    "./skills/engineering/workflow-router",
+    "./skills/engineering/write-prompt-guide",
+    "./skills/engineering/writing-for-agents",
     "./skills/product/roast",
-    "./skills/productivity/handover",
-    "./skills/engineering/write-prompt-guide"
+    "./skills/productivity/handover"
   ]
 }
