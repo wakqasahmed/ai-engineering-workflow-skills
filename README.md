@@ -49,14 +49,19 @@ No installer, no dependency — just files your agent already knows how to read.
 | [`clarify-work`](skills/engineering/clarify-work/SKILL.md) | Clarify non-trivial engineering work before implementation by resolving ambiguity, terminology, constraints, and the smallest viable path. |
 | [`decompose-to-issues`](skills/engineering/decompose-to-issues/SKILL.md) | Break high-level work into independently executable GitHub issues using vertical slices. |
 | [`define-done`](skills/engineering/define-done/SKILL.md) | Define acceptance criteria, risk level, and verification before editing. |
+| [`diagnose`](skills/engineering/diagnose/SKILL.md) | Disciplined diagnosis loop for hard bugs and performance regressions: reproduce → minimise → hypothesise → instrument → fix → regression-test. |
+| [`external-pr-style`](skills/engineering/external-pr-style/SKILL.md) | Write PR descriptions for third-party upstream repos in natural human prose to avoid maintainer AI-rejection patterns. |
 | [`external-pr-viability`](skills/engineering/external-pr-viability/SKILL.md) | Check whether an upstream repo actually merges outside contributors before investing implementation time in an unsolicited PR. |
+| [`git-guardrails-claude-code`](skills/engineering/git-guardrails-claude-code/SKILL.md) | Keep agentic git operations safe and deterministic under Claude Code: protect main/master, enforce branch hygiene, and prevent destructive commands. |
 | [`hitl-blocker`](skills/engineering/hitl-blocker/SKILL.md) | Convert human-only blockers into visible GitHub issues. |
 | [`open-code-review-setup`](skills/engineering/open-code-review-setup/SKILL.md) | Set up Alibaba Open Code Review (OCR) on a repository that lacks it, or audit and update an existing setup. |
 | [`release-gate`](skills/engineering/release-gate/SKILL.md) | Check deployment, staging, rollback, and health verification before release. |
+| [`resolving-merge-conflicts`](skills/engineering/resolving-merge-conflicts/SKILL.md) | Resolve git merge conflicts safely by understanding both sides of the diff, preserving intent, and verifying resolution with tests. |
 | [`review-gate`](skills/engineering/review-gate/SKILL.md) | Run an independent semantic review gate before merging non-trivial work, on top of (not duplicating) Alibaba Code Review and CI. |
 | [`subagent-pipeline`](skills/engineering/subagent-pipeline/SKILL.md) | Run a cold-start implementer, reviewer, and fixer subagent chain for one issue, gated by CI, ending in a staging PR. |
 | [`tmux-orphaned-socket`](skills/engineering/tmux-orphaned-socket/SKILL.md) | Diagnose and recover from an orphaned tmux socket (`error connecting to /tmp/tmux-*/default`) after a `/tmp` cleanup, without assuming the sessions are lost. |
 | [`to-prd`](skills/engineering/to-prd/SKILL.md) | Synthesize the current conversation and repository context into a concise product and engineering spec, publish it to the project issue tracker, and gate agent readiness before decomposition. |
+| [`wizard`](skills/engineering/wizard/SKILL.md) | Interactive decision-tree assistant that guides engineers through selecting the right workflow, testing strategy, or decomposition path. |
 | [`workflow-router`](skills/engineering/workflow-router/SKILL.md) | Routes a software-work request to the smallest applicable delivery workflow and records repository conventions once. |
 | [`write-prompt-guide`](skills/engineering/write-prompt-guide/SKILL.md) | Produce a pack-specific `PROMPT_GUIDE.md` that teaches end users what to type to get a good run out of one Agent Skill pack, from that pack's own `SKILL.md`, README, and open issues. |
 | [`roast`](skills/product/roast/SKILL.md) | Use when someone asks to roast an idea, pressure-test or stress-test an idea, validate a business idea, "convene the council", get a brutal second opinion before building something, or says "/roast". |
