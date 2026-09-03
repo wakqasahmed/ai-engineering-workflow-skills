@@ -1,0 +1,11 @@
+{
+  "version": "1",
+  "description": "Baseline of recognized historical legacy agent labels permitted by the OCR disposition gate.",
+  "allowed_legacy_labels": [
+    "agent:sonnet5-medium-implementer",
+    "agent:sonnet5-high-implementer",
+    "agent:gpt5.6-terra-medium-implementer",
+    "agent:gpt5.6-terra-high-reviewer",
+    "agent:antigravity-default-implementer"
+  ]
+}

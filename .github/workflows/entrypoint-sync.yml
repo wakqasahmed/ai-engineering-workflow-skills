@@ -89,3 +89,6 @@ jobs:
       - name: Verify roast outcome validator
         shell: bash
         run: python3 -m unittest eval/product/roast/test_harness.py
+      - name: Verify PR governance verifier
+        shell: bash
+        run: python3 -m unittest support/ai-engineering-workflow/tests/test_verify_pr_governance.py
