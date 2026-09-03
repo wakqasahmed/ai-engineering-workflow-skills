@@ -11,6 +11,18 @@ Solve the stated problem directly. Prefer concrete delivery over speculative arc
 - Reuse existing project patterns before inventing new ones.
 - When reporting information to the user, be extremely concise. Sacrifice grammar for concision.
 
+## Final Report Format
+
+For clean conclusion of non-trivial tasks, structure completion reports as follows:
+
+- **Completed**: Deliverables produced and outcomes achieved.
+- **Validation**: Verification performed with explicit status (`pass`, `fail`, `skipped`, `unavailable`, `n/a`) and proof.
+- **Changed**: Files and components modified, created, or deleted.
+- **Outstanding**: Unresolved items, residual risks, or blocked items (if any).
+- **Next**: Immediate recommended next action (if relevant).
+
+Trivial fixes may omit this structure. Reserve `handover` specifically for context exhaustion, session boundaries, mid-task blockages, or explicit user requests.
+
 ## Brand Icon Sources
 
 - Use Simple Icons first for real product, platform, or company marks.
