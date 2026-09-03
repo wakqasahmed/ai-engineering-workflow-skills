@@ -15,7 +15,7 @@ REQUIRED_SKILL_TERMS = (
     "Name the minimum verification commands or manual checks.",
     "Record known constraints and non-goals.",
     "State rollback or recovery notes for medium/high-risk changes.",
-    "Low: narrow copy, style, test-only, or isolated bug fix.",
+    "Low: narrow copy, style, test-only, or isolated bug fix (with no business-rule change).",
     "Medium: user-visible behavior, business logic, data handling, CI, integrations, or multi-file behavior.",
     "High: auth, payments, permissions, secrets, migrations, deployment, infrastructure, tenant data, or irreversible operations.",
 )
