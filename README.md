@@ -40,7 +40,7 @@ No installer, no dependency — just files your agent already knows how to read.
 
 ## Using This Skillpack
 
-Once installed, your agent discovers and invokes skills automatically when your prompt matches the trigger keywords defined in `AGENTS.md` (or you can invoke them explicitly by name or slash command, e.g. `/roast`, `/clarify-work`).
+Once installed, your agent discovers and invokes skills automatically when your prompt matches each skill's `description` frontmatter. For repositories adopting this workflow, `AGENTS.md` provides additional repo-level routing rules and a Trigger Map for agents that load it as an instruction file (you can also invoke skills explicitly by name or slash command, e.g. `/roast`, `/clarify-work`).
 
 ### Standard Prompt Pattern
 
@@ -98,9 +98,10 @@ To anchor an agent session to this workflow playbook, reference `system-level/co
 | [`subagent-pipeline`](skills/engineering/subagent-pipeline/SKILL.md) | Run a cold-start implementer, reviewer, and fixer subagent chain for one issue, gated by CI, ending in a staging PR. |
 | [`tmux-orphaned-socket`](skills/engineering/tmux-orphaned-socket/SKILL.md) | Diagnose and recover from an orphaned tmux socket (`error connecting to /tmp/tmux-*/default`) after a `/tmp` cleanup, without assuming the sessions are lost. |
 | [`to-prd`](skills/engineering/to-prd/SKILL.md) | Synthesize the current conversation and repository context into a concise product and engineering spec, publish it to the project issue tracker, and gate agent readiness before decomposition. |
-| [`wizard`](skills/engineering/wizard/SKILL.md) | Interactive decision-tree assistant that guides engineers through selecting the right workflow, testing strategy, or decomposition path. |
+| [`wizard`](skills/engineering/wizard/SKILL.md) | Generate an interactive bash wizard that walks a human through manual steps (provisioning infrastructure, setting up credentials or secrets, walking an unfamiliar dashboard, or running a cutover). |
 | [`workflow-router`](skills/engineering/workflow-router/SKILL.md) | Routes a software-work request to the smallest applicable delivery workflow and records repository conventions once. |
 | [`write-prompt-guide`](skills/engineering/write-prompt-guide/SKILL.md) | Produce a pack-specific `PROMPT_GUIDE.md` that teaches end users what to type to get a good run out of one Agent Skill pack, from that pack's own `SKILL.md`, README, and open issues. |
+| [`writing-for-agents`](skills/engineering/writing-for-agents/SKILL.md) | Reference for authoring documents an agent consumes: skills, AGENTS.md/CLAUDE.md, and progressive disclosure references. |
 | [`roast`](skills/product/roast/SKILL.md) | Use when someone asks to roast an idea, pressure-test or stress-test an idea, validate a business idea, "convene the council", get a brutal second opinion before building something, or says "/roast". |
 | [`handover`](skills/productivity/handover/SKILL.md) | Compact the current conversation into a handover document a fresh agent can pick up and continue seamlessly. |
 

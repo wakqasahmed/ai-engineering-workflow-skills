@@ -44,7 +44,7 @@ python3 support/ai-engineering-workflow/scripts/verify-pr-governance.py \
 
 ## PR Template
 
-Add or update `.github/pull_request_template.md`:
+Add or update `.github/PULL_REQUEST_TEMPLATE.md`:
 
 ```md
 ## Agent Metadata
