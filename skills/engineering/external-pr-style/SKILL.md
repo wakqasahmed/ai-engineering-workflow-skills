@@ -25,7 +25,7 @@ Maintainers in high-volume open-source repositories frequently pattern-match aga
 
 Technique adapted from [mattpocock/skills — caveman](https://github.com/mattpocock/skills/blob/main/skills/misc/caveman/SKILL.md) (filler/hedge/pleasantry stripping), applied to natural prose rather than caveman's fragment style to ensure PR descriptions read as clear, authentic engineer-to-engineer communication.
 
-Long, padded explanations are themselves an AI-tell, independent of headers — reread the drafted body and strip:
+Long, padded explanations are themselves an AI-tell, independent of headers — reread the drafted body and strip (see canonical [prose compression word list](references/compression-word-list.md)):
 
 - Pleasantries/hedging: "I'd be happy to", "please note that", "it's worth mentioning", "certainly", "of course", "I believe".
 - Filler intensifiers: "just", "really", "basically", "actually", "simply", "essentially".
