@@ -70,6 +70,7 @@ Solve the stated problem directly. Prefer concrete delivery over speculative arc
 - Run the minimum relevant baseline checks before editing. Record pre-existing failures.
 - Run the minimum relevant checks before reporting completion.
 - Do not claim success without verification.
+- For actions against systems outside the local repository (such as pushing branches, creating issues or PRs, triggering deployments, or publishing packages), do not assume success from a local exit code 0 alone; verify the remote/external state directly (e.g. check remote ref, query tracker API, verify deployment health endpoint, or confirm registry listing).
 
 ## Test Database Safety
 
