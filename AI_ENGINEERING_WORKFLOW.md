@@ -61,6 +61,7 @@ Agent role contracts:
 - Prefer writing focused tests first when expected behavior is already clear.
 - For user-visible medium-risk and high-risk changes, name and perform the relevant manual acceptance walkthrough.
 - At minimum, no change is complete until the relevant automated or manual checks have been run.
+- For external-system actions (pushing branches, opening PRs, deploying, or publishing releases), verify external state directly (e.g. check remote refs, inspect tracker API response, poll deployment health checks, or verify registry listings). Do not assume success solely from local command exit code 0.
 
 Definition of done:
 
