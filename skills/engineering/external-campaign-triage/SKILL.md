@@ -67,7 +67,7 @@ Real incident: two unrelated third-party maintainers responded with hostile push
 ## Guardrails
 
 - Never apply a `picked by agent` or `agent:*` GitHub label to a repo we don't own or collaborate on — the tracker record is the only claim mechanism here.
-- When this tracker's own PR (against the campaign repo) references a third-party PR/issue, use bare `owner/repo#123` text rather than a full `github.com` URL, per `ai-agent-pr-metadata`'s cross-reference-leak guidance — the same rule applies whether the mention is in code or in the tracker repo's own PR body.
+- When this tracker's own PR/commit (against the campaign repo) references a third-party PR/issue, never write the unbroken `owner/repo#123` pattern (or a full `github.com` URL) in the PR title, body, or commit message — both forms trigger a public "mentioned this pull request" cross-reference on the target's timeline, exposing the campaign tool. See `ai-agent-pr-metadata`'s cross-reference-leak guidance for the confirmed-safe forms (inline code backticks in PR/issue bodies; a broken adjacency like `repo PR #123` in commit messages). This only applies to what you type into a PR/issue/commit-message field — a tracker markdown/JSON file's own content is not scanned for cross-references.
 - See `subagent-pipeline`'s Guardrails section (the "Public issues, PRs, comments, and handovers..." bullet) for the parallel credential-redaction discipline that applies to every public comment this skill causes an agent to post.
 - Do not skip `viability_checked` to save time — an unvetted candidate wastes the same implementation effort `external-pr-viability` exists to avoid.
 - Do not delete or rewrite `history` entries; append only. The tracker is an audit trail, not a status field to overwrite.
