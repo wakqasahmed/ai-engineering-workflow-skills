@@ -23,6 +23,32 @@ Use this after implementation and before merge.
 7. Post concrete findings or explicitly state no blocking issues. Do not repeat resolved lint, formatting, conventional-style, or straightforward static-analysis findings Alibaba Code Review or CI already covered.
 8. Apply review findings before merge.
 
+## Two-Axis Review Structure
+
+Review along two independent axes and report findings under separate headers:
+
+1. **Spec Compliance Axis**: Does the diff satisfy every acceptance criterion and expected behavior without scope creep or missed edge cases?
+2. **Standards & Code Quality Axis**: Does the code adhere to this repository's conventions, architecture patterns, and semantic quality standards?
+
+**Rule**: Never cross-rerank findings across the two axes. A change can cleanly follow conventions yet fail the spec, or satisfy the spec while violating architectural standards. Evaluate both independently.
+
+## Semantic Smell Baseline (12 Fowler Smells)
+
+Use these 12 smells as semantic heuristics during review. Documented repository standards always override these heuristics, and mechanical checks owned by CI/OCR must be skipped:
+
+1. **Mysterious Name**: Unclear variable, function, or class name → rename to reflect intent and domain concepts.
+2. **Duplicated Code**: Identical or near-identical logic in multiple places → extract helper or shared abstraction.
+3. **Feature Envy**: Function queries another object's data more than its own → move behavior closer to data.
+4. **Data Clumps**: Same group of primitives repeatedly passed together → group into a value object or struct.
+5. **Primitive Obsession**: Raw strings/ints used for rich domain concepts → encapsulate in small value objects.
+6. **Repeated Switches**: Same `switch` or `match` on type codes scattered across files → use polymorphism or strategy pattern.
+7. **Shotgun Surgery**: One change forces many small edits across multiple files → consolidate related responsibilities.
+8. **Divergent Change**: One class changes for multiple unrelated reasons → split into cohesive classes with single responsibilities.
+9. **Speculative Generality**: Hooks, parameters, or abstractions built for hypothetical future needs → delete unused generic machinery.
+10. **Message Chains**: Client navigates long chains (`a.b().c().d()`) → hide delegation or extract query.
+11. **Middle Man**: Class merely delegates without adding value → remove delegate and call target directly.
+12. **Refused Bequest**: Subclass rejects inherited methods/data → replace inheritance with composition.
+
 ## Reviewer Contract
 
 The reviewer should read the issue, acceptance criteria, Alibaba Code Review's output, CI results, and the PR diff first. Pull more context only when needed.
