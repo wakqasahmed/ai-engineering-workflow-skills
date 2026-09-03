@@ -115,8 +115,8 @@ Definition of done:
 Use the lowest risk level that honestly fits the change.
 
 - Low risk: copy changes, local styling fixes, test-only changes, or a narrow bug fix with no business-rule change. Require focused verification.
-- Medium risk: user-visible behavior, business logic, data handling, integrations, CI, or meaningful multi-file changes. Require focused tests, independent review, and rollout notes.
-- High risk: auth, payments, permissions, secrets, migrations, deployment, infrastructure, tenant data, or irreversible operations. Require independent review, CI, staging or HITL validation, rollback notes, and a named production health check.
+- Medium risk: user-visible behavior, business logic, data handling, integrations, CI, or meaningful multi-file changes. Require focused tests, independent review (including proportional checks for obvious algorithmic regressions, N+1 queries, missing caching, and resource cleanup), and rollout notes.
+- High risk: auth, payments, permissions, secrets, migrations, deployment, infrastructure, tenant data, or irreversible operations. Require independent review (including deep performance and reliability checks: concurrency bounds, network timeouts/retries, database locks, and failure-path resource cleanup), CI, staging or HITL validation, rollback notes, and a named production health check.
 
 ## Issue Template
 

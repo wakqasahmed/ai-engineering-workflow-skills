@@ -27,6 +27,14 @@ Use this after implementation and before merge.
 
 The reviewer should read the issue, acceptance criteria, Alibaba Code Review's output, CI results, and the PR diff first. Pull more context only when needed.
 
+## Proportional Performance & Reliability Checks
+
+Scale the depth of performance review to the PR's Risk Level (do not prematurely optimize; do not ignore an obvious regression):
+
+- **Low Risk**: Skip dedicated performance checks unless the diff introduces an obvious infinite loop or severe memory leak.
+- **Medium Risk**: Check for obvious algorithmic regressions (e.g. $O(N^2)$ loops where $O(N)$ was standard), N+1 queries in modified routes/queries, missing caching where an existing project pattern supplies it, and resource cleanup.
+- **High Risk**: Check concurrency limits, network timeouts and retries on external calls, queue payload sizes, lock contention/slow migrations, and deterministic failure-path resource cleanup.
+
 ## Merge Rule
 
 CI remains a hard merge gate; this review does not replace it and is not the place to rerun or restate lint/static-analysis automation. Do not merge non-trivial work without a review record. If an automated or subagent reviewer stalls, post a manual expert review that states residual risk.
