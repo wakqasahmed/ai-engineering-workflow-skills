@@ -11,6 +11,18 @@ Solve the stated problem directly. Prefer concrete delivery over speculative arc
 - Reuse existing project patterns before inventing new ones.
 - When reporting information to the user, be extremely concise. Sacrifice grammar for concision.
 
+## Final Report Format
+
+For clean conclusion of non-trivial tasks, structure completion reports as follows:
+
+- **Completed**: Deliverables produced and outcomes achieved.
+- **Validation**: Verification performed with explicit status (`pass`, `fail`, `skipped`, `unavailable`, `n/a`) and proof.
+- **Changed**: Files and components modified, created, or deleted.
+- **Outstanding**: Unresolved items, residual risks, or blocked items (if any).
+- **Next**: Immediate recommended next action (if relevant).
+
+Trivial fixes may omit this structure. Reserve `handover` specifically for context exhaustion, session boundaries, mid-task blockages, or explicit user requests.
+
 ## Brand Icon Sources
 
 - Use Simple Icons first for real product, platform, or company marks.
@@ -29,11 +41,18 @@ Solve the stated problem directly. Prefer concrete delivery over speculative arc
 - Use `security-review` before PRs touching auth, payments, secrets, or external APIs.
 - Mark an issue as picked or claimed before an agent starts work on it.
 - Keep implementation agents issue-scoped to avoid context bloat.
+- Prefer a fresh agent per issue by default.
 - Use `handover` when context will cross an agent or session boundary, when only 5-10% of the session limit remains with work unfinished, or when context usage passes 40% on unfinished multi-step work.
 - For the full operating model, follow `AI_ENGINEERING_WORKFLOW.md`.
 - Use the playbook's risk levels, definition of done, and failure paths for non-trivial work.
-- Keep always-loaded instructions short. Move conditional workflows into skills and periodically prune rules that do not prevent real mistakes.
-- When the same preventable mistake recurs, prefer CI, hooks, or lint rules over more prose.
+## Instruction Hygiene
+
+- Follow `skills/engineering/writing-for-agents/SKILL.md` when authoring or editing agent instructions, skills, or rules.
+- **Progressive disclosure**: Keep core instructions and top-level entrypoints lean. Offload detailed reference checklists, dictionaries, and domain catalogs to `references/` or companion documents loaded only on demand.
+- **Deterministic verification**: Specify the exact command, expected exit code, or observable output that proves a task is complete. Never end an instruction on an unverified assertion.
+- **Explicit stopping criteria**: Avoid vague qualifiers ("be careful", "make sure it's clean", "apply properly"). Define clear boundaries for done vs. not-done to prevent premature completion or unbounded scope creep.
+- **Single source of truth**: Store each rule in one authoritative location. Never duplicate lengthy checklists across multiple skills.
+- When the same preventable mistake recurs, prefer CI checks, pre-commit hooks, or lint rules over adding more prose.
 
 ## Execution Discipline
 
@@ -64,6 +83,7 @@ Solve the stated problem directly. Prefer concrete delivery over speculative arc
 - Run the minimum relevant baseline checks before editing. Record pre-existing failures.
 - Run the minimum relevant checks before reporting completion.
 - Do not claim success without verification.
+- For actions against systems outside the local repository (such as pushing branches, creating issues or PRs, triggering deployments, or publishing packages), do not assume success from a local exit code 0 alone; verify the remote/external state directly (e.g. check remote ref, query tracker API, verify deployment health endpoint, or confirm registry listing).
 
 ## Test Database Safety
 

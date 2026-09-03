@@ -1,6 +1,0 @@
-{
-  "cases": [
-    {"id":"tuning-v4-table","split":"tuning","prompt":"Filament 4 InventoryResource needs a stock table."},
-    {"id":"tuning-non-filament","split":"tuning","prompt":"Add a Laravel mail notification for an invoice."}
-  ]
-}

@@ -25,6 +25,17 @@ The workflow is descriptive as a public playbook, but the files under `system-le
 - Standard: non-trivial issue with acceptance criteria, verification plan, and risk level.
 - Deep: ambiguous, architectural, or cross-cutting work. Clarify decisions, use a PRD when helpful, then decompose before implementation.
 
+### 0. Reconnaissance
+
+Before modifying an unfamiliar repository, inspect its standing context to align your change with existing patterns:
+
+- Repository structure: directory layout, workspaces, monorepo packages, and architecture boundaries.
+- Documentation: `README.md`, `CONTRIBUTING.md`, developer guides, and architecture decision records (`docs/adr/` or similar).
+- Tooling and runtime: supported runtime versions, package managers, build system, and environment requirements (`.env.example`).
+- Verification surface: test frameworks, test execution commands, lint/format scripts, and CI configuration (`.github/workflows/`).
+- Recent history: review recent commits (`git log -n 10 --oneline`) to observe commit message conventions, active branch flows, and recent refactors.
+- Pattern reuse: identify existing abstractions, conventions, helper utilities, and test fixture patterns before introducing new ones.
+
 ### 1. Clarify
 
 - Use `clarify-work` for high-level tasks.
@@ -61,6 +72,7 @@ Agent role contracts:
 - Prefer writing focused tests first when expected behavior is already clear.
 - For user-visible medium-risk and high-risk changes, name and perform the relevant manual acceptance walkthrough.
 - At minimum, no change is complete until the relevant automated or manual checks have been run.
+- For external-system actions (pushing branches, opening PRs, deploying, or publishing releases), verify external state directly (e.g. check remote refs, inspect tracker API response, poll deployment health checks, or verify registry listings). Do not assume success solely from local command exit code 0.
 
 Definition of done:
 
@@ -110,14 +122,18 @@ Definition of done:
 - Use the appropriate model and effort level per PR for independent review passes.
 - Use risk-based staging and HITL, not universal staging for every change.
 - Treat context-bloat concerns as a heuristic, not a numeric rule.
+- Optimize for quality, correctness, and user value over activity/volume metrics:
+  - Do not optimize for throughput signals such as lines of code changed, commit counts, PR volume, or task closure velocity.
+  - Prioritize test validity, backwards compatibility, maintainability, reliability, and measurable behavior over superficial velocity.
+  - A small, focused, well-verified change that cleanly satisfies acceptance criteria is strictly superior to an extensive speculative implementation.
 
 ## Risk Levels
 
 Use the lowest risk level that honestly fits the change.
 
 - Low risk: copy changes, local styling fixes, test-only changes, or a narrow bug fix with no business-rule change. Require focused verification.
-- Medium risk: user-visible behavior, business logic, data handling, integrations, CI, or meaningful multi-file changes. Require focused tests, independent review, and rollout notes.
-- High risk: auth, payments, permissions, secrets, migrations, deployment, infrastructure, tenant data, or irreversible operations. Require independent review, CI, staging or HITL validation, rollback notes, and a named production health check.
+- Medium risk: user-visible behavior, business logic, data handling, integrations, CI, or meaningful multi-file changes. Require focused tests, independent review (including proportional checks for obvious algorithmic regressions, N+1 queries, missing caching, and resource cleanup), and rollout notes.
+- High risk: auth, payments, permissions, secrets, migrations, deployment, infrastructure, tenant data, or irreversible operations. Require independent review (including deep performance and reliability checks: concurrency bounds, network timeouts/retries, database locks, and failure-path resource cleanup), CI, staging or HITL validation, rollback notes, and a named production health check.
 
 ## Issue Template
 
@@ -184,6 +200,22 @@ Do not rely on commit messages for this traceability. Do not add AI co-author li
 - If reviewer and implementer disagree, resolve against the issue acceptance criteria first and the product owner second. Do not merge unresolved correctness disputes.
 - If CI is flaky, rerun once, then record the flake evidence and either fix the flake or require human approval before proceeding.
 - If the issue cannot be completed in one focused pass, write a handover with current state, failing checks, open decisions, and next action, publish it to the issue, and add the `paused by agent` label.
+
+## Anti-Patterns
+
+A consolidated self-check for agents and reviewers to catch preventable mistakes before opening or merging a PR:
+
+- **Coding before understanding**: Editing code without understanding the problem, reproduction steps, or existing architecture (see `0. Reconnaissance` and `1. Clarify`).
+- **Speculative or unrequested architecture**: Introducing new abstractions, generic layers, or broad redesigns when a narrow edit suffices (see `system-level/core.md` Engineering Defaults).
+- **Unrelated refactoring**: Touching lines, reformatting files, or modernizing idioms outside the direct scope of the requested outcome (see `system-level/core.md` Execution Discipline).
+- **Vacuous or fake tests**: Writing tests that assert trivial tautologies, mock away the core behavior under test, or pass regardless of implementation correctness.
+- **Unverified success claims**: Stating a task is complete without running the minimum relevant verification checks and recording evidence (see `system-level/core.md` Validation).
+- **Testing against non-disposable databases**: Running automated tests or database resets against staging, production, customer, or shared operational databases (see `system-level/core.md` Test Database Safety).
+- **Unnecessary dependencies**: Adding production dependencies without verifying necessity, source, license, and securing human approval (see Dependency Checkpoint).
+- **Secret or credential leakage**: Hardcoding secrets, committing dotenv files, or exposing sensitive tokens in PR descriptions or logs.
+- **Destructive git commands**: Force-pushing, bypassing hooks, or committing directly to protected branches without explicit authorization (see `system-level/core.md` Git).
+- **Blind trust in assumptions**: Accepting speculative inferences or ambiguous descriptions without verifying the active codebase.
+- **Excessive questioning vs. unguided autonomy**: Asking trivial questions verifiable from local code, or conversely, making irreversible high-risk domain or deployment choices without human confirmation.
 
 ## Context Packet For Fresh Agents
 
