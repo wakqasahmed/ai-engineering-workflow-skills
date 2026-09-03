@@ -77,6 +77,7 @@ To anchor an agent session to this workflow playbook, reference `system-level/co
 - **Verify maintainer receptivity**: Run `external-pr-viability` to ensure the repository actively merges outside contributions before investing implementation time.
 - **Test and implement**: Implement the fix following the target repo's exact existing conventions and test suites.
 - **Draft authentic PR text**: Run `external-pr-style` to strip formulaic AI section templates, sycophancy, and verbose filler.
+- **Track state across a multi-repo campaign**: Run `external-campaign-triage` when many candidates are in flight across repos we don't own, and before sending any follow-up comment on a stalled PR.
 
 #### 4. Releasing Versioned Packages
 - **Record release intent**: Run `changesets-release` to create changesets, validate semver bumps, and check changelogs.
@@ -97,6 +98,7 @@ To anchor an agent session to this workflow playbook, reference `system-level/co
 | [`decompose-to-issues`](skills/engineering/decompose-to-issues/SKILL.md) | Break high-level work into independently executable GitHub issues using vertical slices. |
 | [`define-done`](skills/engineering/define-done/SKILL.md) | Define acceptance criteria, risk level, and verification before editing. |
 | [`diagnose`](skills/engineering/diagnose/SKILL.md) | Disciplined diagnosis loop for hard bugs and performance regressions: reproduce → minimise → hypothesise → instrument → fix → regression-test. |
+| [`external-campaign-triage`](skills/engineering/external-campaign-triage/SKILL.md) | Track state across many candidate issues, PRs, and repos in a multi-repo external open-source contribution campaign, using a local tracker instead of GitHub labels. |
 | [`external-pr-style`](skills/engineering/external-pr-style/SKILL.md) | Write PR descriptions for third-party upstream repos in natural human prose to avoid maintainer AI-rejection patterns. |
 | [`external-pr-viability`](skills/engineering/external-pr-viability/SKILL.md) | Check whether an upstream repo actually merges outside contributors before investing implementation time in an unsolicited PR. |
 | [`git-guardrails-claude-code`](skills/engineering/git-guardrails-claude-code/SKILL.md) | Keep agentic git operations safe and deterministic under Claude Code: protect main/master, enforce branch hygiene, and prevent destructive commands. |

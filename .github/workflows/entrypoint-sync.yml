@@ -56,6 +56,12 @@ jobs:
       - name: Verify external PR viability outcome validator
         shell: bash
         run: python3 -m unittest eval/engineering/external-pr-viability/test_harness.py
+      - name: Run external campaign triage deterministic contract eval
+        shell: bash
+        run: eval/engineering/external-campaign-triage/run-eval.sh --dry-run
+      - name: Verify external campaign triage outcome validator
+        shell: bash
+        run: python3 -m unittest eval/engineering/external-campaign-triage/test_harness.py
       - name: Run review-gate deterministic contract eval
         shell: bash
         run: eval/engineering/review-gate/run-eval.sh --dry-run

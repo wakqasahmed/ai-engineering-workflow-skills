@@ -13,6 +13,7 @@ The goal is transparency over time: what changed, why it changed, and when the w
 ### Added
 
 - `tmux-orphaned-socket` skill for diagnosing and recovering from a missing `/tmp/tmux-*/default` socket after a `/tmp` cleanup, plus a one-line `system-level/core.md` Safety rule and `AGENTS.md`/`CLAUDE.md` trigger-map entries pointing to it (#108)
+- `external-campaign-triage` skill: a state machine for tracking many candidate issues/PRs across a multi-repo external open-source contribution campaign in a local tracker instead of GitHub labels, with a hard maintainer follow-up guardrail (at most one status-check comment per stalled PR after 7+ days, never a second one, no automated reminder loop, and a `silenced` terminal state on any negative maintainer response). Ships the same deterministic contract check plus gated model-outcome harness pattern as `hitl-blocker`, registered in the plugin manifest and wired into PR CI
 
 ### Changed
 
