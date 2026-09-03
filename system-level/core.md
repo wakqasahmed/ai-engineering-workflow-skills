@@ -19,9 +19,9 @@ For clean conclusion of non-trivial tasks, structure completion reports as follo
 - **Validation**: Verification performed with explicit status (`pass`, `fail`, `skipped`, `unavailable`, `n/a`) and proof.
 - **Changed**: Files and components modified, created, or deleted.
 - **Outstanding**: Unresolved items, residual risks, or blocked items (if any).
-- **Next**: Immediate recommended next action.
+- **Next**: Immediate recommended next action (if relevant).
 
-Trivial fixes may omit this structure. Reserve `handover` specifically for context exhaustion, session boundaries, or mid-task blockages.
+Trivial fixes may omit this structure. Reserve `handover` specifically for context exhaustion, session boundaries, mid-task blockages, or explicit user requests.
 
 ## Brand Icon Sources
 
