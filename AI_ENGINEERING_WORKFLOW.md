@@ -195,6 +195,22 @@ Do not rely on commit messages for this traceability. Do not add AI co-author li
 - If CI is flaky, rerun once, then record the flake evidence and either fix the flake or require human approval before proceeding.
 - If the issue cannot be completed in one focused pass, write a handover with current state, failing checks, open decisions, and next action, publish it to the issue, and add the `paused by agent` label.
 
+## Anti-Patterns
+
+A consolidated self-check for agents and reviewers to catch preventable mistakes before opening or merging a PR:
+
+- **Coding before understanding**: Editing code without understanding the problem, reproduction steps, or existing architecture (see `0. Reconnaissance` and `1. Clarify`).
+- **Speculative or unrequested architecture**: Introducing new abstractions, generic layers, or broad redesigns when a narrow edit suffices (see `system-level/core.md` Engineering Defaults).
+- **Unrelated refactoring**: Touching lines, reformatting files, or modernizing idioms outside the direct scope of the requested outcome (see `system-level/core.md` Execution Discipline).
+- **Vacuous or fake tests**: Writing tests that assert trivial tautologies, mock away the core behavior under test, or pass regardless of implementation correctness.
+- **Unverified success claims**: Stating a task is complete without running the minimum relevant verification checks and recording evidence (see `system-level/core.md` Validation).
+- **Testing against non-disposable databases**: Running automated tests or database resets against staging, production, customer, or shared operational databases (see `system-level/core.md` Test Database Safety).
+- **Unnecessary dependencies**: Adding production dependencies without verifying necessity, source, license, and securing human approval (see Dependency Checkpoint).
+- **Secret or credential leakage**: Hardcoding secrets, committing dotenv files, or exposing sensitive tokens in PR descriptions or logs.
+- **Destructive git commands**: Force-pushing, bypassing hooks, or committing directly to protected branches without explicit authorization (see `system-level/core.md` Git).
+- **Blind trust in assumptions**: Accepting speculative inferences or ambiguous descriptions without verifying the active codebase.
+- **Excessive questioning vs. unguided autonomy**: Asking trivial questions verifiable from local code, or conversely, making irreversible high-risk domain or deployment choices without human confirmation.
+
 ## Context Packet For Fresh Agents
 
 Each issue should give a fresh agent enough context to start without inheriting prior conversation state:
