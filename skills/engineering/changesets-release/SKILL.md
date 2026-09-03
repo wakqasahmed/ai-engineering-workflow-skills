@@ -47,3 +47,4 @@ Changesets records release intent; it does not automatically update every native
 - `changeset status` succeeds in CI for a releaseable change.
 - The version PR contains the expected bump and changelog entry.
 - Artifact inspection proves all public version surfaces match the release tag.
+- After publishing, follow `system-level/core.md` (Validation) and confirm the release appears in the intended package registry.
