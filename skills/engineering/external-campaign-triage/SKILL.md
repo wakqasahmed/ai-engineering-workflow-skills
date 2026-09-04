@@ -49,8 +49,9 @@ Every state transition appends a `history` entry with `role` (`scout` / `impleme
 
 Real incident: two unrelated third-party maintainers responded with hostile pushback after receiving a second "just checking in" comment on their own open PR with no prior maintainer response — one said to stop chasing PRs as a last warning, the other said time is a gift, not something people are entitled to. Treat this as a standing constraint, not a style preference:
 
-- Send at most one polite status-check comment per stalled PR, and only after 7 or more days of maintainer silence since the PR was opened or last touched by a maintainer.
+- Send at most one polite status-check comment per stalled PR, and only after 10 or more days of maintainer silence since the PR was opened or last touched by a maintainer.
 - Never post a second "checking in" or "following up" comment on the same PR. One touch, then silence and patience are the default.
+- Never state an exact elapsed day count in the comment itself (e.g. "it's been 8 days"). Precise counts are what make a message read as bot-generated even when a human typed it — say "it's been a while" or similar instead.
 - After that single follow-up, set the record's state to `stalled_awaiting_maintainer` and stop nudging it. Do not re-check or re-comment on a fixed schedule.
 - Never wire follow-up comments into an automated periodic reminder loop. Only escalate a specific stalled candidate when a human explicitly asks for that specific escalation (then use `hitl-blocker` if the escalation itself needs a human-held action).
 - If a maintainer responds negatively to any contact (asks to stop, expresses annoyance), record the response verbatim in `maintainer_contact.maintainer_response`, set `state` to `silenced` and `silenced: true`, and treat that repo/maintainer as high-caution: no further unsolicited comments, ever. This mirrors the `silenced_repos.json` convention already used in `open-source-tracker` — check that repo's current schema before writing to it, don't assume this skill's field names match it exactly.
