@@ -6,8 +6,7 @@ from pathlib import Path
 
 
 EVAL_DIR = Path(__file__).resolve().parent
-REPO_ROOT = EVAL_DIR.parents[2]
-SKILL = REPO_ROOT / "skills" / "engineering" / "external-campaign-triage" / "SKILL.md"
+SKILL = EVAL_DIR.parent / "SKILL.md"
 CASES = EVAL_DIR / "fixtures" / "held-out.json"
 TUNING_CASES = EVAL_DIR / "fixtures" / "tuning.json"
 REQUIRED_SKILL_TERMS = (
