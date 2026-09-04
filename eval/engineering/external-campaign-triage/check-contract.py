@@ -10,8 +10,9 @@ SKILL = EVAL_DIR.parent / "SKILL.md"
 CASES = EVAL_DIR / "fixtures" / "held-out.json"
 TUNING_CASES = EVAL_DIR / "fixtures" / "tuning.json"
 REQUIRED_SKILL_TERMS = (
-    "Send at most one polite status-check comment per stalled PR, and only after 7 or more days of maintainer silence since the PR was opened or last touched by a maintainer.",
+    "Send at most one polite status-check comment per stalled PR, and only after 10 or more days of maintainer silence since the PR was opened or last touched by a maintainer.",
     "Never post a second \"checking in\" or \"following up\" comment on the same PR.",
+    "Never state an exact elapsed day count in the comment itself",
     "set the record's state to `stalled_awaiting_maintainer` and stop nudging it",
     "Never wire follow-up comments into an automated periodic reminder loop.",
     "set `state` to `silenced` and `silenced: true`",
