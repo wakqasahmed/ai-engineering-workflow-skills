@@ -1,0 +1,71 @@
+name: Open Code Review
+
+# Auto-runs only for PRs opened by the maintainer (wakqasahmed). PRs from
+# anyone else are not reviewed automatically — the maintainer can trigger a
+# review manually on any PR by commenting `/ocr-review` (see
+# ocr-manual-review.yml), which supports fork PRs safely since it only ever
+# diffs PR content and never checks out or executes PR-supplied code.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  open-code-review:
+    if: github.event.pull_request.user.login == 'wakqasahmed'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Resolve OCR model (free model first, paid fallback on quota/outage)
+        id: ocr_model
+        shell: bash
+        env:
+          OCR_LLM_URL: ${{ vars.OCR_LLM_URL }}
+          OCR_LLM_TOKEN: ${{ secrets.OCR_LLM_AUTH_TOKEN }}
+          OCR_LLM_MODEL_FREE: ${{ vars.OCR_LLM_MODEL_FREE }}
+          OCR_LLM_MODEL_FALLBACK: ${{ vars.OCR_LLM_MODEL_FALLBACK }}
+        run: |
+          probe() {
+            curl --silent --show-error --output /tmp/ocr-preflight.json --write-out '%{http_code}' \
+              --connect-timeout 15 --max-time 30 \
+              -H 'Content-Type: application/json' \
+              -H "Authorization: Bearer ${OCR_LLM_TOKEN}" \
+              --data "{\"model\":\"${1}\",\"messages\":[{\"role\":\"user\",\"content\":\"Reply with OK.\"}],\"max_tokens\":1}" \
+              "${OCR_LLM_URL%/}/chat/completions" 2>/dev/null || echo "000"
+          }
+
+          status_code=$(probe "$OCR_LLM_MODEL_FREE")
+          if [[ "$status_code" == 2* ]]; then
+            echo "Free model healthy (HTTP ${status_code}): ${OCR_LLM_MODEL_FREE}"
+            echo "model=${OCR_LLM_MODEL_FREE}" >> "$GITHUB_OUTPUT"
+          else
+            echo "Free model unavailable (HTTP ${status_code}) — falling back to paid model: ${OCR_LLM_MODEL_FALLBACK}"
+            status_code=$(probe "$OCR_LLM_MODEL_FALLBACK")
+            if [[ "$status_code" != 2* ]]; then
+              echo "Fallback model also failed (HTTP ${status_code}). Both configured OpenRouter models are unreachable."
+              cat /tmp/ocr-preflight.json 2>/dev/null || true
+              exit 1
+            fi
+            echo "Fallback model healthy (HTTP ${status_code}): ${OCR_LLM_MODEL_FALLBACK}"
+            echo "model=${OCR_LLM_MODEL_FALLBACK}" >> "$GITHUB_OUTPUT"
+          fi
+
+          rm -f /tmp/ocr-preflight.json
+
+      - uses: alibaba/open-code-review@1c8f930fc923753b17b80f633aea54274fc83825 # v1.7.15
+        with:
+          llm_url: ${{ vars.OCR_LLM_URL }}
+          llm_auth_token: ${{ secrets.OCR_LLM_AUTH_TOKEN }}
+          llm_model: ${{ steps.ocr_model.outputs.model }}
+          llm_use_anthropic: ${{ vars.OCR_USE_ANTHROPIC }}
+          llm_timeout: '300'
+          sticky_summary: 'true'
+          incremental: 'true'

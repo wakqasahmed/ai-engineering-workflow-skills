@@ -1,0 +1,7 @@
+{
+  "id": "should_use_01_fresh_install",
+  "category": "should_use",
+  "description": "Fresh install with nothing present yet: both workflow files must be SHA-pinned to the review action, both must gate on the maintainer, rule.json must have real exclusions, and the credential must never be printed or committed.",
+  "maintainer": "wakqasahmed",
+  "expect_credential_redacted": true
+}

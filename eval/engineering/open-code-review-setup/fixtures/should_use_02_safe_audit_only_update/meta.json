@@ -1,0 +1,6 @@
+{
+  "id": "should_use_02_safe_audit_only_update",
+  "category": "should_use",
+  "description": "Everything already present: this must be an audit, not a reinstall — the response must not claim to overwrite or replace existing customizations, and must confirm (not merely assume) the SHA pin and maintainer gate are still correct.",
+  "decline_signal_patterns": ["audit", "do not overwrite", "does not overwrite", "already", "customiz"]
+}
