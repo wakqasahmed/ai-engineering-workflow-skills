@@ -11,49 +11,198 @@
 # commits/pushes to main/staging but require routine feature-branch pushes for
 # the standard PR workflow (worktree -> branch -> push -> PR).
 # Hardened 2026-08-26 per Open Code Review on PR #103: printf instead of echo
-# (a COMMAND starting with a dash could be misread as an echo option),
-# blank-run normalization so "git reset   --hard" (extra spaces) can't bypass
-# a naive substring match, and word-boundary anchoring so "git reset --harder"
-# or "git checkout .bashrc" don't false-positive against the plain-word forms.
+# (a COMMAND starting with a dash could be misread as an echo option).
 
 INPUT=$(cat)
 COMMAND=$(printf '%s' "$INPUT" | jq -r '.tool_input.command // empty')
 
 [ -z "$COMMAND" ] && exit 0
 
-# Collapse runs of horizontal whitespace (space/tab) per line so "git reset
-# --hard" and "git reset   --hard" match the same pattern. Deliberately uses
-# [:blank:] (not [:space:]) so newlines are preserved and grep keeps matching
-# line-by-line — collapsing newlines would reintroduce the cross-line prose
-# false-positive this hook already had to fix once (a GitHub issue body
-# mentioning "git push" and "main" on the same visual line, far apart).
-NORM_COMMAND=$(printf '%s' "$COMMAND" | tr -s '[:blank:]' ' ')
+PROTECTED_BRANCHES=(main master staging)
 
-# All patterns require a literal "git <subcommand>" prefix, not just the bare
-# word (e.g. "push", "reset --hard") — an earlier version matched those loosely
-# and false-positived on prose mentioning git commands. Bare patterns are also
-# word-boundary anchored on the right (\b) so "git reset --harder" doesn't
-# match "git reset --hard", and the checkout/restore-dot patterns require the
-# dot be immediately followed by whitespace or end-of-line so "git checkout
-# .bashrc" isn't blocked. The push patterns cap the gap between "git push"
-# and its flag/branch target to a short window so a sentence that merely
-# mentions "git push" and "main" far apart in the same line of prose doesn't
-# trigger.
-DANGEROUS_PATTERNS=(
-  "git reset --hard\b"
-  "git clean -f(d)?\b"
-  "git branch -D\b"
-  "git checkout( --)? \.([[:space:]]|$)"
-  "git restore( --)? \.([[:space:]]|$)"
-  "git push[^&|;]{0,30}(--force|--force-with-lease|-f\b)"
-  "git push[^&|;]{0,20}(origin[[:space:]]+)?(HEAD:)?(main|master|staging)\b"
-)
+is_protected_branch() {
+  local argument="$1"
+  local branch
 
-for pattern in "${DANGEROUS_PATTERNS[@]}"; do
-  if printf '%s\n' "$NORM_COMMAND" | grep -qE "$pattern"; then
-    printf 'BLOCKED: %s matches dangerous pattern %s. Force-push, direct pushes to main/master/staging, reset --hard, clean -f/-fd, branch -D, and bare checkout/restore . are not permitted. The user has prevented you from doing this.\n' "$COMMAND" "$pattern" >&2
+  for branch in "${PROTECTED_BRANCHES[@]}"; do
+    if [ "$argument" = "$branch" ] || [ "$argument" = "HEAD:$branch" ]; then
+      return 0
+    fi
+  done
+
+  return 1
+}
+
+is_dangerous_git_command() {
+  local -a words=("$@")
+  local index=0
+  local executable
+  local subcommand
+  local argument
+
+  while [ "$index" -lt "${#words[@]}" ] && [[ "${words[$index]}" =~ ^[A-Za-z_][A-Za-z0-9_]*= ]]; do
+    ((index += 1))
+  done
+
+  [ "$index" -lt "${#words[@]}" ] || return 1
+  executable="${words[$index]}"
+  [ "${executable##*/}" = git ] || return 1
+  ((index += 1))
+
+  while [ "$index" -lt "${#words[@]}" ]; do
+    argument="${words[$index]}"
+    case "$argument" in
+      -C|-c|--git-dir|--work-tree|--namespace|--config-env|--super-prefix|--attr-source)
+        ((index += 2))
+        ;;
+      -C?*|-c?*|--git-dir=*|--work-tree=*|--namespace=*|--config-env=*|--super-prefix=*|--attr-source=*|--exec-path=*)
+        ((index += 1))
+        ;;
+      -p|--paginate|-P|--no-pager|--bare|--no-replace-objects|--no-lazy-fetch|--literal-pathspecs|--glob-pathspecs|--noglob-pathspecs|--icase-pathspecs|--no-optional-locks|--no-advice)
+        ((index += 1))
+        ;;
+      -v|--version|-h|--help|--exec-path|--html-path|--man-path|--info-path)
+        return 1
+        ;;
+      --)
+        return 1
+        ;;
+      -* )
+        return 1
+        ;;
+      *)
+        subcommand="$argument"
+        ((index += 1))
+        break
+        ;;
+    esac
+  done
+
+  [ -n "${subcommand:-}" ] || return 1
+
+  case "$subcommand" in
+    reset)
+      for argument in "${words[@]:$index}"; do
+        [ "$argument" = --hard ] && return 0
+      done
+      ;;
+    clean)
+      for argument in "${words[@]:$index}"; do
+        { [ "$argument" = -f ] || [ "$argument" = -fd ]; } && return 0
+      done
+      ;;
+    branch)
+      for argument in "${words[@]:$index}"; do
+        [ "$argument" = -D ] && return 0
+      done
+      ;;
+    checkout|restore)
+      if [ "${#words[@]}" -eq "$((index + 1))" ] && [ "${words[$index]}" = . ]; then
+        return 0
+      fi
+      if [ "${#words[@]}" -eq "$((index + 2))" ] && [ "${words[$index]}" = -- ] && [ "${words[$((index + 1))]}" = . ]; then
+        return 0
+      fi
+      ;;
+    push)
+      for argument in "${words[@]:$index}"; do
+        case "$argument" in
+          -f|--force|--force-with-lease|--force-with-lease=*)
+            return 0
+            ;;
+        esac
+        is_protected_branch "$argument" && return 0
+      done
+      ;;
+  esac
+
+  return 1
+}
+
+inspect_segment() {
+  [ "${#SEGMENT_WORDS[@]}" -gt 0 ] || return
+
+  if is_dangerous_git_command "${SEGMENT_WORDS[@]}"; then
+    printf 'BLOCKED: %s contains a prohibited Git operation. Force-push, direct pushes to main/master/staging, reset --hard, clean -f/-fd, branch -D, and bare checkout/restore . are not permitted. The user has prevented you from doing this.\n' "$COMMAND" >&2
     exit 2
   fi
+
+  SEGMENT_WORDS=()
+}
+
+append_word() {
+  if [ "$WORD_STARTED" -eq 1 ]; then
+    SEGMENT_WORDS+=("$WORD")
+    WORD=
+    WORD_STARTED=0
+  fi
+}
+
+# Parse shell words without eval so command substitutions in hook input never
+# execute. Separators split compound commands; quoted separators remain data.
+SEGMENT_WORDS=()
+WORD=
+WORD_STARTED=0
+STATE=plain
+INDEX=0
+
+while [ "$INDEX" -lt "${#COMMAND}" ]; do
+  CHARACTER="${COMMAND:$INDEX:1}"
+
+  case "$STATE" in
+    single)
+      if [ "$CHARACTER" = "'" ]; then
+        STATE=plain
+      else
+        WORD+="$CHARACTER"
+      fi
+      ;;
+    double)
+      if [ "$CHARACTER" = '"' ]; then
+        STATE=plain
+      elif [ "$CHARACTER" = '\\' ] && [ "$((INDEX + 1))" -lt "${#COMMAND}" ]; then
+        ((INDEX += 1))
+        WORD+="${COMMAND:$INDEX:1}"
+      else
+        WORD+="$CHARACTER"
+      fi
+      ;;
+    plain)
+      case "$CHARACTER" in
+        "'")
+          STATE=single
+          WORD_STARTED=1
+          ;;
+        '"')
+          STATE=double
+          WORD_STARTED=1
+          ;;
+        '\\')
+          WORD_STARTED=1
+          if [ "$((INDEX + 1))" -lt "${#COMMAND}" ]; then
+            ((INDEX += 1))
+            WORD+="${COMMAND:$INDEX:1}"
+          fi
+          ;;
+        ' '|$'\t'|$'\r')
+          append_word
+          ;;
+        $'\n'|'&'|'|'|';'|'('|')')
+          append_word
+          inspect_segment
+          ;;
+        *)
+          WORD_STARTED=1
+          WORD+="$CHARACTER"
+          ;;
+      esac
+      ;;
+  esac
+
+  ((INDEX += 1))
 done
+
+append_word
+inspect_segment
 
 exit 0
