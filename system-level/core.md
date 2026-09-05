@@ -35,10 +35,10 @@ Trivial fixes may omit this structure. Reserve `handover` specifically for conte
 - For high-level work, start with `clarify-work`.
 - Use `to-prd` when scope or success criteria still need clarification.
 - Use `decompose-to-issues` before implementation on high-level work.
-- Use `tdd` when building features or fixing bugs where expected behavior is clear.
-- Use `simplify` after implementing a feature.
+- Use `test-driven-development` when building features or fixing bugs where expected behavior is clear.
+- Use `code-simplification` after implementing a feature.
 - Use `diagnose` when something is broken, throwing, or regressing.
-- Use `security-review` before PRs touching auth, payments, secrets, or external APIs.
+- Use `security-and-hardening` before PRs touching auth, payments, secrets, or external APIs.
 - Mark an issue as picked or claimed before an agent starts work on it.
 - Keep implementation agents issue-scoped to avoid context bloat.
 - Prefer a fresh agent per issue by default.
