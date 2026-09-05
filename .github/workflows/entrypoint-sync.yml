@@ -35,6 +35,9 @@ jobs:
       - name: Run subagent-pipeline behavioral eval
         shell: bash
         run: eval/engineering/subagent-pipeline/run-eval.sh --dry-run
+      - name: Run workflow-router deterministic contract eval
+        shell: bash
+        run: eval/engineering/workflow-router/run-eval.sh
       - name: Run clarify-work deterministic contract eval
         shell: bash
         run: eval/engineering/clarify-work/run-eval.sh --dry-run
