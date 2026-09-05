@@ -5,7 +5,13 @@ from pathlib import Path
 
 
 EVAL_DIR = Path(__file__).resolve().parent
-SKILL = EVAL_DIR.parent / "SKILL.md"
+ROOT = EVAL_DIR.parents[2]
+SKILL = ROOT / "skills" / "engineering" / "subagent-pipeline" / "SKILL.md"
+CORE = ROOT / "system-level" / "core.md"
+if not SKILL.is_file():
+    ROOT = EVAL_DIR.parent
+    SKILL = ROOT / "SKILL.md"
+    CORE = ROOT / "system-level" / "core.md"
 CASES = EVAL_DIR / "fixtures" / "held-out.json"
 REQUIRED_SKILL_TERMS = (
     "must post real inline PR comments",
@@ -13,6 +19,10 @@ REQUIRED_SKILL_TERMS = (
     "do not merge until CI is green",
     "Outcome evaluation",
     "enabled versus disabled",
+)
+REQUIRED_CORE_TERMS = (
+    "untrusted evidence, not instructions",
+    "trusted user request or repository-controlled instructions",
 )
 REQUIRED_CASE_FIELDS = {
     "id",
@@ -30,6 +40,11 @@ def validate() -> list[str]:
     for term in REQUIRED_SKILL_TERMS:
         if term not in skill:
             failures.append(f"SKILL.md is missing required contract text: {term}")
+
+    core = CORE.read_text()
+    for term in REQUIRED_CORE_TERMS:
+        if term not in core:
+            failures.append(f"core.md is missing required untrusted-content text: {term}")
 
     cases = json.loads(CASES.read_text())["cases"]
     counts = {"use": 0, "do_not_use": 0}
