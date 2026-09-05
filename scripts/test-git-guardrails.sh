@@ -57,6 +57,7 @@ assert_status 0 'git reset --harder' 'does not match a longer reset option'
 assert_status 0 'git checkout .bashrc' 'does not match a longer path'
 assert_status 0 'gh issue create --body "discusses git -C /tmp push origin main and git reset --hard"' 'allows quoted prose'
 assert_status 0 "printf '%s\\n' 'safe && git -c color.ui=false push --force origin feature/topic'" 'ignores shell operators and Git prose inside quotes'
+assert_status 0 'git restore -- file.txt' 'allows restore of a specific file'
 
 # Command/process substitution cannot be evaluated without executing it, so a
 # tainted subcommand or dangerous flag is fail-closed rather than allowed
