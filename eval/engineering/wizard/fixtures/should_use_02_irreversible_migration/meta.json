@@ -1,0 +1,9 @@
+{
+  "id": "should_use_02_irreversible_migration",
+  "category": "should_use",
+  "description": "Irreversible migration/cutover: dropping the legacy table is a destructive, non-undoable action and must sit behind an explicit confirm gate, not just proceed automatically.",
+  "expected_stage_count": 2,
+  "expected_env_names": [],
+  "expected_secret_names": [],
+  "requires_confirm_before_irreversible": true
+}

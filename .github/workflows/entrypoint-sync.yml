@@ -41,6 +41,9 @@ jobs:
       - name: Run clarify-work deterministic contract eval
         shell: bash
         run: eval/engineering/clarify-work/run-eval.sh --dry-run
+      - name: Run wizard deterministic contract eval
+        shell: bash
+        run: eval/engineering/wizard/run-eval.sh
       - name: Run release-gate deterministic contract eval
         shell: bash
         run: eval/engineering/release-gate/run-eval.sh --dry-run
