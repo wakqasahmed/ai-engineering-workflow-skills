@@ -9,7 +9,11 @@ DEFAULT_PATHS = (
     Path(".github/workflows"),
     Path("skills/engineering/open-code-review-setup/templates"),
 )
-USES_PATTERN = re.compile(r"^\s*-?\s*uses:\s*[\"']?([^\"'\s#]+)")
+# The `uses` mapping key accepts an optional matching pair of quotes in YAML
+# (`'uses': x` and `uses: x` are the same key) — match both via a backreference,
+# so a quoted key cannot silently bypass this check the way an unquoted-only
+# pattern would.
+USES_PATTERN = re.compile(r"^\s*-?\s*(['\"]?)uses\1:\s*[\"']?([^\"'\s#]+)")
 FULL_SHA_PATTERN = re.compile(r"[0-9a-fA-F]{40}")
 
 
@@ -37,7 +41,7 @@ def main():
             match = USES_PATTERN.match(line)
             if not match:
                 continue
-            reference = match.group(1)
+            reference = match.group(2)
             if reference.startswith("./"):
                 continue
             action_count += 1
