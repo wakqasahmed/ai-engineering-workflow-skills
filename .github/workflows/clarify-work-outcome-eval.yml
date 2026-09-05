@@ -33,7 +33,7 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
       - name: Run isolated enabled and disabled trials
         run: >-
           python3 eval/engineering/clarify-work/run_harness.py
@@ -48,7 +48,7 @@ jobs:
           python3 eval/engineering/clarify-work/validate-harness-results.py
           --results clarify-work-outcome-results.json
           --trials "${{ inputs.trials }}"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
         with:
           name: clarify-work-outcome-results
