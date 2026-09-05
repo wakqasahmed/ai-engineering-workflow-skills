@@ -12,6 +12,22 @@
 # the standard PR workflow (worktree -> branch -> push -> PR).
 # Hardened 2026-08-26 per Open Code Review on PR #103: printf instead of echo
 # (a COMMAND starting with a dash could be misread as an echo option).
+# Hardened 2026-09-05 per Open Code Review: the parser cannot safely evaluate
+# command/process substitution (`$(...)`, backticks, `<(...)`, `>(...)`) since
+# doing so would mean executing arbitrary input. Words built from a live
+# substitution are tracked as "tainted" (see WORD_TAINTED/SEGMENT_TAINTED
+# below) and, wherever a tainted word lands in the git subcommand position or
+# in one of the dangerous-flag/branch-destination scans, the command is
+# fail-closed (treated as dangerous) rather than allowed through
+# unrecognized. This closes `git $(echo reset) --hard`-style bypasses of the
+# subcommand and dangerous-flag checks. A computed value assigned to a
+# variable in an earlier command (`BRANCH="release/$(date +%Y)"; git push
+# origin "$BRANCH"`) is unaffected — only a substitution written inline in
+# the git invocation itself is tainted. Known, accepted residual limitation:
+# a bare (non-substitution) variable expansion choosing the subcommand or a
+# flag (`git $BRANCH_OP --hard`) cannot be resolved without executing the
+# command, and is not tracked as tainted — this is the same limitation Open
+# Code Review noted for command substitution in general.
 
 INPUT=$(cat)
 COMMAND=$(printf '%s' "$INPUT" | jq -r '.tool_input.command // empty')
@@ -36,6 +52,7 @@ is_protected_branch() {
 is_dangerous_git_command() {
   local -a words=("$@")
   local index=0
+  local i
   local executable
   local subcommand
   local argument
@@ -169,6 +186,12 @@ is_dangerous_git_command() {
         ;;
       *)
         subcommand="$argument"
+        # A subcommand built from a live command/process substitution (e.g.
+        # `git $(echo reset) --hard`) cannot be resolved without executing
+        # it. Fail closed instead of letting an unrecognized value through.
+        if [ "${SEGMENT_TAINTED[$index]:-0}" -eq 1 ]; then
+          return 0
+        fi
         ((index += 1))
         break
         ;;
@@ -179,18 +202,24 @@ is_dangerous_git_command() {
 
   case "$subcommand" in
     reset)
-      for argument in "${words[@]:$index}"; do
-        [ "$argument" = --hard ] && return 0
+      for ((i = index; i < ${#words[@]}; i++)); do
+        if [ "${words[$i]}" = --hard ] || [ "${SEGMENT_TAINTED[$i]:-0}" -eq 1 ]; then
+          return 0
+        fi
       done
       ;;
     clean)
-      for argument in "${words[@]:$index}"; do
-        { [ "$argument" = -f ] || [ "$argument" = -fd ]; } && return 0
+      for ((i = index; i < ${#words[@]}; i++)); do
+        if [ "${words[$i]}" = -f ] || [ "${words[$i]}" = -fd ] || [ "${SEGMENT_TAINTED[$i]:-0}" -eq 1 ]; then
+          return 0
+        fi
       done
       ;;
     branch)
-      for argument in "${words[@]:$index}"; do
-        [ "$argument" = -D ] && return 0
+      for ((i = index; i < ${#words[@]}; i++)); do
+        if [ "${words[$i]}" = -D ] || [ "${SEGMENT_TAINTED[$i]:-0}" -eq 1 ]; then
+          return 0
+        fi
       done
       ;;
     checkout|restore)
@@ -202,12 +231,16 @@ is_dangerous_git_command() {
       fi
       ;;
     push)
-      for argument in "${words[@]:$index}"; do
+      for ((i = index; i < ${#words[@]}; i++)); do
+        argument="${words[$i]}"
         case "$argument" in
           -f|--force|--force-with-lease|--force-with-lease=*)
             return 0
             ;;
         esac
+        if [ "${SEGMENT_TAINTED[$i]:-0}" -eq 1 ]; then
+          return 0
+        fi
         is_protected_branch "$argument" && return 0
       done
       ;;
@@ -225,21 +258,39 @@ inspect_segment() {
   fi
 
   SEGMENT_WORDS=()
+  SEGMENT_TAINTED=()
 }
 
 append_word() {
   if [ "$WORD_STARTED" -eq 1 ]; then
     SEGMENT_WORDS+=("$WORD")
+    SEGMENT_TAINTED+=("$WORD_TAINTED")
     WORD=
     WORD_STARTED=0
+    WORD_TAINTED=0
   fi
 }
 
+# A single backslash character, held in a variable so every comparison below
+# tests one literal backslash. Writing it as the bare pattern/string literal
+# '\\' is a trap: inside single quotes bash performs no escaping at all, so
+# '\\' is *two* literal backslash characters and can never equal the
+# single-character $CHARACTER — silently disabling the branch. (This is
+# exactly the bug Open Code Review flagged: both the plain- and
+# double-quote-state backslash handling below used to compare against '\\'
+# and so never fired.)
+BACKSLASH=$'\\'
+
 # Parse shell words without eval so command substitutions in hook input never
 # execute. Separators split compound commands; quoted separators remain data.
+# A word built from a live (unquoted or double-quoted) command/process
+# substitution is marked tainted via WORD_TAINTED/SEGMENT_TAINTED — see the
+# header comment and is_dangerous_git_command for how taint is used.
 SEGMENT_WORDS=()
+SEGMENT_TAINTED=()
 WORD=
 WORD_STARTED=0
+WORD_TAINTED=0
 STATE=plain
 INDEX=0
 
@@ -257,9 +308,31 @@ while [ "$INDEX" -lt "${#COMMAND}" ]; do
     double)
       if [ "$CHARACTER" = '"' ]; then
         STATE=plain
-      elif [ "$CHARACTER" = '\\' ] && [ "$((INDEX + 1))" -lt "${#COMMAND}" ]; then
-        ((INDEX += 1))
-        WORD+="${COMMAND:$INDEX:1}"
+      elif [ "$CHARACTER" = '`' ]; then
+        WORD_STARTED=1
+        WORD_TAINTED=1
+        WORD+="$CHARACTER"
+      elif [ "$CHARACTER" = '$' ] && [ "${COMMAND:$((INDEX + 1)):1}" = '(' ]; then
+        WORD_STARTED=1
+        WORD_TAINTED=1
+        WORD+="$CHARACTER"
+      elif [ "$CHARACTER" = "$BACKSLASH" ] && [ "$((INDEX + 1))" -lt "${#COMMAND}" ]; then
+        # Inside double quotes the shell only treats backslash as an escape
+        # when the next character is $, `, ", \, or newline; otherwise the
+        # backslash itself is kept literally, alongside that next character.
+        NEXT_CHARACTER="${COMMAND:$((INDEX + 1)):1}"
+        case "$NEXT_CHARACTER" in
+          '$'|'`'|'"'|"$BACKSLASH")
+            ((INDEX += 1))
+            WORD+="$NEXT_CHARACTER"
+            ;;
+          $'\n')
+            ((INDEX += 1))
+            ;;
+          *)
+            WORD+="$CHARACTER"
+            ;;
+        esac
       else
         WORD+="$CHARACTER"
       fi
@@ -274,12 +347,43 @@ while [ "$INDEX" -lt "${#COMMAND}" ]; do
           STATE=double
           WORD_STARTED=1
           ;;
-        '\\')
-          WORD_STARTED=1
+        "$BACKSLASH")
           if [ "$((INDEX + 1))" -lt "${#COMMAND}" ]; then
-            ((INDEX += 1))
-            WORD+="${COMMAND:$INDEX:1}"
+            NEXT_CHARACTER="${COMMAND:$((INDEX + 1)):1}"
+            if [ "$NEXT_CHARACTER" = $'\n' ]; then
+              # Backslash-newline is a line continuation: both characters
+              # vanish and do not start or end a word.
+              ((INDEX += 1))
+            else
+              WORD_STARTED=1
+              WORD+="$NEXT_CHARACTER"
+              ((INDEX += 1))
+            fi
+          else
+            # Trailing backslash with nothing after it: kept as a literal
+            # character rather than silently dropped.
+            WORD_STARTED=1
+            WORD+="$CHARACTER"
           fi
+          ;;
+        '`')
+          WORD_STARTED=1
+          WORD_TAINTED=1
+          WORD+="$CHARACTER"
+          ;;
+        '$')
+          WORD_STARTED=1
+          if [ "${COMMAND:$((INDEX + 1)):1}" = '(' ]; then
+            WORD_TAINTED=1
+          fi
+          WORD+="$CHARACTER"
+          ;;
+        '<'|'>')
+          WORD_STARTED=1
+          if [ "${COMMAND:$((INDEX + 1)):1}" = '(' ]; then
+            WORD_TAINTED=1
+          fi
+          WORD+="$CHARACTER"
           ;;
         ' '|$'\t'|$'\r')
           append_word

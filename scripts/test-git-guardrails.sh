@@ -4,6 +4,10 @@ set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 HOOK="$REPO_ROOT/skills/engineering/git-guardrails-claude-code/scripts/block-dangerous-git.sh"
+if [ ! -x "$HOOK" ]; then
+  printf 'Error: Hook script not found or not executable: %s\n' "$HOOK" >&2
+  exit 1
+fi
 
 assert_status() {
   local expected_status="$1"
@@ -53,5 +57,24 @@ assert_status 0 'git reset --harder' 'does not match a longer reset option'
 assert_status 0 'git checkout .bashrc' 'does not match a longer path'
 assert_status 0 'gh issue create --body "discusses git -C /tmp push origin main and git reset --hard"' 'allows quoted prose'
 assert_status 0 "printf '%s\\n' 'safe && git -c color.ui=false push --force origin feature/topic'" 'ignores shell operators and Git prose inside quotes'
+
+# Command/process substitution cannot be evaluated without executing it, so a
+# tainted subcommand or dangerous flag is fail-closed rather than allowed
+# through unrecognized.
+assert_status 2 'git $(echo reset) --hard' 'blocks a hard reset with the subcommand hidden behind command substitution'
+assert_status 2 'git `echo reset` --hard' 'blocks a hard reset with the subcommand hidden behind backtick substitution'
+assert_status 2 'git reset $(echo --hard)' 'blocks a hard reset with --hard hidden behind command substitution'
+assert_status 2 'git push $(echo --force) origin feature/topic' 'blocks a force push with --force hidden behind command substitution'
+assert_status 0 'git commit -m "Release $(date +%F)"' 'allows a command substitution inside an ordinary commit message'
+assert_status 0 'BRANCH="feature/$(date +%s)"; git push origin "$BRANCH"' 'allows a dynamic feature-branch name computed in an earlier command'
+
+# A backslash-newline line continuation used to split a dangerous command
+# across a fake segment boundary so neither half matched on its own.
+assert_status 2 $'git reset \\\n--hard' 'blocks a hard reset split by an escaped line continuation'
+
+# Real shell double-quote escaping: backslash only escapes $, `, ", \, or a
+# newline inside double quotes; any other backslash is literal and does not
+# end the quoted string early.
+assert_status 0 'git commit -m "say \"hard\" reset"' 'keeps an escaped quote inside a double-quoted commit message as one opaque argument'
 
 printf 'git guardrails tests passed\n'
