@@ -16,6 +16,11 @@ REQUIRED_SKILL_TERMS = (
     "changeset status",
     "Never put registry tokens",
     "every public version surface",
+    "trusted publishing",
+    "build provenance attestation",
+    "Record the artifact's digest",
+    "Verify the attestation after publish",
+    "State explicitly when a registry has no trusted-publishing",
 )
 REQUIRED_CASE_FIELDS = {
     "id",
