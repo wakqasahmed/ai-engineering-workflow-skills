@@ -206,6 +206,98 @@ class TestVerifyPrGovernance(unittest.TestCase):
         self.assertIn("does not match format", rejected[0])
 
 
+class TestResolvedModelIdEnforcement(unittest.TestCase):
+    """Covers #174: a new (non-legacy) agent:* label must be checked against a
+    resolved model ID, not silently passed when one is unavailable."""
+
+    def test_matching_resolved_model_id_passes(self):
+        failures = mod.verify_governance(
+            head_sha="head123",
+            review_comments=[],
+            issue_comments=[],
+            pr_commits=[{"sha": "head123"}],
+            agent_labels=["agent:gpt5.6-terra-medium-implementer"],
+            resolved_model_id="gpt5.6-terra",
+        )
+        self.assertEqual(failures, [])
+
+    def test_mismatching_resolved_model_id_fails(self):
+        failures = mod.verify_governance(
+            head_sha="head123",
+            review_comments=[],
+            issue_comments=[],
+            pr_commits=[{"sha": "head123"}],
+            agent_labels=["agent:not-a-real-model-high-implementer"],
+            resolved_model_id="gpt5.6-terra",
+        )
+        self.assertEqual(len(failures), 1)
+        self.assertIn("does not match resolved model ID", failures[0])
+
+    def test_missing_resolved_model_id_fails_a_new_label(self):
+        """The exact bug #174 reports: a syntactically valid new label with no
+        resolved model ID to check it against must not pass silently."""
+        failures = mod.verify_governance(
+            head_sha="head123",
+            review_comments=[],
+            issue_comments=[],
+            pr_commits=[{"sha": "head123"}],
+            agent_labels=["agent:not-a-real-model-high-implementer"],
+        )
+        self.assertEqual(len(failures), 1)
+        self.assertIn("no resolved model ID is available", failures[0])
+
+    def test_duplicate_agent_labels_each_fail_independently(self):
+        failures = mod.verify_governance(
+            head_sha="head123",
+            review_comments=[],
+            issue_comments=[],
+            pr_commits=[{"sha": "head123"}],
+            agent_labels=[
+                "agent:not-a-real-model-high-implementer",
+                "agent:not-a-real-model-high-implementer",
+            ],
+        )
+        self.assertEqual(len(failures), 2)
+
+    def test_unavailable_resolved_model_id_is_treated_as_missing(self):
+        failures = mod.verify_governance(
+            head_sha="head123",
+            review_comments=[],
+            issue_comments=[],
+            pr_commits=[{"sha": "head123"}],
+            agent_labels=["agent:gpt5.6-terra-medium-implementer"],
+            resolved_model_id=mod.extract_resolved_model_id(
+                "## Agent Metadata\n- Resolved model ID: unavailable\n"
+            ),
+        )
+        self.assertEqual(len(failures), 1)
+        self.assertIn("no resolved model ID is available", failures[0])
+
+    def test_extract_resolved_model_id_reads_the_pr_template_field(self):
+        body = (
+            "## Agent Metadata\n\n"
+            "Implementation/update agent:\n"
+            "- Name: Codex GPT-5.6 Terra Medium\n"
+            "- Resolved model ID: gpt5.6-terra\n"
+            "- Metadata limitation: N/A\n"
+        )
+        self.assertEqual(mod.extract_resolved_model_id(body), "gpt5.6-terra")
+
+    def test_extract_resolved_model_id_treats_unfilled_template_as_missing(self):
+        body = (
+            "- Resolved model ID: <!-- Runtime/orchestrator value, or unavailable "
+            "with limitation below -->\n"
+        )
+        self.assertIsNone(mod.extract_resolved_model_id(body))
+
+    def test_extract_resolved_model_id_treats_literal_unavailable_as_missing(self):
+        self.assertIsNone(mod.extract_resolved_model_id("- Resolved model ID: unavailable\n"))
+
+    def test_extract_resolved_model_id_handles_missing_body(self):
+        self.assertIsNone(mod.extract_resolved_model_id(None))
+        self.assertIsNone(mod.extract_resolved_model_id(""))
+
+
 class TestOcrDispositionWorkflow(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -230,6 +322,9 @@ class TestOcrDispositionWorkflow(unittest.TestCase):
             "--legacy-baseline support/ai-engineering-workflow/legacy-agent-labels.json",
             self.workflow,
         )
+
+    def test_pr_json_is_passed_to_governance_script(self):
+        self.assertIn("--pr-json /tmp/pr-gov/pull-request.json", self.workflow)
 
     def test_api_failures_are_not_replaced_with_empty_evidence(self):
         self.assertNotIn('|| echo "[]"', self.workflow)

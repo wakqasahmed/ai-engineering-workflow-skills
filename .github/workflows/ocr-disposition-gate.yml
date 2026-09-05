@@ -99,4 +99,5 @@ jobs:
             --issue-comments /tmp/pr-gov/issue-comments.json \
             --pr-commits /tmp/pr-gov/pr-commits.json \
             --agent-labels /tmp/pr-gov/agent-labels.json \
-            --legacy-baseline support/ai-engineering-workflow/legacy-agent-labels.json
+            --legacy-baseline support/ai-engineering-workflow/legacy-agent-labels.json \
+            --pr-json /tmp/pr-gov/pull-request.json
