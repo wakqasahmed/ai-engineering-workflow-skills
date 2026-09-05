@@ -50,7 +50,7 @@ EXTERNAL_SKILLS = (
     },
 )
 
-NAME_RE = re.compile(r"^name:\s*(\S+)\s*$", re.MULTILINE)
+NAME_RE = re.compile(r"^name:\s*(\S+)\s*(?:#.*)?$", re.MULTILINE)
 
 
 def fetch_frontmatter_name(repo: str, sha: str, skill_path: str) -> str:
@@ -59,7 +59,9 @@ def fetch_frontmatter_name(repo: str, sha: str, skill_path: str) -> str:
         text = response.read().decode("utf-8")
     match = NAME_RE.search(text)
     if not match:
-        raise AssertionError(f"{url}: no frontmatter 'name:' field found")
+        # Not an assert: -O disables assertions, which would silently skip this
+        # check on external (fetched, untrusted) input instead of failing loud.
+        raise ValueError(f"{url}: no frontmatter 'name:' field found")
     return match.group(1)
 
 
@@ -85,7 +87,11 @@ def main() -> int:
 
     for relative_path in DOC_FILES:
         path = ROOT / relative_path
-        text = path.read_text(encoding="utf-8")
+        try:
+            text = path.read_text(encoding="utf-8")
+        except OSError as exc:
+            errors.append(f"{relative_path}: could not read file ({exc})")
+            continue
         for match in STALE_ALIAS_RE.finditer(text):
             line_number = text.count("\n", 0, match.start()) + 1
             errors.append(
