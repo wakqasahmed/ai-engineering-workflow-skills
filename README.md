@@ -40,7 +40,7 @@ No installer, no dependency — just files your agent already knows how to read.
 
 ### External Skill Prerequisites
 
-Three workflow skills referenced in this playbook (`tdd`, `simplify`, `security-review`) are external companions maintained in the [`addyosmani/agent-skills`](https://github.com/addyosmani/agent-skills) pack. To install them alongside this repository:
+Three workflow skills referenced in this playbook (`test-driven-development`, `code-simplification`, `security-and-hardening`) are external companions maintained in the [`addyosmani/agent-skills`](https://github.com/addyosmani/agent-skills) pack. To install them alongside this repository:
 
 ```bash
 npx skills add addyosmani/agent-skills --skill test-driven-development
@@ -70,7 +70,7 @@ To anchor an agent session to this workflow playbook, reference `system-level/co
 
 #### 2. Investigating Hard Bugs & Regressions
 - **Construct feedback loop & minimise**: Run `diagnose` to build a fast, deterministic loop, reproduce the bug, and minimise it to load-bearing inputs.
-- **Test-first fix**: Use `tdd` to turn the minimised repro into a failing regression test and verify the fix.
+- **Test-first fix**: Use `test-driven-development` to turn the minimised repro into a failing regression test and verify the fix.
 - **Semantic review**: Run `review-gate` to check for unintended side effects, contract breaks, or performance regressions.
 
 #### 3. Contributing to an External Upstream Repo
