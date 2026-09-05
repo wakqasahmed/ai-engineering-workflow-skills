@@ -21,7 +21,7 @@ Classify the request, choose only the matching sequence below, and state each tr
 
 #### Concrete single behavior change
 
-- Concrete single behavior change: define done → `tdd` test-first change → simplify the changed code → `review-gate` → staging PR.
+- Concrete single behavior change: define done → `test-driven-development` test-first change → `code-simplification` on the changed code → `review-gate` → staging PR.
 - Transition rationale: the request is already bounded, so clarification and decomposition add no value; tests prove behavior before review.
 
 #### Claimed non-trivial GitHub issue
