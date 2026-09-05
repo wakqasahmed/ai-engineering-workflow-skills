@@ -14,6 +14,7 @@ EVAL_DIR = Path(__file__).resolve().parent
 ROOT = EVAL_DIR.parents[2]
 CASES = EVAL_DIR / "fixtures" / "held-out.json"
 ADAPTER = EVAL_DIR / "target-agent-adapter.py"
+FAKE_TRACKER = EVAL_DIR / "fake-tracker.py"
 HARNESS_VERSION = "1"
 PROFILE = EVAL_DIR / "sterile-profile.json"
 TARGETS = EVAL_DIR / "targets"
@@ -22,7 +23,7 @@ TARGETS = EVAL_DIR / "targets"
 def prepare_workspace(workspace: Path, agent: Path, case: dict, condition: str) -> None:
     workspace.chmod(0o700)
     (workspace / "case.json").write_text(json.dumps({"prompt": case["prompt"]}))
-    for source, target in ((ADAPTER, "runner"), (agent, "target-agent")):
+    for source, target in ((ADAPTER, "runner"), (agent, "target-agent"), (FAKE_TRACKER, "fake-tracker")):
         shutil.copy2(source, workspace / target)
         (workspace / target).chmod(0o755)
     if condition == "enabled":

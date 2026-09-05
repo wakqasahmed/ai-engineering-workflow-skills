@@ -62,6 +62,33 @@ class TestVerifyPrGovernance(unittest.TestCase):
         )
         self.assertEqual(failures, [])
 
+    def test_disposition_replied_inline_does_not_self_match_as_a_new_finding(self):
+        # Replying to a finding's review-comment thread (rather than posting a
+        # top-level issue comment) lands the disposition in review_comments
+        # too. Its own body contains "<!-- ocr-disposition:" — a substring of
+        # "<!-- ocr-" — so it must not be treated as a brand-new finding that
+        # itself requires a disposition (an unsatisfiable self-reference).
+        finding = {
+            "id": 104,
+            "commit_id": "head123",
+            "body": "<!-- ocr-4 --> Suggestion: extract this into a helper",
+            "user": {"login": "github-actions[bot]"},
+        }
+        disposition_reply = {
+            "id": 204,
+            "commit_id": "head123",
+            "body": "<!-- ocr-disposition:104 -->\nDisposition: fixed\nReason: Extracted.",
+            "author_association": "OWNER",
+            "user": {"login": "wakqasahmed"},
+        }
+        failures = mod.verify_governance(
+            head_sha="head123",
+            review_comments=[finding, disposition_reply],
+            issue_comments=[],
+            pr_commits=[{"sha": "head123"}],
+        )
+        self.assertEqual(failures, [])
+
     def test_blocking_finding_must_be_fixed(self):
         finding = {
             "id": 103,

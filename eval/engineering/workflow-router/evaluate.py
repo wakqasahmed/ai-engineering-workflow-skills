@@ -30,14 +30,20 @@ def route_for(request: str) -> str:
         return "bug"
     if "claimed" in text and "non-trivial" in text and ("github" in text or "issue" in text):
         return "claimed-github-issue"
-    if any(term in text for term in ("vague", "broad", "marketplace", "independent slices", "unsettled")):
-        return "idea-to-staging"
+    if any(
+        term in text
+        for term in ("marketplace", "independent slices", "unsettled", "durable spec", "several")
+    ):
+        return "durable-spec"
+    if any(term in text for term in ("vague", "broad", "unclear", "not sure")):
+        return "vague-single-issue"
     return "small-feature"
 
 
 def route_text(skill_text: str, route: str) -> str:
     sections = {
-        "idea-to-staging": ("#### Vague or multi-issue request", "\n#### "),
+        "vague-single-issue": ("#### Vague but issue-sized request", "\n#### "),
+        "durable-spec": ("#### Broad or multi-issue request", "\n#### "),
         "small-feature": ("#### Concrete single behavior change", "\n#### "),
         "claimed-github-issue": ("#### Claimed non-trivial GitHub issue", "\n### "),
         "bug": ("### Bug or regression", "\n### "),

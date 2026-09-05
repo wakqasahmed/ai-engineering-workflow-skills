@@ -1,0 +1,6 @@
+{
+  "id": "should_not_use_01_agent_performable_task",
+  "category": "should_not_use",
+  "description": "Renaming a package and its imports is entirely agent-performable (no third-party dashboard, no human-only credential, no manual click-through) — the skill's own scope note says not to invoke it for steps the agent can perform itself.",
+  "decline_signal_patterns": ["can perform this", "does not require", "no wizard needed", "not a wizard"]
+}

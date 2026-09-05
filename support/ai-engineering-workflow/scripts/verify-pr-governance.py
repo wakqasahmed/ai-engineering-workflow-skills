@@ -63,6 +63,12 @@ def find_latest_head_sha(head_sha_arg: str | None, pr_commits: list[dict]) -> st
 
 def is_ocr_finding(comment: dict) -> bool:
     body = comment.get("body", "")
+    # A disposition reply itself contains "<!-- ocr-" (as "<!-- ocr-disposition:...")
+    # and would otherwise self-match as a brand-new, permanently undispositioned
+    # finding — an infinite regress that makes the gate impossible to satisfy
+    # once any disposition is posted as (or replied into) a review comment.
+    if DISPOSITION_PATTERN.fullmatch(body or ""):
+        return False
     user = comment.get("user", {}) or {}
     login = user.get("login", "")
     if "<!-- ocr-" in body or "<!-- ocr:" in body:

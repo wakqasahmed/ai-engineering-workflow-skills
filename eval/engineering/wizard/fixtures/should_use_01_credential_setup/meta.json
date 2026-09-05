@@ -1,0 +1,9 @@
+{
+  "id": "should_use_01_credential_setup",
+  "category": "should_use",
+  "description": "Normal, non-destructive credential setup: one secret and one plain env value, with the secret name matching a real CI secrets.* reference.",
+  "expected_stage_count": 1,
+  "expected_env_names": ["TWILIO_ACCOUNT_SID", "TWILIO_AUTH_TOKEN"],
+  "expected_secret_names": ["TWILIO_AUTH_TOKEN"],
+  "requires_confirm_before_irreversible": false
+}
