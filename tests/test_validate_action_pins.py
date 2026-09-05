@@ -121,6 +121,21 @@ class ValidateActionPinsTest(unittest.TestCase):
 
         self.assertEqual(result.returncode, 0, result.stderr)
 
+    def test_reports_undecodable_file_instead_of_crashing(self):
+        with tempfile.TemporaryDirectory(dir=ROOT / "tests") as temporary_directory:
+            workflow = Path(temporary_directory) / "workflow.yml"
+            workflow.write_bytes(b"uses: actions/checkout@\xff\xfe binary garbage")
+            result = subprocess.run(
+                [sys.executable, str(VALIDATOR), str(workflow)],
+                capture_output=True,
+                text=True,
+            )
+
+        # A file that can't be decoded fails loud (not silently skipped) —
+        # skipping it would let an unpinned action hide behind bad encoding.
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("could not read file", result.stderr)
+
     def test_reports_missing_path_instead_of_crashing(self):
         with tempfile.TemporaryDirectory(dir=ROOT / "tests") as temporary_directory:
             missing = Path(temporary_directory) / "does-not-exist.yml"

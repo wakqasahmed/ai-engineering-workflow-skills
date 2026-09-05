@@ -49,7 +49,7 @@ def main():
     for path in files:
         try:
             lines = path.read_text().splitlines()
-        except OSError as error:
+        except (OSError, UnicodeDecodeError) as error:
             failures.append(f"{path}: could not read file: {error}")
             continue
         processed_files += 1
