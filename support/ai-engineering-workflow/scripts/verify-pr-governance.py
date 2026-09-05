@@ -16,6 +16,28 @@ DISPOSITION_PATTERN = re.compile(
 )
 AGENT_LABEL_PATTERN = re.compile(r"^agent:([a-zA-Z0-9.-]+)-(low|medium|high)-(implementer|reviewer|fixer|operator)$")
 AUTHORIZED_DISPOSITION_ASSOCIATIONS = frozenset({"OWNER", "MEMBER", "COLLABORATOR"})
+RESOLVED_MODEL_ID_PATTERN = re.compile(
+    r"^-\s*Resolved model ID:\s*(.+?)\s*$", re.MULTILINE
+)
+HTML_COMMENT_PATTERN = re.compile(r"<!--.*?-->", re.DOTALL)
+
+
+def extract_resolved_model_id(pr_body: str | None) -> str | None:
+    """Pull the single 'Resolved model ID' value out of the PR body's Agent
+    Metadata section (see the PR template in ai-agent-pr-metadata/SKILL.md).
+    Returns None when the field is missing, still the unfilled template
+    placeholder, or literally 'unavailable' — all three mean the same thing
+    for verification purposes: no resolved model ID to check a label against.
+    """
+    if not pr_body:
+        return None
+    match = RESOLVED_MODEL_ID_PATTERN.search(pr_body)
+    if not match:
+        return None
+    value = HTML_COMMENT_PATTERN.sub("", match.group(1)).strip()
+    if not value or value.lower() == "unavailable":
+        return None
+    return value
 
 
 def load_json_file(path: str | Path | None) -> list[dict] | dict:
@@ -158,12 +180,21 @@ def verify_governance(
             failures.append(
                 f"Agent label '{agent_label}' does not match format 'agent:<model>-<effort>-<role>'"
             )
-        elif resolved_model_id:
-            label_model = match.group(1)
-            if label_model != resolved_model_id:
-                failures.append(
-                    f"Agent label model '{label_model}' does not match resolved model ID '{resolved_model_id}'"
-                )
+            continue
+        # A label not in the legacy baseline is new on this PR. A new label with no
+        # resolved model ID to check it against is not a pass-by-default case — it
+        # means the provenance claim the label makes cannot be verified at all.
+        if not resolved_model_id:
+            failures.append(
+                f"Agent label '{agent_label}' is new (not in the legacy baseline) but no "
+                f"resolved model ID is available to verify it against"
+            )
+            continue
+        label_model = match.group(1)
+        if label_model != resolved_model_id:
+            failures.append(
+                f"Agent label model '{label_model}' does not match resolved model ID '{resolved_model_id}'"
+            )
 
     return failures
 
@@ -178,6 +209,15 @@ def main() -> int:
     parser.add_argument("--new-agent-label", required=False, help="Proposed new agent label to validate")
     parser.add_argument("--agent-labels", required=False, help="Path to JSON list of current PR agent labels")
     parser.add_argument("--legacy-baseline", required=False, help="Path to legacy agent labels baseline JSON")
+    parser.add_argument(
+        "--pr-json",
+        required=False,
+        help=(
+            "Path to the PR's raw API JSON ('gh api .../pulls/N'). Used to extract "
+            "'Resolved model ID' from the PR body's Agent Metadata section when "
+            "--resolved-model-id is not passed explicitly."
+        ),
+    )
 
     args = parser.parse_args()
 
@@ -186,12 +226,18 @@ def main() -> int:
     pr_commits = load_json_file(args.pr_commits)
     agent_labels = load_json_file(args.agent_labels)
 
+    resolved_model_id = args.resolved_model_id
+    if not resolved_model_id and args.pr_json:
+        pr_json = load_json_file(args.pr_json)
+        pr_body = pr_json.get("body") if isinstance(pr_json, dict) else None
+        resolved_model_id = extract_resolved_model_id(pr_body)
+
     failures = verify_governance(
         head_sha=args.head_sha,
         review_comments=review_comments,
         issue_comments=issue_comments,
         pr_commits=pr_commits,
-        resolved_model_id=args.resolved_model_id,
+        resolved_model_id=resolved_model_id,
         new_agent_label=args.new_agent_label,
         agent_labels=agent_labels,
         legacy_baseline_path=args.legacy_baseline,

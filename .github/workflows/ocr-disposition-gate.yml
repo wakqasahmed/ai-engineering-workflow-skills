@@ -36,14 +36,14 @@ jobs:
             /tmp/pr-gov/pull-request.json > /tmp/pr-gov/agent-labels.json
 
       - name: Checkout PR head
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           ref: ${{ steps.pull_request.outputs.head_sha }}
           path: pr-head
           persist-credentials: false
 
       - name: Checkout trusted base
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           ref: ${{ steps.pull_request.outputs.base_sha }}
           path: trusted-base
@@ -99,4 +99,5 @@ jobs:
             --issue-comments /tmp/pr-gov/issue-comments.json \
             --pr-commits /tmp/pr-gov/pr-commits.json \
             --agent-labels /tmp/pr-gov/agent-labels.json \
-            --legacy-baseline support/ai-engineering-workflow/legacy-agent-labels.json
+            --legacy-baseline support/ai-engineering-workflow/legacy-agent-labels.json \
+            --pr-json /tmp/pr-gov/pull-request.json

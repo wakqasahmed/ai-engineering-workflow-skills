@@ -29,14 +29,14 @@ jobs:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
       - name: Run offline deterministic contract checks
         run: bash eval/engineering/ai-agent-pr-metadata/run-eval.sh --dry-run
   outcome-harness:
     if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
       - name: Run isolated enabled and disabled trials
         run: >-
           python3 eval/engineering/ai-agent-pr-metadata/run_harness.py
@@ -46,7 +46,7 @@ jobs:
         run: >-
           python3 eval/engineering/ai-agent-pr-metadata/validate-harness-results.py
           results.json --summary summary.json
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
         with:
           name: ai-agent-pr-metadata-outcome-results
