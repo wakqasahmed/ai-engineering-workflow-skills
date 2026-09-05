@@ -10,7 +10,7 @@ jobs:
   entrypoint-sync:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
       - name: Verify AGENTS.md and CLAUDE.md stay aligned
         shell: bash
         run: diff -u <(sed '3d' AGENTS.md) <(sed '3d' CLAUDE.md)
@@ -23,6 +23,12 @@ jobs:
       - name: Verify plugin skill paths
         shell: bash
         run: python3 scripts/validate-plugin.py
+      - name: Verify action pins
+        shell: bash
+        run: python3 scripts/validate-action-pins.py
+      - name: Verify action pin validator
+        shell: bash
+        run: python3 -m unittest tests/test_validate_action_pins.py
       - name: Verify Changesets release skill
         shell: bash
         run: scripts/test-changesets-release.sh
