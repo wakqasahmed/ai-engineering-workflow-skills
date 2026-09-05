@@ -77,6 +77,62 @@ class ValidateActionPinsTest(unittest.TestCase):
 
         self.assertEqual(result.returncode, 0, result.stderr)
 
+    def test_rejects_mutable_ref_inside_a_quoted_value_containing_a_hash(self):
+        # A quoted `uses` value can legally contain a literal '#' or space;
+        # an unquoted-boundary-aware regex must not stop at that '#' and
+        # validate a truncated (and coincidentally SHA-shaped) prefix instead
+        # of the real, unpinned reference.
+        with tempfile.TemporaryDirectory(dir=ROOT / "tests") as temporary_directory:
+            workflow = Path(temporary_directory) / "workflow.yml"
+            workflow.write_text(
+                "name: Bad\n"
+                "on: push\n"
+                "jobs:\n"
+                "  build:\n"
+                "    steps:\n"
+                '      - uses: "attacker/action@main # not a sha"\n'
+            )
+            result = subprocess.run(
+                [sys.executable, str(VALIDATOR), str(workflow)],
+                capture_output=True,
+                text=True,
+            )
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("attacker/action@main", result.stderr)
+
+    def test_skips_local_actions_referenced_by_absolute_or_parent_path(self):
+        with tempfile.TemporaryDirectory(dir=ROOT / "tests") as temporary_directory:
+            workflow = Path(temporary_directory) / "workflow.yml"
+            workflow.write_text(
+                "name: OK\n"
+                "on: push\n"
+                "jobs:\n"
+                "  build:\n"
+                "    steps:\n"
+                "      - uses: ../shared-actions/build\n"
+                "      - uses: /opt/actions/deploy\n"
+            )
+            result = subprocess.run(
+                [sys.executable, str(VALIDATOR), str(workflow)],
+                capture_output=True,
+                text=True,
+            )
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_reports_missing_path_instead_of_crashing(self):
+        with tempfile.TemporaryDirectory(dir=ROOT / "tests") as temporary_directory:
+            missing = Path(temporary_directory) / "does-not-exist.yml"
+            result = subprocess.run(
+                [sys.executable, str(VALIDATOR), str(missing)],
+                capture_output=True,
+                text=True,
+            )
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("does not exist", result.stderr)
+
 
 if __name__ == "__main__":
     unittest.main()
