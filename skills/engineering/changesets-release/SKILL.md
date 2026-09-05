@@ -27,6 +27,16 @@ Use this for consumer-installed packages. Do not require Changesets for a single
 - Use the Changesets GitHub Action to create/update a version-packages PR. Review generated versions and changelogs before merging.
 - Keep publishing credentials in CI secrets. Never put registry tokens in a changeset, repository config, or commit.
 
+## Supply-Chain Provenance
+
+A CI secret and registry visibility are not proof of what was actually published. Every distributable artifact needs verifiable provenance before its release is considered complete.
+
+- Prefer registry trusted publishing over a long-lived token for every package eligible for it — npm's trusted publishing issues short-lived OIDC-backed credentials per publish and automatically generates provenance for eligible public packages, replacing a standing `NPM_TOKEN` secret entirely. Check registry docs for the equivalent (PyPI Trusted Publishers, RubyGems Trusted Publishing) before assuming npm-only.
+- When trusted publishing is unsupported by the registry (a private registry, a non-npm artifact, an internal package feed), generate a build provenance attestation for the distributable artifact instead — `actions/attest-build-provenance` for artifacts hosted with GitHub, or an equivalent SLSA-compliant attestation step, satisfying at minimum SLSA Build L1 (a provenance record identifying the output artifact by cryptographic digest and describing how it was built).
+- Record the artifact's digest (sha256) in the release notes or version PR, not just its version string — a version tag can be recreated; a digest cannot.
+- Verify the attestation after publish, not just generate it: `gh attestation verify <artifact> --repo <owner>/<repo>` (or the registry's equivalent) before declaring the release complete.
+- State explicitly when a registry has no trusted-publishing or attestation support: document the fallback (long-lived token in CI secrets, manual digest recording) as a known gap, not a silent omission.
+
 ## Non-NPM Artifacts
 
 Changesets records release intent; it does not automatically update every native manifest. The version PR must update and verify every public version surface.

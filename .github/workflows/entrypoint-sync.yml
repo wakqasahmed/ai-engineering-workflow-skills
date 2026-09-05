@@ -23,6 +23,9 @@ jobs:
       - name: Verify skill listing
         shell: bash
         run: scripts/list-skills.sh | grep -q "skills/engineering/clarify-work/SKILL.md"
+      - name: Run open-code-review-setup deterministic contract eval
+        shell: bash
+        run: eval/engineering/open-code-review-setup/run-eval.sh
       - name: Verify plugin skill paths
         shell: bash
         run: python3 scripts/validate-plugin.py
@@ -32,6 +35,9 @@ jobs:
       - name: Verify action pin validator
         shell: bash
         run: python3 -m unittest tests/test_validate_action_pins.py
+      - name: Verify Git guardrails
+        shell: bash
+        run: scripts/test-git-guardrails.sh
       - name: Verify Changesets release skill
         shell: bash
         run: scripts/test-changesets-release.sh
@@ -44,9 +50,15 @@ jobs:
       - name: Run subagent-pipeline behavioral eval
         shell: bash
         run: eval/engineering/subagent-pipeline/run-eval.sh --dry-run
+      - name: Run workflow-router deterministic contract eval
+        shell: bash
+        run: eval/engineering/workflow-router/run-eval.sh
       - name: Run clarify-work deterministic contract eval
         shell: bash
         run: eval/engineering/clarify-work/run-eval.sh --dry-run
+      - name: Run wizard deterministic contract eval
+        shell: bash
+        run: eval/engineering/wizard/run-eval.sh
       - name: Run release-gate deterministic contract eval
         shell: bash
         run: eval/engineering/release-gate/run-eval.sh --dry-run
