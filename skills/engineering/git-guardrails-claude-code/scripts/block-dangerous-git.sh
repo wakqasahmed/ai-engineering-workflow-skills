@@ -40,13 +40,110 @@ is_dangerous_git_command() {
   local subcommand
   local argument
 
-  while [ "$index" -lt "${#words[@]}" ] && [[ "${words[$index]}" =~ ^[A-Za-z_][A-Za-z0-9_]*= ]]; do
-    ((index += 1))
+  while [ "$index" -lt "${#words[@]}" ]; do
+    while [ "$index" -lt "${#words[@]}" ] && [[ "${words[$index]}" =~ ^[A-Za-z_][A-Za-z0-9_]*= ]]; do
+      ((index += 1))
+    done
+
+    [ "$index" -lt "${#words[@]}" ] || return 1
+    executable="${words[$index]##*/}"
+
+    case "$executable" in
+      command)
+        ((index += 1))
+        while [ "$index" -lt "${#words[@]}" ]; do
+          case "${words[$index]}" in
+            -p)
+              ((index += 1))
+              ;;
+            --)
+              ((index += 1))
+              break
+              ;;
+            -v|-V|-*)
+              return 1
+              ;;
+            *)
+              break
+              ;;
+          esac
+        done
+        ;;
+      env)
+        ((index += 1))
+        while [ "$index" -lt "${#words[@]}" ]; do
+          argument="${words[$index]}"
+          if [[ "$argument" =~ ^[A-Za-z_][A-Za-z0-9_]*= ]]; then
+            ((index += 1))
+            continue
+          fi
+          case "$argument" in
+            -|-i|--ignore-environment|-v|--debug|--block-signal|--default-signal|--ignore-signal|--list-signal-handling)
+              ((index += 1))
+              ;;
+            -u|-C|-S|-a|--unset|--chdir|--split-string|--argv0)
+              ((index += 2))
+              ;;
+            -u?*|-C?*|-S?*|-a?*|--unset=*|--chdir=*|--split-string=*|--argv0=*|--block-signal=*|--default-signal=*|--ignore-signal=*)
+              ((index += 1))
+              ;;
+            --)
+              ((index += 1))
+              break
+              ;;
+            -*)
+              return 1
+              ;;
+            *)
+              break
+              ;;
+          esac
+        done
+        ;;
+      sudo)
+        ((index += 1))
+        while [ "$index" -lt "${#words[@]}" ]; do
+          argument="${words[$index]}"
+          if [[ "$argument" =~ ^[A-Za-z_][A-Za-z0-9_]*= ]]; then
+            ((index += 1))
+            continue
+          fi
+          if [[ "$argument" =~ ^-[AbEHiknPSs]+$ ]]; then
+            ((index += 1))
+            continue
+          fi
+          case "$argument" in
+            --askpass|--background|--bell|--login|--non-interactive|--preserve-env|--preserve-groups|--reset-timestamp|--set-home|--shell|--stdin)
+              ((index += 1))
+              ;;
+            -a|-C|-c|-D|-g|-h|-p|-R|-r|-T|-t|-u|--auth-type|--close-from|--login-class|--chdir|--group|--host|--prompt|--chroot|--role|--command-timeout|--type|--user)
+              ((index += 2))
+              ;;
+            -a?*|-C?*|-c?*|-D?*|-g?*|-h?*|-p?*|-R?*|-r?*|-T?*|-t?*|-u?*|--auth-type=*|--close-from=*|--login-class=*|--chdir=*|--group=*|--host=*|--prompt=*|--preserve-env=*|--chroot=*|--role=*|--command-timeout=*|--type=*|--user=*)
+              ((index += 1))
+              ;;
+            --)
+              ((index += 1))
+              break
+              ;;
+            -*)
+              return 1
+              ;;
+            *)
+              break
+              ;;
+          esac
+        done
+        ;;
+      *)
+        break
+        ;;
+    esac
   done
 
   [ "$index" -lt "${#words[@]}" ] || return 1
-  executable="${words[$index]}"
-  [ "${executable##*/}" = git ] || return 1
+  executable="${words[$index]##*/}"
+  [ "$executable" = git ] || return 1
   ((index += 1))
 
   while [ "$index" -lt "${#words[@]}" ]; do
