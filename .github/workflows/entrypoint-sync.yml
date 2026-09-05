@@ -20,6 +20,9 @@ jobs:
       - name: Verify skill listing
         shell: bash
         run: scripts/list-skills.sh | grep -q "skills/engineering/clarify-work/SKILL.md"
+      - name: Run open-code-review-setup deterministic contract eval
+        shell: bash
+        run: eval/engineering/open-code-review-setup/run-eval.sh
       - name: Verify plugin skill paths
         shell: bash
         run: python3 scripts/validate-plugin.py
