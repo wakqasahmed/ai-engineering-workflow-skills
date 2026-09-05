@@ -11,6 +11,7 @@ REQUIRED_SKILL_TERMS = (
     "must post real inline PR comments",
     "gh api repos/.../pulls/.../comments",
     "do not merge until CI is green",
+    "auto_merge_authorized",
     "Outcome evaluation",
     "enabled versus disabled",
 )

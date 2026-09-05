@@ -111,22 +111,30 @@ assert_fixer_reads_structured_comments() {
 #   "auto-merge (`gh pr merge --squash --auto`) to `staging` once CI passes."
 #   "Always require human approval before merging to `main`."
 merge_should_proceed_bash() {
-  local ci_state="$1" base_branch="$2" human_approval="$3"
+  local ci_state="$1" base_branch="$2" human_approval="$3" auto_merge_authorized="$4"
   if [[ "$ci_state" != "success" ]]; then
     echo "false"
     return
   fi
-  if [[ "$base_branch" == "main" && "$human_approval" != "true" ]]; then
-    echo "false"
-    return
+  if [[ "$base_branch" == "main" ]]; then
+    if [[ "$human_approval" != "true" ]]; then
+      echo "false"
+      return
+    fi
+  else
+    if [[ "$auto_merge_authorized" != "true" ]]; then
+      echo "false"
+      return
+    fi
   fi
   echo "true"
 }
 
 merge_should_proceed_jq() {
-  local ci_state="$1" base_branch="$2" human_approval="$3"
+  local ci_state="$1" base_branch="$2" human_approval="$3" auto_merge_authorized="$4"
   jq -n --arg ci "$ci_state" --arg base "$base_branch" --argjson approved "$human_approval" \
-    '($ci == "success") and (($base != "main") or $approved)'
+    --argjson authorized "$auto_merge_authorized" \
+    '($ci == "success") and (if $base == "main" then $approved else $authorized end)'
 }
 
 # Evaluate a merge-gate fixture with both independent implementations and
@@ -136,13 +144,14 @@ merge_should_proceed_jq() {
 # fails this — it is not merely self-consistency.
 assert_merge_fixture() {
   local fixture="$1" label="$2"
-  local ci_state base_branch human_approval expected bash_result jq_result
+  local ci_state base_branch human_approval auto_merge_authorized expected bash_result jq_result
   ci_state=$(jq -r '.ci_state' "$fixture")
   base_branch=$(jq -r '.base_branch' "$fixture")
   human_approval=$(jq -r '.human_approval' "$fixture")
+  auto_merge_authorized=$(jq -r '.auto_merge_authorized' "$fixture")
   expected=$(jq -r '.expect_merge' "$fixture")
-  bash_result=$(merge_should_proceed_bash "$ci_state" "$base_branch" "$human_approval")
-  jq_result=$(merge_should_proceed_jq "$ci_state" "$base_branch" "$human_approval")
+  bash_result=$(merge_should_proceed_bash "$ci_state" "$base_branch" "$human_approval" "$auto_merge_authorized")
+  jq_result=$(merge_should_proceed_jq "$ci_state" "$base_branch" "$human_approval" "$auto_merge_authorized")
   local agree="false"
   [[ "$bash_result" == "$jq_result" && "$bash_result" == "$expected" ]] && agree="true"
   check "$label" "$agree"
@@ -151,10 +160,17 @@ assert_merge_fixture() {
 # (c) Merge only proceeds when the CI-green condition is true in the fixture.
 assert_merge_requires_ci_green() {
   local fixture="${FIXTURES_DIR}/merge-target-staging.json"
-  assert_merge_fixture "$fixture" "staging + CI green -> merge proceeds (bash and jq implementations agree)"
+  assert_merge_fixture "$fixture" "staging + CI green + authorized -> merge proceeds (bash and jq implementations agree)"
 
   fixture="${FIXTURES_DIR}/merge-target-staging-ci-red.json"
   assert_merge_fixture "$fixture" "staging + CI red -> merge blocked (bash and jq implementations agree)"
+}
+
+# (c2) Staging auto-merge requires explicit authorization even with CI green —
+#      #168: delegated implementation authority is not merge authority.
+assert_staging_requires_auto_merge_authorization() {
+  local fixture="${FIXTURES_DIR}/merge-target-staging-no-authorization.json"
+  assert_merge_fixture "$fixture" "staging + CI green + no auto-merge authorization -> merge blocked (bash and jq implementations agree)"
 }
 
 # (d) A main-branch fixture where merge must NOT proceed without a
@@ -235,6 +251,7 @@ PY
   assert_inline_comments_required
   assert_fixer_reads_structured_comments
   assert_merge_requires_ci_green
+  assert_staging_requires_auto_merge_authorization
   assert_main_requires_human_approval
   assert_implementer_and_ci_status_fixtures_are_used
 }
