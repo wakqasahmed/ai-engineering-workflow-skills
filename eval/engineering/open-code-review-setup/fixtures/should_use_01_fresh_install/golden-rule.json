@@ -1,0 +1,13 @@
+{
+  "exclude": [
+    "node_modules/**",
+    "vendor/**",
+    "dist/**",
+    "build/**",
+    "**/*.md",
+    "**/*.json",
+    "**/*.lock",
+    "**/pnpm-lock.yaml",
+    "**/package-lock.json"
+  ]
+}

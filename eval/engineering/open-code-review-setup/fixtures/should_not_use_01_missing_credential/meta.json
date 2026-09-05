@@ -1,0 +1,6 @@
+{
+  "id": "should_not_use_01_missing_credential",
+  "category": "should_not_use",
+  "description": "No OpenRouter key is available. SKILL.md is explicit: no key or a 401 means stop and use hitl-blocker, never retry automation or invent a placeholder credential.",
+  "decline_signal_patterns": ["hitl-blocker", "hitl blocker", "human", "cannot proceed", "does not have"]
+}

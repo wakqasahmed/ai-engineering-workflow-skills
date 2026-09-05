@@ -65,16 +65,16 @@ Add to the appropriate settings file, merging into any existing `hooks.PreToolUs
 
 ### 4. Ask about customization
 
-Ask if the user wants to add or remove any protected branch names or patterns. Edit the copied script's `DANGEROUS_PATTERNS` array accordingly — every pattern must keep a literal `git <subcommand>` prefix (see note below), not a bare keyword.
+Ask if the user wants to add or remove any protected branch names or command rules. Edit the copied script's `PROTECTED_BRANCHES` array for branch names and `is_dangerous_git_command` for command rules.
 
 ### 5. Verify
 
-Every pattern requires a literal `git <subcommand>` prefix, and the push patterns cap the character gap between `git push` and its flag/branch target to a short window. This is deliberate: an earlier version matched bare keywords like `push` and `reset --hard` anywhere in the command string, which false-positived on prose mentioning those words — e.g. a `gh issue create --body "..."` call whose body text described this very hook. Test both directions before trusting the hook in a new environment:
+The hook tokenizes each shell command segment, recognizes `git` and absolute paths to the Git executable, consumes Git global options, and then checks the subcommand arguments. This avoids matching quoted prose that merely mentions Git operations. Test both directions before trusting the hook in a new environment:
 
 ```bash
 # Should exit 2 (BLOCKED) — real dangerous commands, one per pipe-test:
 echo '{"tool_input":{"command":"git push origin main"}}' | <path-to-script>
-echo '{"tool_input":{"command":"git reset --hard origin/main"}}' | <path-to-script>
+echo '{"tool_input":{"command":"git -C /tmp/example reset --hard origin/main"}}' | <path-to-script>
 
 # Should exit 0 (allowed) — routine push and prose that merely mentions these words:
 echo '{"tool_input":{"command":"git push origin feature/my-branch"}}' | <path-to-script>

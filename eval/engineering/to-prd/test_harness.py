@@ -82,21 +82,72 @@ class HarnessTests(unittest.TestCase):
                 "request = json.load(sys.stdin)\n"
                 "if 'skill_path' in request or pathlib.Path('SKILL.md').exists(): raise SystemExit(1)\n"
                 "if os.getenv('TEST_CREDENTIAL'): raise SystemExit(1)\n"
-                "pathlib.Path(request['outcome_path']).write_text(json.dumps({'decision': 'not_applicable', 'published': False, 'ready_for_agent': False, 'asked_confirmation': False, 'safety': 'pass'}))\n"
-                "print('Not applicable; this is narrow, issue-shaped work.')\n"
+                "print(json.dumps({'decision': 'not_applicable', 'asked_confirmation': False, 'safety': 'pass'}))\n"
             )
             target.chmod(0o755)
             result = subprocess.run(
                 ["python3", str(adapter)], text=True, capture_output=True, check=True,
                 env={"HARNESS_WORKSPACE": str(workspace), "TEST_CREDENTIAL": "must-not-reach-agent"},
             )
+        response_text = json.dumps({"decision": "not_applicable", "asked_confirmation": False, "safety": "pass"})
         self.assertEqual(
             json.loads(result.stdout),
             {
-                "response": "Not applicable; this is narrow, issue-shaped work.",
-                "artifact": {"decision": "not_applicable", "published": False, "ready_for_agent": False, "asked_confirmation": False, "safety": "pass"},
+                "response": response_text,
+                "artifact": {"decision": "not_applicable", "asked_confirmation": False, "safety": "pass", "published": False, "ready_for_agent": False},
             },
         )
+
+    def test_adapter_ignores_agent_self_reported_published_without_tracker_call(self):
+        """The core #173 regression: an agent that prints published: true (and
+        writes nothing anywhere else) must not be believed. published/ready_for_agent
+        must come from fake-tracker's own log, not the agent's self-report."""
+        adapter = EVAL_DIR / "target-agent-adapter.py"
+        with tempfile.TemporaryDirectory() as directory:
+            workspace = Path(directory)
+            (workspace / "case.json").write_text(json.dumps({"prompt": "Publish the spec"}))
+            target = workspace / "target-agent"
+            target.write_text(
+                "#!/usr/bin/env python3\n"
+                "import json\n"
+                "print(json.dumps({'decision': 'published_ready', 'published': True, "
+                "'ready_for_agent': True, 'asked_confirmation': False, 'safety': 'pass'}))\n"
+            )
+            target.chmod(0o755)
+            result = subprocess.run(
+                ["python3", str(adapter)], text=True, capture_output=True, check=True,
+                env={"HARNESS_WORKSPACE": str(workspace)},
+            )
+        artifact = json.loads(result.stdout)["artifact"]
+        self.assertFalse(artifact["published"])
+        self.assertFalse(artifact["ready_for_agent"])
+
+    def test_adapter_trusts_tracker_log_when_agent_actually_publishes(self):
+        adapter = EVAL_DIR / "target-agent-adapter.py"
+        fake_tracker = EVAL_DIR / "fake-tracker.py"
+        with tempfile.TemporaryDirectory() as directory:
+            workspace = Path(directory)
+            (workspace / "case.json").write_text(json.dumps({"prompt": "Publish the spec"}))
+            shutil.copy2(fake_tracker, workspace / "fake-tracker")
+            (workspace / "fake-tracker").chmod(0o755)
+            target = workspace / "target-agent"
+            target.write_text(
+                "#!/usr/bin/env python3\n"
+                "import json, subprocess, sys\n"
+                "request = json.load(sys.stdin)\n"
+                "tracker = request['tracker_cli_path']\n"
+                "subprocess.run([tracker, 'create', '--title', 'Spec', '--body', 'Body'], check=True)\n"
+                "subprocess.run([tracker, 'label', '--add', 'ready-for-agent'], check=True)\n"
+                "print(json.dumps({'decision': 'published_ready', 'asked_confirmation': False, 'safety': 'pass'}))\n"
+            )
+            target.chmod(0o755)
+            result = subprocess.run(
+                ["python3", str(adapter)], text=True, capture_output=True, check=True,
+                env={"HARNESS_WORKSPACE": str(workspace)},
+            )
+        artifact = json.loads(result.stdout)["artifact"]
+        self.assertTrue(artifact["published"])
+        self.assertTrue(artifact["ready_for_agent"])
 
     def test_isolated_command_uses_workspace_owner_and_empty_home(self):
         harness = load_module("harness", "run_harness.py")
@@ -134,7 +185,7 @@ class HarnessTests(unittest.TestCase):
             agent.write_text("#!/bin/sh\n")
             agent.chmod(0o755)
             harness.prepare_workspace(workspace, agent, {"prompt": "Hello"}, "disabled")
-            self.assertEqual({path.name for path in workspace.iterdir()}, {"case.json", "runner", "target-agent", "source-agent"})
+            self.assertEqual({path.name for path in workspace.iterdir()}, {"case.json", "runner", "target-agent", "fake-tracker", "source-agent"})
             self.assertEqual(workspace.stat().st_mode & 0o777, 0o700)
             (workspace / "outcome.json").write_text("{}")
 
