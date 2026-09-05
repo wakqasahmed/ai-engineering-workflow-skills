@@ -14,10 +14,15 @@ Classify the request, choose only the matching sequence below, and state each tr
 
 ### Idea to staging
 
-#### Vague or multi-issue request
+#### Vague but issue-sized request
 
-- Vague, broad, or decision-heavy request: `clarify-work` → `define-done` → `decompose-to-issues` only when it cannot fit one independently verifiable issue.
-- Transition rationale: clarify creates a safe boundary; define-done makes success testable; decomposition protects independent delivery.
+- Vague or decision-heavy request that clarification resolves into one independently verifiable issue: `clarify-work` → `define-done`.
+- Transition rationale: clarify creates a safe boundary; define-done makes success testable; a single bounded issue needs no decomposition or durable spec.
+
+#### Broad or multi-issue request
+
+- Broad request that will not fit one independently verifiable issue even after clarification (several independent slices, unsettled cross-cutting decisions, a durable spec the team will reference across issues): `clarify-work` → `to-prd` → `decompose-to-issues`.
+- Transition rationale: clarify creates a safe boundary; `to-prd` drafts and publishes the durable spec the multi-issue breakdown depends on; decomposition protects independent delivery.
 
 #### Concrete single behavior change
 
@@ -46,7 +51,7 @@ Classify the request, choose only the matching sequence below, and state each tr
 
 ### Standalone tools
 
-- `clarify-work` for unclear scope; `define-done` for acceptance criteria; `decompose-to-issues` for a multi-issue plan; `review-gate` before merge; `handover` at a context boundary.
+- `clarify-work` for unclear scope; `define-done` for acceptance criteria on a single bounded issue; `to-prd` for a durable spec a multi-issue plan will reference; `decompose-to-issues` for a multi-issue plan; `review-gate` before merge; `handover` at a context boundary.
 - Use `subagent-pipeline` only for a claimed non-trivial GitHub issue. Its CI gate ends with the appropriate staging PR.
 
 ## Run-once setup
