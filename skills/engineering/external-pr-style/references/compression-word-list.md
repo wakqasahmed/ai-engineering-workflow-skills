@@ -26,6 +26,10 @@ This reference document defines words, phrases, and padding to strip during pros
   - "As described in the issue..."
   - Narrating obvious file edits that the diff already demonstrates.
 
+## Punctuation Tells
+
+- **Em dash (`U+2014`)**: Used as a default connector or aside marker, it is a tell. Rewrite with a period, comma, colon, or parentheses. See external-pr-style's [Em dashes are a tell](../SKILL.md#em-dashes-are-a-tell) for the full evidence and one-per-body ceiling.
+
 ## Compression Discipline
 
 - Keep full sentences, articles, and natural grammatical flow (do not use fragmented "caveman" style).
