@@ -15,7 +15,7 @@ REQUIRED_SKILL_TERMS = (
     "Redact secrets, API keys, passwords, personally identifiable information, credential values, and local credential-file paths as `Credential details: [redacted]`.",
     "Do not duplicate content already captured in other artifacts",
     "No next steps beyond the single \"Pick up here\" line",
-    "Comment on the issue with the handover file's absolute path and the full handover content",
+    "Comment on the issue with the full handover content, sanitized per Rule 6",
     "Do not audit the filesystem or git history to reconstruct this.",
 )
 REQUIRED_CASE_FIELDS = {"id", "split", "prompt", "expected_outcome"}
