@@ -38,7 +38,7 @@ Skip it when ample context remains and work is progressing, or when the work is 
 
 If the work traces to a GitHub issue or PR:
 
-1. Comment on the issue with the handover file's absolute path and the full handover content (in the public comment, omit the host temp path and redact machine-local paths as `[local path redacted]`, while identifying workspace files by repository-relative path) — temp directories do not survive; the comment is the durable copy.
+1. Comment on the issue with the full handover content, sanitized per Rule 6 above (workspace paths converted to repository-relative, other local paths redacted, temp file path omitted) — temp directories do not survive; the comment is the durable copy.
 2. Add the label `paused by agent` (create it if missing). It marks half-done work waiting for pickup and pairs with `picked by agent`.
 3. The agent that resumes removes `paused by agent`, applies `picked by agent`, and continues from the "Pick up here" line.
 
