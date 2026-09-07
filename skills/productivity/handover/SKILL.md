@@ -31,14 +31,14 @@ Skip it when ample context remains and work is progressing, or when the work is 
 3. Do not audit the filesystem or git history to reconstruct this. It's a synthesis of this session, not a fresh investigation.
 4. Include a "suggested skills" section listing skills the next agent should invoke.
 5. Do not duplicate content already captured in other artifacts (PRDs, plans, ADRs, issues, commits, diffs). Reference them by path or URL.
-6. Redact secrets, API keys, passwords, personally identifiable information, credential values, and local credential-file paths as `Credential details: [redacted]`.
+6. Redact secrets, API keys, passwords, personally identifiable information, credential values, and local credential-file paths as `Credential details: [redacted]`. Separate local and public rendering: retain absolute paths only in the local temporary artifact. When publishing to GitHub, sanitize machine-local paths to prevent leaking host usernames, private home directory layouts, or internal service environments: omit the temporary handover file path, convert workspace file paths to repository-relative paths (e.g. `src/cache/redis_client.py`) or commit URLs, and replace all other machine-specific local paths (e.g. `/home/*`, `C:\Users\*`, `/opt/*`) with `[local path redacted]`.
 7. If the user passed arguments, treat them as what the next session will focus on and tailor the doc accordingly.
 
 ## Publish to the issue
 
 If the work traces to a GitHub issue or PR:
 
-1. Comment on the issue with the handover file's absolute path and the full handover content — temp directories do not survive; the comment is the durable copy.
+1. Comment on the issue with the handover file's absolute path and the full handover content (in the public comment, omit the host temp path and redact machine-local paths as `[local path redacted]`, while identifying workspace files by repository-relative path) — temp directories do not survive; the comment is the durable copy.
 2. Add the label `paused by agent` (create it if missing). It marks half-done work waiting for pickup and pairs with `picked by agent`.
 3. The agent that resumes removes `paused by agent`, applies `picked by agent`, and continues from the "Pick up here" line.
 
@@ -79,7 +79,7 @@ If no issue exists, report the handover file path in chat instead.
 ## Hard rules
 
 - Never invent state. If a section has nothing to report, write "none" — don't omit the section; structure stability is the point.
-- Absolute paths always — the next agent may have a different working directory.
+- Absolute paths always in the local artifact so an agent on the same host can locate files directly; in the public issue/PR comment, use repository-relative paths and replace host-specific paths with [local path redacted] to protect environment privacy.
 - If a plan file drove the session, name it first under "Key files."
 - Terse and concrete: paths, commands, IDs, decisions. Prefer links to issues, PRs, and files over prose. No retrospective, no hype, no emojis.
 - No next steps beyond the single "Pick up here" line — the next agent decides.
