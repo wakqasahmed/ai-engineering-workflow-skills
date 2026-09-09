@@ -86,6 +86,9 @@ To anchor an agent session to this workflow playbook, reference `system-level/co
 #### 5. Context Compaction & Agent Handover
 - **Cross session or agent boundary**: Run `handover` when context usage exceeds 40%, when 5-10% of context remains, or when passing work to a fresh agent.
 
+#### 6. Token-Saving Communication
+- **Compress ongoing technical chat**: Run `caveman` when the user asks for ultra-compressed replies or lower token use. It stays active until explicitly disabled, while safety warnings and other Auto-Clarity cases temporarily use full prose.
+
 ## Available Skills
 
 **Start with `workflow-router`** if you're not sure which skill applies — it routes a work request to the smallest applicable delivery workflow.
@@ -115,6 +118,7 @@ To anchor an agent session to this workflow playbook, reference `system-level/co
 | [`write-prompt-guide`](skills/engineering/write-prompt-guide/SKILL.md) | Produce a pack-specific `PROMPT_GUIDE.md` that teaches end users what to type to get a good run out of one Agent Skill pack, from that pack's own `SKILL.md`, README, and open issues. |
 | [`writing-for-agents`](skills/engineering/writing-for-agents/SKILL.md) | Reference for authoring documents an agent consumes: skills, AGENTS.md/CLAUDE.md, and progressive disclosure references. |
 | [`roast`](skills/product/roast/SKILL.md) | Use when someone asks to roast an idea, pressure-test or stress-test an idea, validate a business idea, "convene the council", get a brutal second opinion before building something, or says "/roast". |
+| [`caveman`](skills/productivity/caveman/SKILL.md) | Ultra-compressed, persistent communication mode that removes filler while preserving technical accuracy and temporarily restores full clarity for safety-critical content. |
 | [`handover`](skills/productivity/handover/SKILL.md) | Compact the current conversation into a handover document a fresh agent can pick up and continue seamlessly. |
 
 ## Contents
@@ -131,7 +135,7 @@ Changes merged to this repository are automatically synchronized to [wakqasahmed
 
 ## Outcome-eval harness status
 
-Several skills already have a deterministic eval layer. The gated model-harness layer — real skill-enabled vs. disabled comparisons against a live model — is still open work for 8 skills and is not yet tracked.
+Several skills already have a deterministic eval layer. The gated model-harness layer — real skill-enabled vs. disabled comparisons against a live model — is still open work for 9 skills and is not yet tracked.
 
 ### Fund the real harness runs
 

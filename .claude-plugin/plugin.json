@@ -24,6 +24,7 @@
     "./skills/engineering/write-prompt-guide",
     "./skills/engineering/writing-for-agents",
     "./skills/product/roast",
+    "./skills/productivity/caveman",
     "./skills/productivity/handover"
   ]
 }
