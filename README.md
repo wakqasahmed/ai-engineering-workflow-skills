@@ -50,7 +50,7 @@ npx skills add addyosmani/agent-skills --skill security-and-hardening
 
 ## Using This Skillpack
 
-Once installed, your agent discovers and invokes skills automatically when your prompt matches each skill's `description` frontmatter. For repositories adopting this workflow, `AGENTS.md` provides additional repo-level routing rules and a Trigger Map for agents that load it as an instruction file (you can also invoke skills explicitly by name or slash command, e.g. `/roast`, `/clarify-work`).
+Once installed, your agent discovers model-invoked skills automatically when your prompt matches each skill's `description` frontmatter. Skills with `disable-model-invocation: true` run only when explicitly invoked. For repositories adopting this workflow, `AGENTS.md` provides additional repo-level routing rules and a Trigger Map for agents that load it as an instruction file (you can also invoke skills explicitly by name or slash command, e.g. `/roast`, `/clarify-work`).
 
 ### Standard Prompt Pattern
 
@@ -87,7 +87,7 @@ To anchor an agent session to this workflow playbook, reference `system-level/co
 - **Cross session or agent boundary**: Run `handover` when context usage exceeds 40%, when 5-10% of context remains, or when passing work to a fresh agent.
 
 #### 6. Token-Saving Communication
-- **Compress ongoing technical chat**: Run `caveman` when the user asks for ultra-compressed replies or lower token use. It stays active until explicitly disabled, while safety warnings and other Auto-Clarity cases temporarily use full prose.
+- **Compress ongoing technical chat**: Use `caveman` only when the user explicitly asks for caveman mode or ultra-compressed replies; keep it active until the user says "stop caveman" or "normal mode", except for Auto-Clarity safety cases.
 
 ## Available Skills
 
@@ -118,7 +118,7 @@ To anchor an agent session to this workflow playbook, reference `system-level/co
 | [`write-prompt-guide`](skills/engineering/write-prompt-guide/SKILL.md) | Produce a pack-specific `PROMPT_GUIDE.md` that teaches end users what to type to get a good run out of one Agent Skill pack, from that pack's own `SKILL.md`, README, and open issues. |
 | [`writing-for-agents`](skills/engineering/writing-for-agents/SKILL.md) | Reference for authoring documents an agent consumes: skills, AGENTS.md/CLAUDE.md, and progressive disclosure references. |
 | [`roast`](skills/product/roast/SKILL.md) | Use when someone asks to roast an idea, pressure-test or stress-test an idea, validate a business idea, "convene the council", get a brutal second opinion before building something, or says "/roast". |
-| [`caveman`](skills/productivity/caveman/SKILL.md) | Ultra-compressed, persistent communication mode that removes filler while preserving technical accuracy and temporarily restores full clarity for safety-critical content. |
+| [`caveman`](skills/productivity/caveman/SKILL.md) | User-invoked persistent ultra-compressed communication mode that removes filler while preserving technical accuracy and temporarily restores full clarity for safety-critical content. |
 | [`handover`](skills/productivity/handover/SKILL.md) | Compact the current conversation into a handover document a fresh agent can pick up and continue seamlessly. |
 
 ## Contents

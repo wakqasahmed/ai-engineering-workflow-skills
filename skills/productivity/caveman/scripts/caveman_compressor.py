@@ -5,12 +5,12 @@ Stdlib-only. Deterministic regex-based compression matching the rules in
 Matt Pocock's caveman skill SKILL.md:
 
   1. Drop articles (a/an/the)
-  2. Drop filler (just/really/basically/actually/simply)
+  2. Drop filler (just/really/basically/actual/actually/simply)
   3. Drop pleasantries (sure/certainly/of course/happy to)
   4. Drop hedging (might/maybe/perhaps/likely/possibly)
   5. Abbreviate common technical terms (database -> DB, configuration -> config, etc.)
   6. Strip conjunctions where safe (and/but at sentence start)
-  7. Use arrows for "leads to" / "causes" phrases (-> )
+  7. Use arrows for unambiguous causality phrases such as "leads to" (-> )
   8. Strip "as you can see / it should be noted / it's worth mentioning"
 
 PRESERVES:
@@ -35,45 +35,22 @@ import re
 import sys
 from typing import Any, Dict, List, Tuple
 
-
-ARTICLES = {"a", "an", "the"}
-FILLER = {"just", "really", "basically", "actually", "simply", "obviously", "literally"}
-PLEASANTRIES_PHRASES = [
-    "sure!", "sure,", "certainly!", "certainly,",
-    "of course!", "of course,",
-    "happy to help", "i'd be happy to", "i would be happy to",
-    "great question", "good question",
-    "absolutely!", "absolutely,",
-    "no problem!", "no problem,",
-]
-HEDGING = {"might", "maybe", "perhaps", "likely", "possibly", "probably"}
-METATALK_PHRASES = [
-    "as you can see",
-    "it should be noted",
-    "it's worth mentioning",
-    "it is worth mentioning",
-    "needless to say",
-    "to be clear",
-    "in other words",
-    "that said",
-    "having said that",
-]
+from caveman_rules import (
+    FILLER_WORDS,
+    HEDGING_WORDS,
+    METATALK_PHRASES,
+    PLEASANTRY_PHRASES,
+    SINGLE_QUOTED_LITERAL_PATTERN,
+)
 
 ABBREVIATIONS = [
     (r"\bdatabase\b", "DB"),
-    (r"\bdatabases\b", "DBs"),
     (r"\bauthentication\b", "auth"),
-    (r"\bauthorization\b", "authz"),
     (r"\bconfiguration\b", "config"),
-    (r"\bconfigurations\b", "configs"),
     (r"\brequest\b", "req"),
-    (r"\brequests\b", "reqs"),
     (r"\bresponse\b", "res"),
-    (r"\bresponses\b", "ress"),
     (r"\bfunction\b", "fn"),
-    (r"\bfunctions\b", "fns"),
     (r"\bimplementation\b", "impl"),
-    (r"\bimplementations\b", "impls"),
     (r"\benvironment\b", "env"),
     (r"\bdependencies\b", "deps"),
     (r"\bdependency\b", "dep"),
@@ -81,11 +58,16 @@ ABBREVIATIONS = [
     (r"\brepositories\b", "repos"),
     (r"\bdocumentation\b", "docs"),
     (r"\bapplication\b", "app"),
-    (r"\bapplications\b", "apps"),
 ]
 
 CAUSALITY_PATTERNS = [
-    (re.compile(r"\b(which\s+)?(leads?|causes?|results?\s+in|gives?\s+you|produces?)\s+", re.IGNORECASE), "-> "),
+    (
+        re.compile(
+            r"\b(?:which[^\S\n]+)?(?:leads?[^\S\n]+to|results?[^\S\n]+in|gives?[^\S\n]+you)[^\S\n]+",
+            re.IGNORECASE,
+        ),
+        "-> ",
+    ),
     (re.compile(r"\bbecause\s+of\b", re.IGNORECASE), "<- "),
 ]
 
@@ -120,7 +102,7 @@ def _protect_literals(text: str) -> Tuple[str, List[str]]:
     text = re.sub(r"```.*?```", replace_literal, text, flags=re.DOTALL)
     text = re.sub(r"`[^`]+`", replace_literal, text)
     text = re.sub(r'(?<!\w)"(?:\\.|[^"\\])*"', replace_literal, text)
-    text = re.sub(r"(?<!\w)'(?:\\.|[^'\\])*'", replace_literal, text)
+    text = re.sub(SINGLE_QUOTED_LITERAL_PATTERN, replace_literal, text)
     return text, protected
 
 
@@ -131,27 +113,36 @@ def _restore_literals(text: str, protected: List[str]) -> str:
 
 
 def _drop_articles(text: str) -> str:
-    pattern = re.compile(r"\b(" + "|".join(ARTICLES) + r")\s+", re.IGNORECASE)
-    return pattern.sub("", text)
+    pattern = re.compile(r"\b(an|the)[^\S\n]+", re.IGNORECASE)
+    text = pattern.sub("", text)
+    return re.sub(
+        r"\ba[^\S\n]+(?!(?:==|!=|<=|>=|=|->|[+*/%&|^-]))",
+        "",
+        text,
+        flags=re.IGNORECASE,
+    )
 
 
 def _drop_word_set(text: str, words: set) -> str:
-    pattern = re.compile(r"\b(" + "|".join(words) + r")\b\s*", re.IGNORECASE)
+    pattern = re.compile(r"\b(" + "|".join(words) + r")\b[^\S\n]*", re.IGNORECASE)
     return pattern.sub("", text)
 
 
-def _drop_phrases(text: str, phrases: List[str]) -> str:
-    variants = set(phrases)
-    variants.update(phrase.rstrip(",!") for phrase in phrases)
-    for phrase in sorted(variants, key=len, reverse=True):
-        pattern = r"(?<!\w)" + re.escape(phrase) + r"(?!\w)\s*"
+def _drop_phrases(text: str, phrases: Tuple[str, ...]) -> str:
+    for phrase in sorted(phrases, key=len, reverse=True):
+        pattern = r"(?<!\w)" + re.escape(phrase) + r"(?!\w)[!,]?[^\S\n]*"
         text = re.sub(pattern, "", text, flags=re.IGNORECASE)
     return text
 
 
 def _apply_abbreviations(text: str) -> str:
     for pattern, replacement in ABBREVIATIONS:
-        text = re.sub(pattern, replacement, text, flags=re.IGNORECASE)
+        def replace_abbreviation(match: re.Match) -> str:
+            if match.group(0)[0].isupper() and replacement[0].islower():
+                return replacement[0].upper() + replacement[1:]
+            return replacement
+
+        text = re.sub(pattern, replace_abbreviation, text, flags=re.IGNORECASE)
     return text
 
 
@@ -166,8 +157,9 @@ def _strip_leading_conjunctions(text: str) -> str:
 
 
 def _collapse_whitespace(text: str) -> str:
-    text = re.sub(r"\s+", " ", text)
-    text = re.sub(r"\s+([.,;:!?])", r"\1", text)
+    text = re.sub(r"[^\S\n]+", " ", text)
+    text = re.sub(r"[^\S\n]+([.,;:!?])", r"\1", text)
+    text = re.sub(r"\n{3,}", "\n\n", text)
     return text.strip()
 
 
@@ -177,10 +169,10 @@ def compress(text: str) -> str:
         return text
 
     text, protected = _protect_literals(text)
-    text = _drop_phrases(text, PLEASANTRIES_PHRASES)
+    text = _drop_phrases(text, PLEASANTRY_PHRASES)
     text = _drop_phrases(text, METATALK_PHRASES)
-    text = _drop_word_set(text, FILLER)
-    text = _drop_word_set(text, HEDGING)
+    text = _drop_word_set(text, FILLER_WORDS)
+    text = _drop_word_set(text, HEDGING_WORDS)
     text = _drop_articles(text)
     text = _apply_abbreviations(text)
     text = _apply_causality_arrows(text)
@@ -239,7 +231,7 @@ def main() -> int:
         try:
             with open(args.file, "r", encoding="utf-8") as file:
                 original = file.read()
-        except (IOError, OSError) as error:
+        except (OSError, UnicodeDecodeError) as error:
             print(f"error: {error}", file=sys.stderr)
             return 1
     elif args.text:

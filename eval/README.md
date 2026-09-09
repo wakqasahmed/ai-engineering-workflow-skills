@@ -34,7 +34,7 @@ This directory contains deterministic contract evaluations and model-outcome har
 | `ai-agent-pr-metadata` | `eval/engineering/ai-agent-pr-metadata/` | Built-in | Verified in CI |
 | `external-campaign-triage` | `eval/engineering/external-campaign-triage/` | Built-in | Verified in CI |
 | `roast` | `eval/product/roast/` | Built-in | Verified in CI |
-| `caveman` | `tests/test_caveman.py` | Not tracked | Lightweight script-unit and written-contract checks; verified in CI |
+| `caveman` | `eval/productivity/caveman/` | Not yet tracked | Lightweight script-unit and written-contract checks; verified in CI |
 | `handover` | `eval/productivity/handover/` | Built-in | Verified in CI |
 | `diagnose` | Intentional deferral | Not yet tracked | Upstream-adapted diagnostic loop |
 | `external-pr-style` | Intentional deferral | Not yet tracked | Natural prose guidance |

@@ -1,14 +1,11 @@
 ---
 name: caveman
-description: >
-  Ultra-compressed communication mode. Cuts token usage ~75% by dropping
-  filler, articles, and pleasantries while keeping full technical accuracy.
-  Use when user says "caveman mode", "talk like caveman", "use caveman",
-  "less tokens", "be brief", or invokes /caveman.
+description: User-invoked persistent ultra-compressed communication mode that targets 20-50% token reduction on typical replies while preserving technical accuracy.
+disable-model-invocation: true
 license: MIT
 metadata:
   adapted_from: "https://github.com/alirezarezvani/claude-skills/tree/main/engineering/caveman/skills/caveman"
-  derived_from: "https://github.com/mattpocock/skills/tree/main/skills/productivity/caveman"
+  derived_from: "https://github.com/mattpocock/skills/blob/221ffca96736afefdc08ca7cf0b3965e9ea83f41/skills/productivity/caveman/SKILL.md"
   original_author: "Matt Pocock (@mattpocock)"
   original_license: MIT
   adaptation_license: MIT
@@ -18,7 +15,7 @@ metadata:
 
 # Caveman Mode
 
-Source: adapted from [alirezarezvani/claude-skills — caveman](https://github.com/alirezarezvani/claude-skills/tree/main/engineering/caveman/skills/caveman) (MIT), itself derived from Matt Pocock's `skills/productivity/caveman` skill (MIT). The original path has since been removed from the live `mattpocock/skills` repository. Matt's voice is preserved verbatim in the ruleset below; this port retains the fork's compression tools and references.
+Source: adapted from [alirezarezvani/claude-skills — caveman](https://github.com/alirezarezvani/claude-skills/tree/main/engineering/caveman/skills/caveman) (MIT), itself derived from [Matt Pocock's historical `skills/productivity/caveman` skill](https://github.com/mattpocock/skills/blob/221ffca96736afefdc08ca7cf0b3965e9ea83f41/skills/productivity/caveman/SKILL.md) (MIT). The original path has since been removed from the live `mattpocock/skills` repository. Matt's voice is preserved verbatim in the ruleset below; this port retains the fork's compression tools and references.
 
 Respond terse like smart caveman. All technical substance stay. Only fluff die.
 

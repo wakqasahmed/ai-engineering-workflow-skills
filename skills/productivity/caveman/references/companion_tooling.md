@@ -16,6 +16,8 @@ All three tools:
 - Output text or JSON (`--output json`)
 - Code blocks + inline code preserved (compression skips them)
 
+The linter exits `0` for `CLEAN` and `WARN`; only `FAIL` exits `1`.
+
 ## Token-Savings Heuristic
 
 The estimator uses character-per-token approximations:
@@ -32,7 +34,7 @@ The compressor + lint tool both recognize these exception zones — Matt's rule 
 - Multi-step sequences where fragment order risks misread
 - User asks to clarify or repeats question
 
-The tools detect `**Warning:**`, `destructive`, `irreversible`, and `cannot be undone` markers. The compressor leaves marked input unchanged; the linter softens its verdict accordingly. The remaining exception zones require agent judgment.
+The tools detect `**Warning:**`, `destructive`, `irreversible`, and `cannot be undone` markers. The compressor leaves marked input unchanged. The linter softens violations only inside the marked paragraph; violations elsewhere still produce `FAIL`. The remaining exception zones require agent judgment.
 
 ## Why Include the Fork's Tools
 
@@ -45,16 +47,4 @@ Matt's caveman skill is tight + complete. The immediate `alirezarezvani/claude-s
 
 Immediate source: [alirezarezvani/claude-skills — caveman](https://github.com/alirezarezvani/claude-skills/tree/main/engineering/caveman/skills/caveman) (MIT).
 
-Original: Matt Pocock's historical [`skills/productivity/caveman`](https://github.com/mattpocock/skills/tree/main/skills/productivity/caveman) skill (MIT; no longer present in the live repository).
-
----
-
-**Source authorities (non-exhaustive):**
-
-- **Matt Pocock — caveman** ([mattpocock/skills](https://github.com/mattpocock/skills), MIT) — the upstream source
-- **Anthropic — Token usage best practices** (https://docs.claude.com/en/docs/build-with-claude/prompt-engineering) — token-conscious prompting
-- **OpenAI tokenizer docs** — `tiktoken` library + cl100k_base / o200k_base heuristics
-- **Strunk & White — "The Elements of Style"** (1918) — "omit needless words"; foundational text on prose compression
-- **Plain Language Movement / Plain Writing Act of 2010** — federal mandate for concise government writing
-- **Norman, D. — "Living with Complexity"** (2010) — when simplicity helps vs hurts cognition
-- **Pareto principle in communication** — 20% of words carry 80% of information density
+Original: Matt Pocock's historical [`skills/productivity/caveman`](https://github.com/mattpocock/skills/blob/221ffca96736afefdc08ca7cf0b3965e9ea83f41/skills/productivity/caveman/SKILL.md) skill (MIT; no longer present in the live repository).

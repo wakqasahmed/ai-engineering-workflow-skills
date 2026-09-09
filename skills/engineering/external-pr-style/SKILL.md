@@ -32,7 +32,7 @@ In our own PR [litespeedtech/openlitespeed#509](https://github.com/litespeedtech
 
 ## Compression pass (do this last, before posting)
 
-Technique adapted from [mattpocock/skills — caveman](https://github.com/mattpocock/skills/blob/main/skills/productivity/caveman/SKILL.md) (filler/hedge/pleasantry stripping), applied to natural prose rather than caveman's fragment style to ensure PR descriptions read as clear, authentic engineer-to-engineer communication.
+Technique adapted from [mattpocock/skills — caveman](https://github.com/mattpocock/skills/blob/221ffca96736afefdc08ca7cf0b3965e9ea83f41/skills/productivity/caveman/SKILL.md) (filler/hedge/pleasantry stripping), applied to natural prose rather than caveman's fragment style to ensure PR descriptions read as clear, authentic engineer-to-engineer communication.
 
 Long, padded explanations are themselves an AI-tell, independent of headers. Reread the drafted body and strip (see canonical [prose compression word list](references/compression-word-list.md)):
 

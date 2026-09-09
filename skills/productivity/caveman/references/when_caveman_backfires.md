@@ -112,7 +112,7 @@ The lint tool detects these markers as exception-zone signals:
 - `irreversible`
 - `cannot be undone`
 
-When present, the linter softens FAIL → WARN. This isn't perfect — manual review still required for stakeholder mismatches + first-turn responses.
+Within a marked paragraph, the linter softens violations from FAIL → WARN. Violations in any unmarked paragraph keep the document at FAIL. Manual review remains required for stakeholder mismatches + first-turn responses.
 
 ## Resuming Caveman After Exception
 
@@ -141,15 +141,3 @@ When in doubt:
 - **Brevity in writing generally** — different concern; see editing references
 - **Code minification** — different mode; this is about prose around code
 - **API response compression** — gzip/brotli, not prose compression
-
----
-
-**Source authorities (non-exhaustive):**
-
-- **Matt Pocock — caveman** (historical `skills/productivity/caveman` path in [mattpocock/skills](https://github.com/mattpocock/skills), MIT; no longer present in the live repository) — the auto-clarity exception list
-- **Nielsen Norman Group — Error message design** — when verbosity in errors helps vs hurts
-- **FAA Human Factors research on cockpit warnings** — emphasis + redundancy in safety-critical communications
-- **Krug, S. — "Don't Make Me Think"** (2000) — when brevity becomes ambiguity
-- **Schneier, B. — Communication on security warnings** — why brevity in security messages is dangerous
-- **Larson, W. — "An Elegant Puzzle"** (2019) — engineering manager communication patterns
-- **Rommetveit, R. — Linguistic shared context** — when compression depends on shared frame

@@ -30,20 +30,19 @@ import re
 import sys
 from typing import Any, Dict, List
 
+from caveman_rules import (
+    FILLER_WORDS,
+    HEDGING_WORDS,
+    METATALK_PHRASES,
+    PLEASANTRY_PHRASES,
+    SINGLE_QUOTED_LITERAL_PATTERN,
+)
 
 BANNED_PHRASES = {
-    "pleasantry": [
-        "sure!", "sure,", "certainly", "of course", "happy to help",
-        "i'd be happy", "i would be happy", "great question", "good question",
-        "absolutely", "no problem!",
-    ],
-    "filler": ["just", "really", "basically", "actually", "simply", "obviously", "literally"],
-    "hedging": ["might", "maybe", "perhaps", "likely", "possibly", "probably"],
-    "metatalk": [
-        "as you can see", "it should be noted", "worth mentioning",
-        "needless to say", "to be clear", "in other words",
-        "that said", "having said that",
-    ],
+    "pleasantry": PLEASANTRY_PHRASES,
+    "filler": FILLER_WORDS,
+    "hedging": HEDGING_WORDS,
+    "metatalk": METATALK_PHRASES,
     "verbose": [
         "implement a solution for", "the implementation of",
         "in order to", "for the purpose of", "with respect to",
@@ -77,7 +76,7 @@ def _protect_literals(text: str) -> str:
         text,
     )
     return re.sub(
-        r"(?<!\w)'(?:\\.|[^'\\])*'",
+        SINGLE_QUOTED_LITERAL_PATTERN,
         lambda match: "\x00" * len(match.group(0)),
         text,
     )
@@ -96,9 +95,7 @@ def _violation_record(category: str, phrase: str, count: int) -> Dict[str, Any]:
     return {"category": category, "phrase": phrase, "count": count}
 
 
-def find_violations(text: str) -> List[Dict[str, Any]]:
-    """Find banned phrases. Returns list of {category, phrase, count}."""
-    masked = _protect_literals(text)
+def _find_violations_in_masked(masked: str) -> List[Dict[str, Any]]:
     violations: List[Dict[str, Any]] = []
     for category, phrases in BANNED_PHRASES.items():
         for phrase in phrases:
@@ -108,14 +105,28 @@ def find_violations(text: str) -> List[Dict[str, Any]]:
     return violations
 
 
+def find_violations(text: str) -> List[Dict[str, Any]]:
+    """Find banned phrases. Returns list of {category, phrase, count}."""
+    return _find_violations_in_masked(_protect_literals(text))
+
+
 def analyze(text: str) -> Dict[str, Any]:
-    violations = find_violations(text)
+    masked = _protect_literals(text)
+    violations = _find_violations_in_masked(masked)
     total_violations = sum(violation["count"] for violation in violations)
-    has_exception = _has_exception_context(text)
+    has_exception = _has_exception_context(masked)
+    softened_violations = 0
+
+    for paragraph in re.split(r"\n[^\S\n]*\n+", masked):
+        if _has_exception_context(paragraph):
+            softened_violations += sum(
+                violation["count"]
+                for violation in _find_violations_in_masked(paragraph)
+            )
 
     if total_violations == 0:
         verdict = "CLEAN"
-    elif has_exception or total_violations <= 2:
+    elif softened_violations == total_violations:
         verdict = "WARN"
     else:
         verdict = "FAIL"
@@ -176,7 +187,7 @@ def main() -> int:
         try:
             with open(args.file, "r", encoding="utf-8") as file:
                 text = file.read()
-        except (IOError, OSError) as error:
+        except (OSError, UnicodeDecodeError) as error:
             print(f"error: {error}", file=sys.stderr)
             return 1
     elif args.text:
@@ -189,7 +200,7 @@ def main() -> int:
         print(json.dumps({"text": text, **result}, indent=2))
     else:
         print(render_text(text, result))
-    return 0 if result["verdict"] == "CLEAN" else 1
+    return 0 if result["verdict"] in {"CLEAN", "WARN"} else 1
 
 
 if __name__ == "__main__":

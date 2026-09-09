@@ -23,7 +23,7 @@ import argparse
 import json
 import os
 import sys
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -44,21 +44,23 @@ def _estimate_chars_per_token(text: str) -> float:
     return CHARS_PER_TOKEN_PROSE
 
 
-def estimate_tokens(text: str) -> int:
-    return int(round(len(text) / _estimate_chars_per_token(text)))
+def estimate_tokens(text: str, chars_per_token: Optional[float] = None) -> int:
+    divisor = chars_per_token if chars_per_token is not None else _estimate_chars_per_token(text)
+    return int(round(len(text) / divisor))
 
 
 def analyze(original: str, price_per_mtok: float = 0.0) -> Dict[str, Any]:
     compressed = compress(original)
-    original_tokens = estimate_tokens(original)
-    compressed_tokens = estimate_tokens(compressed)
+    chars_per_token = _estimate_chars_per_token(original)
+    original_tokens = estimate_tokens(original, chars_per_token)
+    compressed_tokens = estimate_tokens(compressed, chars_per_token)
     saved = original_tokens - compressed_tokens
     percent_saved = round(100.0 * saved / max(original_tokens, 1), 1)
 
     result: Dict[str, Any] = {
         "original_chars": len(original),
         "compressed_chars": len(compressed),
-        "chars_per_token_used": _estimate_chars_per_token(original),
+        "chars_per_token_used": chars_per_token,
         "estimated_original_tokens": original_tokens,
         "estimated_compressed_tokens": compressed_tokens,
         "tokens_saved": saved,
@@ -122,7 +124,7 @@ def main() -> int:
         try:
             with open(args.file, "r", encoding="utf-8") as file:
                 original = file.read()
-        except (IOError, OSError) as error:
+        except (OSError, UnicodeDecodeError) as error:
             print(f"error: {error}", file=sys.stderr)
             return 1
     elif args.text:
