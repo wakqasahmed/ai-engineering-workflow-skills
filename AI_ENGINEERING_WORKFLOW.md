@@ -93,6 +93,7 @@ Definition of done:
 - That review can come from another human, another fresh agent, or a review tool such as Greptile.
 - For medium-risk and high-risk changes, review spec compliance against acceptance criteria before reviewing code quality, regressions, security, and maintainability.
 - Apply review findings before merge.
+- For external open-source contributions against repositories we do not own, maintain at most 3 open pull requests concurrently (recommended) to prevent being flagged as automated spam by project maintainers or platform abuse detection systems.
 
 ### 6. Release
 

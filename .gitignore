@@ -1,4 +1,5 @@
 .claude/
+.agents/
 
 # Dependencies
 node_modules/
