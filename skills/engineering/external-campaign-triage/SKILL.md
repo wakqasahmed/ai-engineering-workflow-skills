@@ -72,3 +72,4 @@ Real incident: two unrelated third-party maintainers responded with hostile push
 - See `subagent-pipeline`'s Guardrails section (the "Public issues, PRs, comments, and handovers..." bullet) for the parallel credential-redaction discipline that applies to every public comment this skill causes an agent to post.
 - Do not skip `viability_checked` to save time — an unvetted candidate wastes the same implementation effort `external-pr-viability` exists to avoid.
 - Do not delete or rewrite `history` entries; append only. The tracker is an audit trail, not a status field to overwrite.
+- Concurrency ceiling: Maintain a recommended maximum of 3 open external PRs (`in_review`) concurrently across third-party repositories. Submitting more than 3 simultaneous unsolicited PRs dramatically increases the likelihood of being flagged as an automated spammer by project maintainers or platform abuse detection.

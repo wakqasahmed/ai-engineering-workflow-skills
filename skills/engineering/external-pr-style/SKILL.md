@@ -20,6 +20,7 @@ Maintainers in high-volume open-source repositories frequently pattern-match aga
 - State what you verified (tests run, red→green proof, residual risk on security-sensitive changes) as plain sentences woven into the explanation, not as a labeled checklist.
 - Don't over-explain a small fix. Match the length of the description to the size of the change: for small fixes (1-20 lines), write 1-2 concise sentences describing the symptom and fix; for medium changes (20-100 lines), write one compact paragraph (3-5 sentences); for large changes (100+ lines), write two focused paragraphs detailing what changed, why, and what was verified.
 - Don't hedge excessively or enumerate edge cases nobody asked about.
+- Keep at most 3 external PRs open at a time (recommended). Submitting batches beyond this concurrency threshold risks being flagged as an automated spammer by maintainers or platform abuse filters.
 
 ## Em dashes are a tell
 

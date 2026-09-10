@@ -78,6 +78,7 @@ To anchor an agent session to this workflow playbook, reference `system-level/co
 - **Test and implement**: Implement the fix following the target repo's exact existing conventions and test suites.
 - **Draft authentic PR text**: Run `external-pr-style` to strip formulaic AI section templates, sycophancy, and verbose filler.
 - **Track state across a multi-repo campaign**: Run `external-campaign-triage` when many candidates are in flight across repos we don't own, and before sending any follow-up comment on a stalled PR.
+- **Limit concurrent open PRs**: Maintain at most 3 open external PRs concurrently (recommended) to avoid being flagged as an automated spammer by maintainers or platform abuse detection.
 
 #### 4. Releasing Versioned Packages
 - **Record release intent**: Run `changesets-release` to create changesets, validate semver bumps, and check changelogs.

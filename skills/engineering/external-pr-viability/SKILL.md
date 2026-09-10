@@ -45,3 +45,4 @@ When a repo fails this check, write down what you found — the last-100-merged 
 - Never disqualify a repo from a single closed PR alone — confirm the pattern via the merge-count check first.
 - Never fabricate the merge-count evidence — the decision must cite an actual command's real output, not an assumption or a guess made to move faster.
 - Don't confuse a CLA/DCO requirement (a process gate, satisfiable by any contributor) with an external-merge policy (a categorical exclusion). CLA-gated repos can still be fully viable once the CLA is signed — check the actual merged-author mix, not just the presence of a CLA bot.
+- Concurrent open PR ceiling: Maintain at most 3 open PRs concurrently across third-party repositories (recommended) before opening new ones, to avoid being flagged as automated spam by maintainers or platform abuse systems.
