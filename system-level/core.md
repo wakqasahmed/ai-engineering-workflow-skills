@@ -99,6 +99,7 @@ Trivial fixes may omit this structure. Reserve `handover` specifically for conte
 - Do not take staging backups just to run tests. If tests require a backup first, the test environment is wrong.
 - Before intentional staging data changes, such as seeders, migrations, imports, repair scripts, or one-off data fixes, create a staging backup and record the restore path.
 - Prefer executable guardrails in bootstrap scripts, CI, wrappers, or framework hooks over relying on agent memory.
+- Use `docker-db-guardrails` to set up the PreToolUse hook enforcing this mechanically — a container's DB env vars are process-wide, not scoped to any working directory copied into it, so copying files into a temp path inside a container does not create test isolation on its own.
 
 ## Review And Traceability
 
