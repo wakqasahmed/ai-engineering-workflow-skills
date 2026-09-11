@@ -170,9 +170,24 @@ def main() -> int:
     if not any(tool in scannable for tool in INVOKING_TOOLS):
         return 0
 
+    # An explicit -d/--dbname/-D/--database argument states the user's actual
+    # intent for THIS invocation and always wins outright - safe, allow;
+    # unsafe, block immediately. Never fall through to a container's or this
+    # shell's env vars afterward: those describe the container/shell in
+    # general, not necessarily the specific database this command names, and
+    # an explicit unsafe target must not be rescued by an unrelated
+    # safe-looking env var elsewhere on the same container.
     explicit_db = find_explicit_dbname(tokens)
-    if explicit_db and SAFE_NAME_PATTERN.search(explicit_db):
-        return 0
+    if explicit_db is not None:
+        if SAFE_NAME_PATTERN.search(explicit_db):
+            return 0
+        sys.stderr.write(
+            f"BLOCKED: explicit database name \"{explicit_db}\" does not "
+            f"visibly contain test/testing/demo - refusing a schema/data-"
+            f"destructive command ({command}). An explicitly named target "
+            f"always wins over any container or shell environment variable.\n"
+        )
+        return 2
 
     container = find_container(tokens)
     if container:
@@ -186,7 +201,14 @@ def main() -> int:
                 f"user.\n"
             )
             return 2
-        if any(SAFE_NAME_PATTERN.search(v) for v in db_values):
+        # Every recognized database-name env var present must look safe, not
+        # just one of them - a container can carry more than one of these
+        # keys (e.g. a leftover MYSQL_DATABASE alongside the DB_DATABASE the
+        # invoked tool actually reads), and this hook cannot always tell
+        # which one governs a given tool/invocation. Requiring unanimity
+        # means one unsafe-looking value blocks, rather than one
+        # safe-looking value rescuing an otherwise-unsafe target.
+        if all(SAFE_NAME_PATTERN.search(v) for v in db_values):
             return 0
         sys.stderr.write(
             f"BLOCKED: container \"{container}\"'s resolved database "
@@ -208,7 +230,7 @@ def main() -> int:
         v for k, v in os.environ.items()
         if k in DB_NAME_ENV_KEYS
     ]
-    if any(SAFE_NAME_PATTERN.search(v) for v in local_values):
+    if local_values and all(SAFE_NAME_PATTERN.search(v) for v in local_values):
         return 0
 
     sys.stderr.write(
