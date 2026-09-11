@@ -75,6 +75,8 @@ def find_reason(tokens: list[str]) -> str | None:
         if tok == "docker-compose":
             if "down" in rest and any(arg in ("-v", "--volumes") for arg in rest):
                 return "docker-compose down -v/--volumes deletes named volumes declared in the compose file"
+            if "rm" in rest and any(arg in ("-v", "--volumes") for arg in rest):
+                return "docker-compose rm -v/--volumes removes anonymous volumes attached to the containers"
             continue
 
         # tok == "docker"
@@ -88,8 +90,14 @@ def find_reason(tokens: list[str]) -> str | None:
             return "docker system prune --volumes deletes volumes permanently"
         if sub == "rm" and any(arg in ("-v", "--volumes") for arg in rest[1:]):
             return "docker rm -v/--volumes removes anonymous volumes attached to the container"
-        if sub == "compose" and "down" in rest and any(arg in ("-v", "--volumes") for arg in rest):
-            return "docker compose down -v/--volumes deletes named volumes declared in the compose file"
+        if sub == "container" and len(rest) > 1 and rest[1] == "rm" \
+                and any(arg in ("-v", "--volumes") for arg in rest[2:]):
+            return "docker container rm -v/--volumes removes anonymous volumes attached to the container"
+        if sub == "compose":
+            if "down" in rest and any(arg in ("-v", "--volumes") for arg in rest):
+                return "docker compose down -v/--volumes deletes named volumes declared in the compose file"
+            if "rm" in rest and any(arg in ("-v", "--volumes") for arg in rest):
+                return "docker compose rm -v/--volumes removes anonymous volumes attached to the containers"
     return None
 
 
