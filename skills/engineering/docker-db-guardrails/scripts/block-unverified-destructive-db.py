@@ -56,16 +56,20 @@ def read_command() -> str:
     return payload.get("tool_input", {}).get("command", "") or ""
 
 
-def tokenize(command: str) -> list[str]:
+def tokenize(command: str) -> list[str] | None:
+    """Returns None (not []) on failure - a caller that could not resolve
+    the command must fail closed, not silently treat it as containing zero
+    scannable words. An earlier version returned [] here, which made
+    scannable_text empty, which made the destructive-pattern check fail to
+    match, which let the whole command through unblocked - a fail-open bug
+    on the exact class of malformed input (unbalanced quotes) this hook
+    exists to be paranoid about."""
     lexer = shlex.shlex(command, posix=True, punctuation_chars=False)
     lexer.whitespace_split = True
     try:
         return list(lexer)
     except ValueError:
-        # Unbalanced quotes or similar - can't safely tokenize; treat every
-        # token as opaque prose by returning nothing scannable, and let the
-        # caller's fail-closed default handle whether that's actually safe.
-        return []
+        return None
 
 
 def scannable_tokens(tokens: list[str]) -> list[int]:
@@ -101,7 +105,7 @@ def find_container(tokens: list[str]) -> str | None:
         return None
 
     i = exec_index + 1
-    value_flags = {"-w", "-u", "-e", "--env", "--user", "--workdir"}
+    value_flags = {"-w", "-u", "-e", "--env", "--env-file", "--user", "--workdir"}
     while i < len(tokens):
         tok = tokens[i]
         if tok in value_flags:
@@ -153,6 +157,15 @@ def main() -> int:
         return 0
 
     tokens = tokenize(command)
+    if tokens is None:
+        sys.stderr.write(
+            f"BLOCKED: could not safely tokenize this command (unbalanced "
+            f"quotes or similar) while checking it for schema/data-"
+            f"destructive operations: {command}. Fixing the quoting and "
+            f"re-running is the safe path - this hook cannot verify a "
+            f"command it cannot parse.\n"
+        )
+        return 2
     # A list, not a set: order must be preserved so multi-word patterns like
     # "drop\s+table" can only match when those words are genuinely adjacent
     # in the command, not merely present anywhere. Python sets do not
