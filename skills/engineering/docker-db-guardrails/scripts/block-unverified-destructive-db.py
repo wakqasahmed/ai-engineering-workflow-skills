@@ -38,6 +38,12 @@ DESTRUCTIVE_PATTERN = re.compile(
 INVOKING_TOOLS = {"artisan", "psql", "mysql", "mariadb", "sqlite3", "mongosh"}
 SAFE_NAME_PATTERN = re.compile(r"test|testing|demo", re.IGNORECASE)
 
+# Single source of truth for every "which env var names the database"
+# lookup - a container's env (container_db_values) and this shell's own env
+# (the local fallback in main()) both use this, so they can never drift out
+# of sync with each other again the way they briefly did during review.
+DB_NAME_ENV_KEYS = ("DB_DATABASE", "DB_NAME", "POSTGRES_DB", "MYSQL_DATABASE", "MARIADB_DATABASE")
+
 # Flags whose value is free-form prose, not a command/argument to inspect.
 PROSE_FLAGS = {"-m", "--message", "--body", "--title", "--comment", "-F", "--file"}
 
@@ -133,9 +139,7 @@ def container_db_values(container: str) -> list[str]:
     values = []
     for line in result.stdout.splitlines():
         key, _, value = line.partition("=")
-        # MYSQL_DATABASE/MARIADB_DATABASE: the official mysql/mariadb Docker
-        # images set the initial database name via these, not DB_DATABASE.
-        if key in ("DB_DATABASE", "DB_NAME", "POSTGRES_DB", "MYSQL_DATABASE", "MARIADB_DATABASE"):
+        if key in DB_NAME_ENV_KEYS:
             values.append(value)
     return values
 
@@ -202,7 +206,7 @@ def main() -> int:
     import os
     local_values = [
         v for k, v in os.environ.items()
-        if k in ("DB_DATABASE", "DB_NAME", "POSTGRES_DB")
+        if k in DB_NAME_ENV_KEYS
     ]
     if any(SAFE_NAME_PATTERN.search(v) for v in local_values):
         return 0
@@ -211,7 +215,7 @@ def main() -> int:
         f"BLOCKED: {command} looks like a schema/data-destructive command "
         f"and this hook could not confirm the actual target database is a "
         f"test/testing/demo database (checked this shell's own "
-        f"DB_DATABASE/DB_NAME/POSTGRES_DB env vars: "
+        f"{'/'.join(DB_NAME_ENV_KEYS)} env vars: "
         f"{', '.join(local_values) or '<none found>'}). Ambiguous or "
         f"unresolvable targets are treated as production until proven "
         f"otherwise. Confirm the real target with the user before "
