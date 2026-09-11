@@ -75,7 +75,11 @@ def scannable_tokens(tokens: list[str]) -> list[int]:
         if tok in PROSE_FLAGS:
             skip_next = True
             continue
-        if any(tok.startswith(f"{flag}=") for flag in PROSE_FLAGS):
+        # Catches both the spaced-out "--flag=value" form and a short flag
+        # glued directly onto its value with no space (-m"a message here"
+        # shlex-tokenizes as one word, "-ma message here" - not equal to
+        # "-m" and no "=" present, so the exact/"=" checks alone miss it).
+        if any(tok.startswith(flag) and len(tok) > len(flag) for flag in PROSE_FLAGS):
             continue
         indices.append(i)
     return indices
@@ -85,7 +89,7 @@ def find_container(tokens: list[str]) -> str | None:
     try:
         exec_index = next(
             i for i, tok in enumerate(tokens)
-            if tok == "exec" and i > 0 and tokens[i - 1] in ("docker", "compose")
+            if tok == "exec" and i > 0 and tokens[i - 1] in ("docker", "compose", "docker-compose")
         )
     except StopIteration:
         return None
@@ -106,9 +110,11 @@ def find_container(tokens: list[str]) -> str | None:
 
 def find_explicit_dbname(tokens: list[str]) -> str | None:
     for i, tok in enumerate(tokens):
-        if tok in ("-d", "--dbname", "--db") and i + 1 < len(tokens):
+        # -D/--database: mysql/mariadb client flags for selecting a database,
+        # alongside -d/--dbname/--db (psql/sqlite-style tools).
+        if tok in ("-d", "--dbname", "--db", "-D", "--database") and i + 1 < len(tokens):
             return tokens[i + 1]
-        for prefix in ("--dbname=", "--db="):
+        for prefix in ("--dbname=", "--db=", "--database="):
             if tok.startswith(prefix):
                 return tok[len(prefix):]
     return None
@@ -127,7 +133,9 @@ def container_db_values(container: str) -> list[str]:
     values = []
     for line in result.stdout.splitlines():
         key, _, value = line.partition("=")
-        if key in ("DB_DATABASE", "DB_NAME", "POSTGRES_DB"):
+        # MYSQL_DATABASE/MARIADB_DATABASE: the official mysql/mariadb Docker
+        # images set the initial database name via these, not DB_DATABASE.
+        if key in ("DB_DATABASE", "DB_NAME", "POSTGRES_DB", "MYSQL_DATABASE", "MARIADB_DATABASE"):
             values.append(value)
     return values
 
@@ -141,7 +149,13 @@ def main() -> int:
         return 0
 
     tokens = tokenize(command)
-    scannable = {tokens[i] for i in scannable_tokens(tokens)}
+    # A list, not a set: order must be preserved so multi-word patterns like
+    # "drop\s+table" can only match when those words are genuinely adjacent
+    # in the command, not merely present anywhere. Python sets do not
+    # guarantee iteration order, so joining a set here could silently
+    # scramble word order and make the regex match (or fail to match)
+    # based on hash placement rather than the command's actual content.
+    scannable = [tokens[i] for i in scannable_tokens(tokens)]
     scannable_text = " ".join(scannable)
 
     # A destructive keyword alone isn't enough - it must appear as a real
