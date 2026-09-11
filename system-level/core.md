@@ -69,6 +69,7 @@ Trivial fixes may omit this structure. Reserve `handover` specifically for conte
 - Treat auth, payments, secrets, and deployment paths as high-risk areas.
 - Before adding a production dependency, verify its source, maintenance status, license, and necessity. Require human approval.
 - Use `tmux-orphaned-socket` before any broad `/tmp` cleanup — check for live process handles, not just file age, before deleting.
+- Never delete a Docker volume without explicit human confirmation. Use `docker-volume-guardrails` to enforce this mechanically — a hook cannot observe whether that confirmation happened in the conversation, so the rule is unconditional: an agent never runs a volume-deleting command, no exceptions.
 
 ## Untrusted Content
 

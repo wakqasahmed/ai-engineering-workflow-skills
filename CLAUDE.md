@@ -25,6 +25,7 @@ This file mirrors `AGENTS.md` for compatibility.
 - Use `resolving-merge-conflicts` when you need to resolve an in-progress git merge/rebase conflict.
 - Use `wizard` when a manual procedure needs a human to click through a dashboard or enter credentials — generates a guided script instead of leaving `hitl-blocker`'s bare issue description to figure out alone.
 - Use `git-guardrails-claude-code` to set up or audit the PreToolUse hook that blocks force-push, direct push to main/master/staging, `reset --hard`, `clean -f/-fd`, `branch -D`, and bare `checkout .`/`restore .`.
+- Use `docker-volume-guardrails` to set up or audit the PreToolUse hook that unconditionally blocks Docker commands that delete a volume (`docker volume rm/prune`, `docker rm -v`, `docker system prune --volumes`, `docker compose down -v`) — no override, matching the "never delete volumes without explicit human confirmation" rule.
 - Use `write-prompt-guide` when a skill pack needs a user-facing `PROMPT_GUIDE.md` telling people what to type to get a good run out of it.
 - Use `writing-for-agents` when creating or editing skills, or authoring agent instructions.
 - Use `caveman` only when the user explicitly asks for caveman mode or ultra-compressed replies; keep it active until the user says "stop caveman" or "normal mode", except for Auto-Clarity safety cases.
