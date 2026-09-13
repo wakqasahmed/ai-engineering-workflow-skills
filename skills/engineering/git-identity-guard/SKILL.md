@@ -157,3 +157,14 @@ git -c user.name="Your Name" -c user.email="you@example.com" commit -m "hook coe
   co-maintaining someone else's fork under their name), the fix is to run
   `scripts/install.sh` again with the new identity, not to bypass the check
   for one commit.
+- The push-time check has one built-in exception: a commit whose committer
+  is exactly `GitHub <noreply@github.com>` (created by GitHub itself - a
+  web-UI squash-merge, an "Update branch" click, a bot-authored commit) is
+  only checked on its author *email*, not its author/committer *name*.
+  Found live while retroactively rewriting a batch of already-open PR
+  branches: several contained legitimate GitHub-generated commits (another
+  maintainer's merge, a CI bot's auto-format commit) whose author display
+  name naturally isn't the configured `REQUIRED_NAME` string. Forcing those
+  to match would misattribute a real action GitHub took on someone else's
+  behalf - the email is the actual signal CLA bots and account-linking use,
+  so that's what's still enforced.

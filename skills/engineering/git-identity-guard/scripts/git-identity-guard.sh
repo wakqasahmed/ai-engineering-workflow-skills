@@ -139,11 +139,19 @@ check_identity() {
 }
 
 check_outgoing_commits() {
+  # Exception: a commit whose committer is GitHub's own web-merge identity
+  # ("GitHub <noreply@github.com>", e.g. from a squash-merge or "Update
+  # branch" button click) is created by GitHub itself, not authored locally -
+  # its author *name* is the account's GitHub display name, not our git
+  # config value, and that's correct/expected, not a violation. Only the
+  # author *email* still has to be ours, since that's the actual signal CLA
+  # bots and "Verified"/account-linking checks use.
   local bad
   bad=$("$REAL_GIT" "${leading_args[@]}" log HEAD --not --remotes \
         --format='%H|%an|%ae|%cn|%ce' 2>/dev/null | \
         awk -F'|' -v n="$REQUIRED_NAME" -v e="$REQUIRED_EMAIL" \
-          '$2!=n || $3!=e || $4!=n || $5!=e {print}')
+          '($4=="GitHub" && $5=="noreply@github.com") { if ($3!=e) print; next }
+           $2!=n || $3!=e || $4!=n || $5!=e {print}')
   if [ -z "$bad" ]; then
     return 0
   fi
