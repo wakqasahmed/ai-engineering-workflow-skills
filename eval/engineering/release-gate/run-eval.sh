@@ -10,11 +10,12 @@ if [[ "${1:---dry-run}" != "--dry-run" || $# -gt 1 ]]; then
   exit 1
 fi
 
-mkdir -p "$WORKSPACE/eval/fixtures" "$WORKSPACE/home"
+mkdir -p "$WORKSPACE/eval/fixtures" "$WORKSPACE/references" "$WORKSPACE/home"
 cp "$EVAL_DIR/check-contract.py" "$WORKSPACE/eval/"
 cp "$EVAL_DIR/fixtures/held-out.json" "$WORKSPACE/eval/fixtures/"
 cp "$EVAL_DIR/fixtures/tuning.json" "$WORKSPACE/eval/fixtures/"
 cp "$EVAL_DIR/../../../skills/engineering/release-gate/SKILL.md" "$WORKSPACE/SKILL.md"
+cp "$EVAL_DIR/../../../skills/engineering/release-gate/references/configuration-preflight.md" "$WORKSPACE/references/configuration-preflight.md"
 cat > "$WORKSPACE/sitecustomize.py" <<'PY'
 import socket
 

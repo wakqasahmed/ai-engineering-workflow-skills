@@ -11,10 +11,12 @@ Use this before staging or production release.
 
 1. Confirm the reviewed commit or artifact being released.
 2. Confirm environment and deployment mechanism.
-3. Run the smallest deployment validation available.
-4. Smoke-test the critical route or workflow.
-5. Record rollback path.
-6. Create a HITL issue if deployment needs missing human-held access.
+3. If the release introduces or changes a required config/secret name, reconcile required config/secret names against the target environment and block on any gap (`reconcile_config`) — see [configuration preflight](references/configuration-preflight.md).
+4. If a secret-delivery path is new or changed, run a non-secret canary through that path and block until the canary confirms delivery works (`run_canary`) — see [configuration preflight](references/configuration-preflight.md).
+5. Run the smallest deployment validation available.
+6. Smoke-test the critical route or workflow.
+7. Record rollback path.
+8. Create a HITL issue if deployment needs missing human-held access. This is for access that does not exist yet and only a human can create or grant it (e.g., nobody has been given the third-party account/credential itself) — distinct from step 3's reconciliation, which is for config/secret names already obtainable through an existing provisioning process that simply haven't been set in the target environment yet.
 
 ## Scope & Exemption Rules
 
@@ -30,7 +32,7 @@ Apply this gate selectively based on risk level to prevent release gridlock:
 - Smoke test command
 - Rollback command or previous artifact
 - Health check signal
-- Configuration completeness and secret-delivery verification, for changes that introduce or change required config/secrets (see `references/configuration-preflight.md`)
+- Configuration completeness and secret-delivery verification, for changes that introduce or change required config/secrets (see [configuration preflight](references/configuration-preflight.md))
 
 ## Guardrails
 
