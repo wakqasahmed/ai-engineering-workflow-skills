@@ -9,4 +9,4 @@ This design system came from a competitor-research pass with no source file, non
 Does not compose — rework before scaling
 
 ## Gaps
-- No token or component represents a declined-with-retry state distinct from a hard decline — Genuine: escalate as design-system amendment (issue #205); the KYC flow cannot be built correctly until this state is defined, so other features must not scale on this system yet.
+- No token or component represents a declined-with-retry state distinct from a hard decline — Genuine: escalate as design-system amendment (issue #205); retry-after-decline is part of this flow's most common real path, so the KYC flow cannot be built correctly today until this state is defined, and other features must not scale on this system yet.

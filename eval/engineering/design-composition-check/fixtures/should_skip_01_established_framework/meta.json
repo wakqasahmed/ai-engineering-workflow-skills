@@ -2,5 +2,5 @@
   "id": "should_skip_01_established_framework",
   "category": "should_skip",
   "description": "shadcn/ui is already proven across three existing features in this project; the trigger does not fire and the skill must skip without forcing a screen selection or verdict.",
-  "skip_signal_patterns": ["skip", "already proven", "established"]
+  "skip_signal_patterns": ["already proven", "established"]
 }

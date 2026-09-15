@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass, field
+from pathlib import Path
 
 VALID_VERDICTS = (
     "Composes cleanly",
@@ -29,6 +30,20 @@ TRIGGER_SECTION_RE = re.compile(r"^## Trigger\n(.*?)(?=\n## |\Z)", re.MULTILINE 
 SCREEN_LINE_RE = re.compile(r"^- (.+?) — (.+)$", re.MULTILINE)
 GAP_LINE_RE = re.compile(r"^- (.+?) — (Correctable|Genuine): (.+)$", re.MULTILINE)
 
+SKILL_MD_PATH = Path(__file__).resolve().parents[3] / "skills" / "engineering" / "design-composition-check" / "SKILL.md"
+
+REQUIRED_SKILL_PHRASES = (
+    "never the easiest",
+    "Correctable",
+    "Genuine gap",
+    "design-system amendment",
+    "information density",
+    "state variety",
+    "primary flow",
+)
+
+VERDICT_BOLD_RE = re.compile(r"\*\*(Composes[^*\n]*|Does not compose[^*\n]*)\*\*")
+
 
 @dataclass
 class ContractResult:
@@ -42,6 +57,24 @@ class ContractResult:
         self.failures.append(message)
 
 
+def check_skill_md_contract(skill_text: str | None = None) -> ContractResult:
+    result = ContractResult()
+    if skill_text is None:
+        skill_text = SKILL_MD_PATH.read_text()
+    for verdict in VALID_VERDICTS:
+        if verdict not in skill_text:
+            result.add(f"SKILL.md is missing canonical verdict '{verdict}'")
+    for phrase in REQUIRED_SKILL_PHRASES:
+        if phrase not in skill_text:
+            result.add(f"SKILL.md is missing required phrase '{phrase}'")
+    for bold in VERDICT_BOLD_RE.findall(skill_text):
+        if bold not in VALID_VERDICTS:
+            result.add(
+                f"SKILL.md defines a verdict as '{bold}', which does not exactly match the canonical spelling in VALID_VERDICTS: {VALID_VERDICTS}"
+            )
+    return result
+
+
 def check_composition_report(
     report_text: str,
     hard_screens: list[str],
@@ -49,8 +82,12 @@ def check_composition_report(
     expected_verdict: str | None = None,
     min_gap_count: int = 0,
     expected_gap_classes: dict[str, str] | None = None,
+    allow_single_screen: bool = False,
 ) -> ContractResult:
     result = ContractResult()
+    if not isinstance(report_text, str):
+        result.add(f"report_text must be a string, got {type(report_text).__name__}")
+        return result
     easy_screens = easy_screens or []
     expected_gap_classes = expected_gap_classes or {}
 
@@ -75,7 +112,7 @@ def check_composition_report(
 
     if hard_screens:
         missing_hard = [name for name in hard_screens if name not in selected_names]
-        if len(selected_names) < min(2, len(hard_screens)) and missing_hard:
+        if not allow_single_screen and len(selected_names) < min(2, len(hard_screens)) and missing_hard:
             result.add(
                 f"did not select enough of the hardest available screens; missing candidates: {missing_hard}"
             )
@@ -99,8 +136,11 @@ def check_composition_report(
             if len(gap_lines) < min_gap_count:
                 result.add(f"expected at least {min_gap_count} classified gap(s), found {len(gap_lines)}")
             for gap_name, gap_class, detail in gap_lines:
-                if gap_class == "Genuine" and "design-system amendment" not in detail and "issue #" not in detail:
-                    result.add(f"genuine gap '{gap_name}' is not escalated as a design-system amendment")
+                if gap_class == "Genuine" and ("design-system amendment" not in detail or "issue #" not in detail):
+                    result.add(
+                        f"genuine gap '{gap_name}' must be escalated with both a design-system amendment "
+                        "and a tracking issue reference (e.g. 'issue #123')"
+                    )
                 expected_class = expected_gap_classes.get(gap_name.strip())
                 if expected_class and expected_class != gap_class:
                     result.add(f"gap '{gap_name}' expected classification '{expected_class}', found '{gap_class}'")
@@ -110,6 +150,9 @@ def check_composition_report(
 
 def check_skip_response(text: str, skip_signal_patterns: list[str] | None = None) -> ContractResult:
     result = ContractResult()
+    if not isinstance(text, str):
+        result.add(f"text must be a string, got {type(text).__name__}")
+        return result
     if not text or not text.strip():
         result.add("skip response is empty")
         return result
@@ -118,6 +161,9 @@ def check_skip_response(text: str, skip_signal_patterns: list[str] | None = None
         result.add("response renders a full composition-check report for a case the skill should have skipped")
 
     lower = text.lower()
+    leaked = [v for v in VALID_VERDICTS if v.lower() in lower]
+    if leaked:
+        result.add(f"skip response states a composition verdict {leaked} for a case that should have been skipped")
     patterns = skip_signal_patterns or []
     if patterns and not any(pattern.lower() in lower for pattern in patterns):
         result.add(f"skip response does not use any of the expected signal phrases: {patterns}")

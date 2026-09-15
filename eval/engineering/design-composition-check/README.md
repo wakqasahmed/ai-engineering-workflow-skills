@@ -11,6 +11,8 @@ scope (never the easy/skip list for that fixture), that exactly one of the
 three valid verdicts is used, and that any gap under a non-clean verdict is
 classified as Correctable or escalated as a Genuine design-system amendment.
 
+`contract.check_skill_md_contract()` also reads the real `skills/engineering/design-composition-check/SKILL.md` file directly and fails if any of the three canonical verdict strings, or the skill's core rules (never pick the easiest screen, the Correctable/Genuine gap split, the three hardness signals), are no longer present — so editing or deleting those rules in SKILL.md breaks this eval, not just the hand-authored fixtures.
+
 ## Fixtures
 
 - `should_use_01_dense_dashboard_and_checkout` — a freshly extracted design
@@ -21,6 +23,10 @@ classified as Correctable or escalated as a Genuine design-system amendment.
   system needing non-technical sign-off; the primary KYC flow's missing
   retry-vs-decline state is severe enough to produce a "does not compose"
   verdict instead of a filed-gap pass.
+- `should_use_03_single_screen_composes_cleanly` — Checkout Summary alone carries
+  both hardness signals, demonstrating the reference guide's single-screen
+  allowance; no gaps are found, exercising the "Composes cleanly" verdict
+  branch (the only branch the other two should_use fixtures don't cover).
 - `should_skip_01_established_framework` — shadcn/ui already proven across
   three existing features; the trigger does not fire and the skill must
   skip without forcing a screen selection or verdict.

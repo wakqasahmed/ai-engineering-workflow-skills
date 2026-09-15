@@ -40,6 +40,7 @@ def run_should_use_fixture(fixture_dir: Path, meta: dict) -> list:
         expected_verdict=meta.get("expected_verdict"),
         min_gap_count=meta.get("min_gap_count", 0),
         expected_gap_classes=meta.get("expected_gap_classes", {}),
+        allow_single_screen=meta.get("allow_single_screen", False),
     )
     return result.failures
 
@@ -72,8 +73,11 @@ def check_easy_screen_regression() -> list[str]:
         easy_screens=meta["easy_screens"],
         expected_verdict=meta.get("expected_verdict"),
     )
-    if result.passed:
-        return ["contract accepted a report that anchored on the easy landing/settings screens instead of the hard ones"]
+    if not any("is one of the easy/skip screens" in f for f in result.failures):
+        return [
+            "contract did not reject the easy-screen anchors via the dedicated easy_screens guard "
+            f"(failures were: {result.failures})"
+        ]
     return []
 
 
@@ -86,6 +90,13 @@ def main() -> int:
     should_use_count = 0
     should_skip_count = 0
     total_failures = 0
+
+    skill_failures = contract.check_skill_md_contract().failures
+    status = "PASS" if not skill_failures else "FAIL"
+    print(f"[{status}] SKILL.md matches the deterministic contract")
+    for failure in skill_failures:
+        print(f"    - {failure}")
+        total_failures += 1
 
     regression_failures = check_easy_screen_regression()
     status = "PASS" if not regression_failures else "FAIL"
