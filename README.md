@@ -202,6 +202,7 @@ To anchor an agent session to this workflow playbook, reference `system-level/co
 | [`clarify-work`](skills/engineering/clarify-work/SKILL.md) | Clarify non-trivial engineering work before implementation by resolving ambiguity, terminology, constraints, and the smallest viable path. |
 | [`decompose-to-issues`](skills/engineering/decompose-to-issues/SKILL.md) | Break high-level work into independently executable GitHub issues using vertical slices. |
 | [`define-done`](skills/engineering/define-done/SKILL.md) | Define acceptance criteria, risk level, and verification before editing. |
+| [`design-composition-check`](skills/engineering/design-composition-check/SKILL.md) | Falsify a new or unfamiliar design system by rendering its hardest UI compositions before other features build on it. |
 | [`diagnose`](skills/engineering/diagnose/SKILL.md) | Disciplined diagnosis loop for hard bugs and performance regressions: reproduce → minimise → hypothesise → instrument → fix → regression-test. |
 | [`docker-volume-guardrails`](skills/engineering/docker-volume-guardrails/SKILL.md) | Set up a hook that unconditionally blocks Docker commands that permanently delete a volume (`docker volume rm/prune`, `docker rm -v`, `docker system prune --volumes`, `docker compose down -v`). |
 | [`external-campaign-triage`](skills/engineering/external-campaign-triage/SKILL.md) | Track state across many candidate issues, PRs, and repos in a multi-repo external open-source contribution campaign, using a local tracker instead of GitHub labels. |

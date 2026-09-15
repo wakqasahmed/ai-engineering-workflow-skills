@@ -1,0 +1,13 @@
+{
+  "id": "should_use_01_dense_dashboard_and_checkout",
+  "category": "should_use",
+  "description": "New, unfamiliar, Figma-extracted design system about to be used by four features; the hardest candidates are the dense filtered/sortable dashboard and the primary approval flow, not the landing or settings screens.",
+  "hard_screens": ["Analytics Dashboard", "Approval Flow"],
+  "easy_screens": ["Welcome Landing Screen", "Settings Screen"],
+  "expected_verdict": "Composes with a filed gap",
+  "min_gap_count": 2,
+  "expected_gap_classes": {
+    "Column-level filter chips overflow the token spacing scale at 6+ active filters": "Correctable",
+    "No defined state for a rejected approval step re-opened for edits": "Genuine"
+  }
+}
