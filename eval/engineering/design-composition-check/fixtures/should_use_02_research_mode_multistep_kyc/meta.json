@@ -1,0 +1,12 @@
+{
+  "id": "should_use_02_research_mode_multistep_kyc",
+  "category": "should_use",
+  "description": "Research-mode-derived design system, non-technical stakeholder sign-off required; the primary KYC flow has state variety the system cannot yet represent, forcing a does-not-compose verdict rather than a filed-gap pass.",
+  "hard_screens": ["KYC Flow", "Audit Log"],
+  "easy_screens": ["Why Verify Explainer"],
+  "expected_verdict": "Does not compose — rework before scaling",
+  "min_gap_count": 1,
+  "expected_gap_classes": {
+    "No token or component represents a declined-with-retry state distinct from a hard decline": "Genuine"
+  }
+}
