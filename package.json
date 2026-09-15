@@ -1,0 +1,18 @@
+{
+  "name": "ai-engineering-workflow-skills",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Canonical source for engineering workflow, product, and productivity Agent Skills, installed with `npx skills add wakqasahmed/ai-engineering-workflow-skills`.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wakqasahmed/ai-engineering-workflow-skills.git"
+  },
+  "scripts": {
+    "diagram": "node scripts/generate-workflow-diagram.mjs",
+    "diagram:check": "node scripts/generate-workflow-diagram.mjs --check"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^3.0.3"
+  }
+}
