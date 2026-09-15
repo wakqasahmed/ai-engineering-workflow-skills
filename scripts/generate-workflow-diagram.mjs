@@ -121,6 +121,11 @@ function discoverSkills() {
 
 const nodeId = (name) => "s_" + name.replace(/[^a-zA-Z0-9]/g, "_");
 
+// Skill names and category/stage labels end up inside double-quoted Mermaid
+// node labels; escape so a literal `"` or `\` in either can't break the
+// generated diagram's syntax.
+const escapeMermaidLabel = (label) => label.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+
 function buildDiagram(skills) {
   const assigned = new Set([ENTRY_SKILL]);
   const groups = [];
@@ -143,7 +148,7 @@ function buildDiagram(skills) {
   for (const [category, names] of [...byCategory].sort()) {
     groups.push({
       id: "X_" + category.replace(/[^a-zA-Z0-9]/g, "_"),
-      label: `Unrouted ${category} skills`,
+      label: `Unrouted ${escapeMermaidLabel(category)} skills`,
       skills: names,
     });
   }
@@ -165,10 +170,10 @@ function buildDiagram(skills) {
   for (const group of groups) {
     const isStage = STAGES.some((stage) => stage.id === group.id);
     if (isStage) stageIds.push(group.id);
-    lines.push(`    subgraph ${group.id}["${group.label}"]`);
+    lines.push(`    subgraph ${group.id}["${escapeMermaidLabel(group.label)}"]`);
     lines.push("        direction LR");
     for (const name of group.skills) {
-      lines.push(`        ${nodeId(name)}["${name}"]`);
+      lines.push(`        ${nodeId(name)}["${escapeMermaidLabel(name)}"]`);
     }
     if (group.sequential) {
       for (let i = 1; i < group.skills.length; i += 1) {
