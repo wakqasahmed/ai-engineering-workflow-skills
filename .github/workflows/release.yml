@@ -30,9 +30,15 @@ jobs:
       # the repository with `npx skills add`. The action only opens/updates the
       # version PR, and the version step regenerates the README diagram so it
       # ships with the same commit as the version bump.
+      #
+      # changesets/action runs `version` via @actions/exec with no shell, so it
+      # tokenizes the string itself and `&&` is passed through literally instead
+      # of being interpreted as a shell operator. The chain has to live behind a
+      # single npm script (npm run *does* go through a shell) rather than inline
+      # here.
       - uses: changesets/action@ae32849d5ba541f9ae29e40e22a623bc13562f51 # v2.1.2
         with:
-          version: npx changeset version && node scripts/generate-workflow-diagram.mjs
+          version: npm run version-packages
           title: "Version Packages"
           commit: "chore: version packages"
         env:

@@ -40,7 +40,7 @@ const STAGES = [
   {
     id: "S4",
     label: "4 - Verify & Review",
-    skills: ["review-gate", "ai-agent-pr-metadata", "open-code-review-setup"],
+    skills: ["review-gate", "ai-agent-pr-metadata", "open-code-review-setup", "design-composition-check"],
   },
   {
     id: "S5",
