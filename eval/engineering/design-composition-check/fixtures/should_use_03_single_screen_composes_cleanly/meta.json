@@ -1,0 +1,11 @@
+{
+  "id": "should_use_03_single_screen_composes_cleanly",
+  "category": "should_use",
+  "description": "A design system serving two queued features; Checkout Summary alone carries both hardness signals (a dense order-summary table and the primary flow), so picking it alone is sufficient per the screen-selection guide's single-screen allowance. No gaps found: the system composes cleanly.",
+  "hard_screens": ["Checkout Summary", "Order Confirmation"],
+  "easy_screens": ["Thank You Screen"],
+  "expected_verdict": "Composes cleanly",
+  "min_gap_count": 0,
+  "expected_gap_classes": {},
+  "allow_single_screen": true
+}

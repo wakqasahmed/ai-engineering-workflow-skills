@@ -1,0 +1,1 @@
+Skip: shadcn/ui is an established, framework-driven UI already proven across three existing features in this project over the past two quarters, and this feature introduces no new tokens or components. The design-composition-check trigger does not fire — proceeding directly to the bulk-edit screen without a screen selection or verdict.

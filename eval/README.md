@@ -23,6 +23,7 @@ This directory contains deterministic contract evaluations and model-outcome har
 | `clarify-work` | `eval/engineering/clarify-work/` | Built-in | Verified in CI |
 | `decompose-to-issues` | `eval/engineering/decompose-to-issues/` | Built-in | Verified in CI |
 | `define-done` | `eval/engineering/define-done/` | Built-in | Verified in CI |
+| `design-composition-check` | `eval/engineering/design-composition-check/` | None | Golden-fixture report-structure contract only, same tier as `write-prompt-guide`; verified in CI |
 | `hitl-blocker` | `eval/engineering/hitl-blocker/` | Built-in | Verified in CI |
 | `release-gate` | `eval/engineering/release-gate/` | Built-in | Verified in CI |
 | `review-gate` | `eval/engineering/review-gate/` | Built-in | Verified in CI |
