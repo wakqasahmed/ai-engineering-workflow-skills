@@ -30,6 +30,7 @@ Apply this gate selectively based on risk level to prevent release gridlock:
 - Smoke test command
 - Rollback command or previous artifact
 - Health check signal
+- Configuration completeness and secret-delivery verification, for changes that introduce or change required config/secrets (see `references/configuration-preflight.md`)
 
 ## Guardrails
 
