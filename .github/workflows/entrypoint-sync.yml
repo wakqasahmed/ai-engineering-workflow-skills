@@ -23,6 +23,9 @@ jobs:
       - name: Verify skill listing
         shell: bash
         run: scripts/list-skills.sh | grep -q "skills/engineering/clarify-work/SKILL.md"
+      - name: Verify README workflow diagram matches the skills on disk
+        shell: bash
+        run: node scripts/generate-workflow-diagram.mjs --check
       - name: Run open-code-review-setup deterministic contract eval
         shell: bash
         run: eval/engineering/open-code-review-setup/run-eval.sh
