@@ -1,11 +1,11 @@
 ---
 name: external-pr-style
-description: Write PR descriptions for third-party upstream repos in natural human prose to avoid maintainer AI-rejection patterns. Use before opening any PR against a repo we don't own.
+description: Write PR descriptions and maintainer replies for third-party upstream repos in natural, concise human prose to avoid maintainer AI-rejection patterns. Use before opening any PR against a repo we don't own, and before replying to a maintainer's comment or question on one.
 ---
 
 # External PR Style
 
-Use this whenever opening a PR against a repository we don't own or control: any upstream, third-party, open-source contribution.
+Use this whenever opening a PR against a repository we don't own or control, and whenever replying to a maintainer's comment or question on one: any upstream, third-party, open-source contribution.
 
 ## The problem
 
@@ -18,9 +18,26 @@ Maintainers in high-volume open-source repositories frequently pattern-match aga
 - Write the PR body as first-person prose describing the bug and the fix, the way you'd explain it to a coworker over chat, not as a templated report.
 - No invented section headers unless the target repo's own template requires them (see exception below). Skip "Root Cause:", "Why This Works:", "Alternatives Considered:", "Summary:" unless the repo asks for exactly that.
 - State what you verified (tests run, red→green proof, residual risk on security-sensitive changes) as plain sentences woven into the explanation, not as a labeled checklist.
-- Don't over-explain a small fix. Match the length of the description to the size of the change: for small fixes (1-20 lines), write 1-2 concise sentences describing the symptom and fix; for medium changes (20-100 lines), write one compact paragraph (3-5 sentences); for large changes (100+ lines), write two focused paragraphs detailing what changed, why, and what was verified.
-- Don't hedge excessively or enumerate edge cases nobody asked about.
+- Don't over-explain a small fix. Match the length of the description to the size of the change:
+
+  | Change size | Body shape | Rough ceiling |
+  | :--- | :--- | :---: |
+  | Small (1-20 lines) | 1-2 concise sentences on symptom and fix | ~40 words |
+  | Medium (20-100 lines) | one compact paragraph (3-5 sentences) | ~90 words |
+  | Large (100+ lines) | two focused paragraphs: what changed and why, then what was verified | ~220 words |
+
+  These ceilings count the description prose only, not a repo-required template's own checklist items. Treat them as a budget to catch drift, not a target to fill: a correct 15-word body for a small fix is better than a 40-word one padded to hit the ceiling.
+- Don't hedge excessively, enumerate edge cases nobody asked about, or offer unrequested follow-up work ("happy to also add X if useful"). If it's worth doing, do it before opening the PR; if it isn't necessary, don't mention it.
 - Keep at most 3 external PRs open at a time (recommended). Submitting batches beyond this concurrency threshold risks being flagged as an automated spammer by maintainers or platform abuse filters.
+
+## Replying to maintainer comments and questions
+
+The same principle governs replies, not just the initial PR body: match the reply's length to what the maintainer actually asked, not to everything you know about the change.
+
+- A yes/no question, a request to rebase, or a one-line clarification gets a one- or two-sentence reply. Don't re-derive or restate the original diagnosis the maintainer has already read in the PR body.
+- Only go longer when the maintainer explicitly asks for more (e.g. "can you walk through why this doesn't regress X", "what about the case where Y"). Answer exactly what was asked, at the depth asked for, and stop there.
+- If a maintainer closes the PR in favor of a different approach, a short acknowledgment is enough. Don't re-argue the case or re-explain the original fix; they've already made the call.
+- The same em-dash, hedge-word, and compression-pass rules below apply to every reply, exactly as they apply to the PR body.
 
 ## Em dashes are a tell
 
@@ -44,6 +61,8 @@ Long, padded explanations are themselves an AI-tell, independent of headers. Rer
 
 This is a compression pass on your own draft, not a caveman-style rewrite. Keep full sentences, articles, and natural grammar. The goal is a shorter draft that reads like a person who typed fast, not a person who dropped words to save tokens. If a sentence survives after removing every filler word from it, it earns its place; if it doesn't survive, it wasn't saying anything.
 
+Before posting, name the diff's size tier from the table above (or "reply" for a comment response) and roughly count the drafted words. If it's over that tier's ceiling, cut until it isn't, rather than shipping the first draft.
+
 ## Exception: repos with a bot-enforced template
 
 Some repos mechanically require specific sections (a PR-checks bot that blocks merge until a template is filled in, e.g. a required Summary/Why/How/Testing/Examples/Checklist structure, or a PR-title-lint bot with a fixed scope list). There, fill in exactly what's required. That's a hard requirement, not the AI-tell pattern: skipping it isn't concision, it's an incomplete submission that gets mechanically blocked before a human ever reads it.
@@ -56,4 +75,4 @@ Some repos state an outright policy against AI-assisted contributions (e.g. a ma
 
 ## Commit messages
 
-This governs PR *descriptions* only. Commit message attribution rules (no AI co-author lines, ever) are unaffected and covered separately in `system-level/core.md`: they apply regardless of which repo you're contributing to.
+This governs PR *descriptions and replies* only. Commit message attribution rules (no AI co-author lines, ever) are unaffected and covered separately in `system-level/core.md`: they apply regardless of which repo you're contributing to.

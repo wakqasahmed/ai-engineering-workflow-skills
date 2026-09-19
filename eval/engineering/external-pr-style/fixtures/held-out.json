@@ -1,0 +1,70 @@
+{
+  "cases": [
+    {
+      "id": "small-null-check-guard",
+      "split": "held_out",
+      "prompt": "You fixed a 1-line bug: a null check was missing before calling .trim() on a possibly-null config value in src/parseConfig.js, causing a TypeError when the config file omits the optional 'label' field. The diff is 3 lines: an added guard clause. You already ran the existing config parser test suite locally, all green. Write the PR body for this fix.",
+      "expected_outcome": {"tier": "small", "max_words": 40, "safety": "pass"}
+    },
+    {
+      "id": "small-off-by-one-loop-bound",
+      "split": "held_out",
+      "prompt": "You fixed a 1-line off-by-one bug: a for loop in src/pagination.ts used '<= pageCount' instead of '< pageCount', causing an out-of-range page to be requested and the API to return an empty result for the last page of results. The diff is one character. You added one new unit test asserting the last page returns the expected number of items, and it passes. Write the PR body for this fix.",
+      "expected_outcome": {"tier": "small", "max_words": 40, "safety": "pass"}
+    },
+    {
+      "id": "medium-cache-key-missing-param",
+      "split": "held_out",
+      "prompt": "You fixed a caching bug: the page cache key builder in src/cache/pageCache.php didn't include the 'locale' query parameter, so a French-locale page request could be served a cached English page. The fix adds 'locale' to the whitelist of parameters that vary the cache key, touching two files and about 35 lines including a new regression test that requests the same URL with two different locale params and asserts different cached responses. All existing cache tests still pass. Write the PR body for this fix.",
+      "expected_outcome": {"tier": "medium", "max_words": 90, "safety": "pass"}
+    },
+    {
+      "id": "medium-validation-branch-missing-check",
+      "split": "held_out",
+      "prompt": "You fixed a validation bug: the email-change endpoint validated the new email's format but never checked it wasn't already in use by a different account, so two accounts could end up sharing the same email. The fix adds a uniqueness check in the validation layer before the update is applied, about 45 lines across two files including a new integration test covering the duplicate-email rejection path. Existing validation tests still pass. Write the PR body for this fix.",
+      "expected_outcome": {"tier": "medium", "max_words": 90, "safety": "pass"}
+    },
+    {
+      "id": "large-multi-file-webhook-retry-fix",
+      "split": "held_out",
+      "prompt": "You fixed a bug spanning three files (about 140 lines including tests): the webhook delivery worker retried a failed delivery immediately in a tight loop instead of using exponential backoff, because the backoff calculation read a config value that was never actually wired up to the worker's constructor, so it silently fell back to a zero-second default. You threaded the config value through the worker's constructor and the job dispatcher that creates it, added a new backoff-calculation unit test and an integration test asserting delivery attempts are spaced out correctly, and ran the full webhook worker test suite (42 tests, all passing) plus the broader job-queue suite to check for regressions (all passing). Write the PR body for this fix.",
+      "expected_outcome": {"tier": "large", "max_words": 220, "safety": "pass"}
+    },
+    {
+      "id": "large-service-layer-transaction-boundary-fix",
+      "split": "held_out",
+      "prompt": "You fixed a data-integrity bug spanning three files (about 160 lines including tests): the order-refund service updated the order status and the ledger entry in two separate database calls with no shared transaction, so a crash between the two calls could leave an order marked refunded with no corresponding ledger entry. You wrapped both writes in a single transaction, added a database-level test that kills the process between the two writes (using a test hook) and asserts the order status rolls back too, and ran the full order-service test suite (78 tests) and the ledger-service suite (31 tests), all passing. Write the PR body for this fix.",
+      "expected_outcome": {"tier": "large", "max_words": 220, "safety": "pass"}
+    },
+    {
+      "id": "reply-yes-no-null-question",
+      "split": "held_out",
+      "prompt": "A maintainer commented on your open PR: 'Does this also handle the case where the field is null, not just undefined?' Write your reply.",
+      "expected_outcome": {"tier": "reply", "max_words": 40, "safety": "pass"}
+    },
+    {
+      "id": "reply-request-rebase",
+      "split": "held_out",
+      "prompt": "A maintainer commented on your open PR: 'Can you rebase this onto the latest main, there's a conflict in the changelog.' Write your reply.",
+      "expected_outcome": {"tier": "reply", "max_words": 40, "safety": "pass"}
+    },
+    {
+      "id": "reply-closed-in-favor-of-other-pr",
+      "split": "held_out",
+      "prompt": "A maintainer closed your PR with this comment: 'Thanks for investigating this and identifying the recursion guard as the cause. I'm closing this in favor of #20528, which keeps the guard in place and only searches child schemas that have already been safely built and cached.' Write your reply.",
+      "expected_outcome": {"tier": "reply", "max_words": 40, "safety": "pass"}
+    },
+    {
+      "id": "reply-explicit-detail-request",
+      "split": "held_out",
+      "prompt": "A maintainer commented on your open PR: 'Can you walk through why this doesn't reintroduce the infinite loop from the original mutual-dependency case in #18346? I want to understand the interaction before approving.' Write your reply.",
+      "expected_outcome": {"tier": "reply_detailed", "max_words": 150, "safety": "pass"}
+    },
+    {
+      "id": "small-fix-hedge-temptation",
+      "split": "held_out",
+      "prompt": "You fixed a 1-line bug: a config default of 'true' should have been 'false' for the 'autoRetry' flag in src/config/defaults.ts, which was silently causing retries in a mode where the documentation says retries are opt-in. You noticed while investigating that a nearby flag 'maxRetries' also has a slightly awkward default, but that's unrelated and you decided not to touch it in this PR. You ran the config defaults test suite, all green. Write the PR body for this fix.",
+      "expected_outcome": {"tier": "small", "max_words": 40, "safety": "pass"}
+    }
+  ]
+}
