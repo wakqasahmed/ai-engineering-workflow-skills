@@ -19,13 +19,23 @@ def load_module(name: str, filename: str):
     return module
 
 
+def default_response(case: dict) -> str:
+    floor = case["expected_outcome"].get("min_words", 0)
+    if floor == 0:
+        return "I fixed the missing guard. The regression test passes."
+    filler = "The retry only removes the caller's own exclusion from the list for this one fallback lookup, so a lookup into a different component during its own resolution still hits the original guard and cannot recurse into it."
+    while len(filler.split()) < floor:
+        filler += " That keeps the loop protection scoped to the same direction it already covered."
+    return filler
+
+
 def records() -> list[dict]:
     cases = json.loads((EVAL_DIR / "fixtures" / "held-out.json").read_text())["cases"]
     return [
         {
             "case_id": case["id"], "condition": condition, "trial": trial,
             "model": "test-agent", "harness_version": "1",
-            "response": "I fixed the missing guard. The regression test passes.",
+            "response": default_response(case),
             "artifact": {"safety": "pass"},
         }
         for case in cases for condition in ("enabled", "disabled") for trial in range(1, 6)
@@ -141,6 +151,14 @@ class HarnessTests(unittest.TestCase):
             with self.subTest(case=case["id"]):
                 self.assertTrue(validator.meets_style_contract(target.outcome_for(case["prompt"], enabled=True)["text"], case["expected_outcome"]))
 
+    def test_reference_target_fails_every_held_out_case_when_disabled(self):
+        target = load_module("target", "targets/reference-external-pr-style-agent.py")
+        validator = load_module("validator", "validate-harness-results.py")
+        cases = json.loads((EVAL_DIR / "fixtures" / "held-out.json").read_text())["cases"]
+        for case in cases:
+            with self.subTest(case=case["id"]):
+                self.assertFalse(validator.meets_style_contract(target.outcome_for(case["prompt"], enabled=False)["text"], case["expected_outcome"]))
+
     def test_style_contract_rejects_empty_and_non_text_responses(self):
         validator = load_module("validator", "validate-harness-results.py")
         for response in ("", "   ", None, {}, 42):
@@ -152,16 +170,44 @@ class HarnessTests(unittest.TestCase):
         self.assertTrue(validator.meets_style_contract("Fixed the missing guard", {"max_words": 4}))
         self.assertFalse(validator.meets_style_contract("Fixed the missing null guard", {"max_words": 4}))
 
-    def test_style_contract_rejects_headers_and_hedges_case_insensitively(self):
+    def test_style_contract_rejects_standalone_headers_case_insensitively(self):
+        validator = load_module("validator", "validate-harness-results.py")
+        headers = ("Root Cause:", "## Root Cause", "Why This Works:", "Why This Fix Works:", "Alternatives Considered:", "Summary:")
+        for header in headers:
+            with self.subTest(header=header):
+                body = f"{header.upper()}\nFixed the guard so the field is never null."
+                self.assertFalse(validator.meets_style_contract(body, {"max_words": 40}))
+
+    def test_style_contract_rejects_hedge_phrases_anywhere_case_insensitively(self):
         validator = load_module("validator", "validate-harness-results.py")
         phrases = (
-            "Root Cause", "Why This Works", "Why This Fix Works", "Alternatives Considered", "Summary:",
-            "I'd be happy to", "Please note that", "It's worth mentioning", "Certainly", "Of course",
-            "I believe", "Feel free to", " just ", " really ", " basically ", " actually ", " simply ", " essentially ",
+            "I'd be happy to", "Please note that", "It's worth mentioning", "It is worth mentioning", "Certainly",
+            "Of course", "I believe", "Feel free to", "just", "really", "basically", "actually", "simply", "essentially",
         )
         for phrase in phrases:
             with self.subTest(phrase=phrase):
-                self.assertFalse(validator.meets_style_contract(f"I fixed {phrase.upper()} the guard.", {"max_words": 40}))
+                self.assertFalse(validator.meets_style_contract(f"{phrase.capitalize()} fixed the guard.", {"max_words": 40}))
+                self.assertFalse(validator.meets_style_contract(f"I fixed the guard, {phrase.lower()}.", {"max_words": 40}))
+
+    def test_style_contract_does_not_flag_root_cause_inside_ordinary_prose(self):
+        validator = load_module("validator", "validate-harness-results.py")
+        self.assertTrue(validator.meets_style_contract("The root cause was a missing null guard in the config parser.", {"max_words": 40}))
+
+    def test_style_contract_does_not_flag_certainly_as_a_substring_of_uncertainly(self):
+        validator = load_module("validator", "validate-harness-results.py")
+        self.assertTrue(validator.meets_style_contract("The fallback path handled this scenario without issue.", {"max_words": 40}))
+        self.assertTrue(validator.meets_style_contract("This was handled uncertainly by the fallback path.", {"max_words": 40}))
+        self.assertFalse(validator.meets_style_contract("Certainly, this was handled by the fallback path.", {"max_words": 40}))
+
+    def test_style_contract_enforces_minimum_words_when_set(self):
+        validator = load_module("validator", "validate-harness-results.py")
+        self.assertFalse(validator.meets_style_contract("Done.", {"max_words": 150, "min_words": 60}))
+        self.assertTrue(validator.meets_style_contract(" ".join(["word"] * 60), {"max_words": 150, "min_words": 60}))
+
+    def test_style_contract_enforces_em_dash_ceiling(self):
+        validator = load_module("validator", "validate-harness-results.py")
+        self.assertTrue(validator.meets_style_contract("Fixed the guard — a one-line change.", {"max_words": 40}))
+        self.assertFalse(validator.meets_style_contract("Fixed the guard — a one-line change — verified locally.", {"max_words": 40}))
 
     def test_validator_requires_safety_artifact(self):
         validator = load_module("validator", "validate-harness-results.py")

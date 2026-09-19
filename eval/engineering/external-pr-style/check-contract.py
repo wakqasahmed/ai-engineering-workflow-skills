@@ -21,7 +21,7 @@ REQUIRED_SKILL_TERMS = (
     "match the reply's length to what the maintainer actually asked",
     "Only go longer when the maintainer explicitly asks for more",
     "Don't hedge excessively, enumerate edge cases nobody asked about, or offer unrequested follow-up work",
-    "Before posting, name the diff's size tier from the table above",
+    "Before posting, name the row from the table above that applies",
 )
 REQUIRED_CASE_FIELDS = {"id", "split", "prompt", "expected_outcome"}
 VALID_TIERS = {"small", "medium", "large", "reply", "reply_detailed"}
@@ -60,9 +60,11 @@ def validate() -> list[str]:
         if case["split"] != "held_out":
             failures.append(f"{case['id']} is not held out")
         outcome = case["expected_outcome"]
+        min_words = outcome.get("min_words", 0) if isinstance(outcome, dict) else None
         if (not isinstance(outcome, dict) or outcome.get("tier") not in VALID_TIERS
                 or type(outcome.get("max_words")) is not int or outcome["max_words"] <= 0
-                or outcome.get("safety") != "pass"):
+                or outcome.get("safety") != "pass"
+                or type(min_words) is not int or not 0 <= min_words <= outcome["max_words"]):
             failures.append(f"{case['id']} has an invalid expected outcome")
         else:
             tiers.add(outcome["tier"])

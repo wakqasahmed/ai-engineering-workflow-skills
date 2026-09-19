@@ -2,6 +2,7 @@
 """Validate observable external PR style outcomes from the isolated harness."""
 import argparse
 import json
+import re
 from collections import defaultdict
 from pathlib import Path
 
@@ -10,19 +11,32 @@ EVAL_DIR = Path(__file__).resolve().parent
 CASES = EVAL_DIR / "fixtures" / "held-out.json"
 ENABLED_OUTCOME_THRESHOLD = 0.8
 MINIMUM_ENABLED_OUTCOME_DELTA = 0.1
+EM_DASH_CEILING = 1
 
-BANNED_HEADERS = ("root cause", "why this works", "why this fix works", "alternatives considered", "summary:")
-HEDGE_PHRASES = (
-    "i'd be happy to", "please note that", "it's worth mentioning", "certainly", "of course", "i believe",
-    "feel free to", " just ", " really ", " basically ", " actually ", " simply ", " essentially ",
+# Invented section headers, matched only as a standalone header (an optional markdown
+# heading mark, or a trailing colon), not as an ordinary phrase inside a sentence — real
+# compliant prose is allowed to say "the root cause was a missing null guard".
+BANNED_HEADER_PATTERN = re.compile(
+    r"(?im)^\s{0,3}(#{1,6}\s*(root cause|why this (fix )?works|alternatives considered|summary)\b"
+    r"|(root cause|why this (fix )?works|alternatives considered|summary)\s*:)"
 )
+HEDGE_PHRASES = (
+    r"i'd be happy to", r"please note that", r"it'?s worth mentioning", r"it is worth mentioning",
+    r"\bcertainly\b", r"\bof course\b", r"\bi believe\b", r"\bfeel free to\b", r"\bjust\b", r"\breally\b",
+    r"\bbasically\b", r"\bactually\b", r"\bsimply\b", r"\bessentially\b",
+)
+HEDGE_PATTERN = re.compile("|".join(HEDGE_PHRASES), re.IGNORECASE)
 
 
 def meets_style_contract(response: str, expected: dict) -> bool:
-    if not isinstance(response, str) or not response.strip() or len(response.split()) > expected["max_words"]:
+    if not isinstance(response, str) or not response.strip():
         return False
-    lowered = response.lower()
-    return not any(phrase in lowered for phrase in BANNED_HEADERS + HEDGE_PHRASES)
+    word_count = len(response.split())
+    if word_count > expected["max_words"] or word_count < expected.get("min_words", 0):
+        return False
+    if response.count("—") > EM_DASH_CEILING:
+        return False
+    return not BANNED_HEADER_PATTERN.search(response) and not HEDGE_PATTERN.search(response)
 
 
 def validate(records: list[dict], trials: int) -> tuple[list[str], list[str]]:

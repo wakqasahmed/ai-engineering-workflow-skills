@@ -25,6 +25,8 @@ Maintainers in high-volume open-source repositories frequently pattern-match aga
   | Small (1-20 lines) | 1-2 concise sentences on symptom and fix | ~40 words |
   | Medium (20-100 lines) | one compact paragraph (3-5 sentences) | ~90 words |
   | Large (100+ lines) | two focused paragraphs: what changed and why, then what was verified | ~220 words |
+  | Reply (routine question, rebase request, acknowledgment) | 1-2 sentences answering exactly what was asked | ~40 words |
+  | Reply (maintainer explicitly asked for detail) | as many sentences as the question needs, no more | ~150 words |
 
   These ceilings count the description prose only, not a repo-required template's own checklist items. Treat them as a budget to catch drift, not a target to fill: a correct 15-word body for a small fix is better than a 40-word one padded to hit the ceiling.
 - Don't hedge excessively, enumerate edge cases nobody asked about, or offer unrequested follow-up work ("happy to also add X if useful"). If it's worth doing, do it before opening the PR; if it isn't necessary, don't mention it.
@@ -61,7 +63,7 @@ Long, padded explanations are themselves an AI-tell, independent of headers. Rer
 
 This is a compression pass on your own draft, not a caveman-style rewrite. Keep full sentences, articles, and natural grammar. The goal is a shorter draft that reads like a person who typed fast, not a person who dropped words to save tokens. If a sentence survives after removing every filler word from it, it earns its place; if it doesn't survive, it wasn't saying anything.
 
-Before posting, name the diff's size tier from the table above (or "reply" for a comment response) and roughly count the drafted words. If it's over that tier's ceiling, cut until it isn't, rather than shipping the first draft.
+Before posting, name the row from the table above that applies (a diff size tier, or one of the two reply rows) and roughly count the drafted words. If it's over that row's ceiling, cut until it isn't, rather than shipping the first draft.
 
 ## Exception: repos with a bot-enforced template
 
