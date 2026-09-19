@@ -73,7 +73,7 @@ def main() -> int:
                 with tempfile.TemporaryDirectory() as directory:
                     workspace = Path(directory)
                     prepare_workspace(workspace, agent, case, condition)
-                    result = subprocess.run(isolated_command(workspace, args.image), text=True, capture_output=True, check=True, env={"PATH": os.environ["PATH"], "HOME": "/nonexistent", "LANG": "C"})
+                    result = subprocess.run(isolated_command(workspace, args.image), text=True, capture_output=True, check=True, timeout=60, env={"PATH": os.environ["PATH"], "HOME": "/nonexistent", "LANG": "C"})
                 record = json.loads(result.stdout)
                 if set(record) != {"response", "artifact"} or not isinstance(record["response"], str) or not isinstance(record["artifact"], dict):
                     raise SystemExit("target-agent adapter must emit text plus an outcome artifact")

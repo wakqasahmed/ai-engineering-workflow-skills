@@ -16,7 +16,7 @@ def main() -> int:
     skill = WORKSPACE / "SKILL.md"
     if skill.is_file():
         request["skill_path"] = str(skill)
-    result = subprocess.run([str(WORKSPACE / "target-agent")], input=json.dumps(request), text=True, capture_output=True, check=True, cwd=WORKSPACE, env={"HOME": "/home/agent", "LANG": "C", "PATH": "/usr/local/bin:/usr/bin:/bin", "PYTHONNOUSERSITE": "1"})
+    result = subprocess.run([str(WORKSPACE / "target-agent")], input=json.dumps(request), text=True, capture_output=True, check=True, timeout=30, cwd=WORKSPACE, env={"HOME": "/home/agent", "LANG": "C", "PATH": "/usr/local/bin:/usr/bin:/bin", "PYTHONNOUSERSITE": "1"})
     if not result.stdout.strip():
         raise SystemExit("target agent returned an empty response")
     if not outcome_path.is_file():
