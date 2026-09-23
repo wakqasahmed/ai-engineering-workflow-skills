@@ -8,6 +8,7 @@
     "./skills/engineering/define-done",
     "./skills/engineering/design-composition-check",
     "./skills/engineering/diagnose",
+    "./skills/engineering/docker-db-guardrails",
     "./skills/engineering/docker-volume-guardrails",
     "./skills/engineering/external-campaign-triage",
     "./skills/engineering/external-pr-style",

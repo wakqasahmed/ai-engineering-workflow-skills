@@ -44,6 +44,9 @@ jobs:
       - name: Verify action pin validator
         shell: bash
         run: python3 -m unittest tests/test_validate_action_pins.py
+      - name: Verify docker DB guardrails hook
+        shell: bash
+        run: python3 -m unittest tests/test_block_unverified_destructive_db.py
       - name: Run caveman deterministic contract eval
         shell: bash
         run: eval/productivity/caveman/run-eval.sh
