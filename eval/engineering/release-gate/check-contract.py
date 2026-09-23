@@ -7,6 +7,7 @@ from pathlib import Path
 
 EVAL_DIR = Path(__file__).resolve().parent
 SKILL = EVAL_DIR.parent / "SKILL.md"
+CONFIGURATION_PREFLIGHT = EVAL_DIR.parent / "references" / "configuration-preflight.md"
 CASES = EVAL_DIR / "fixtures" / "held-out.json"
 TUNING_CASES = EVAL_DIR / "fixtures" / "tuning.json"
 REQUIRED_SKILL_TERMS = (
@@ -17,6 +18,16 @@ REQUIRED_SKILL_TERMS = (
     "Record rollback path.",
     "Create a HITL issue if deployment needs missing human-held access.",
     "Do not deploy production from unreviewed PRs.",
+    "reconcile required config/secret names against the target environment and block on any gap (`reconcile_config`)",
+    "run a non-secret canary through that path and block until the canary confirms delivery works (`run_canary`)",
+    "distinct from step 3's reconciliation, which is for config/secret names already obtainable through an existing provisioning process that simply haven't been set in the target environment yet",
+    "[configuration preflight](references/configuration-preflight.md)",
+)
+REQUIRED_REFERENCE_TERMS = (
+    "## 1. Reconciliation",
+    "## 2. Non-secret canary",
+    "it proves the delivery mechanism resolves",
+    "It does not prove the real credential is valid",
 )
 REQUIRED_CASE_FIELDS = {"id", "split", "prompt", "expected_outcome"}
 
@@ -45,6 +56,14 @@ def validate() -> list[str]:
     for term in REQUIRED_SKILL_TERMS:
         if term not in skill:
             failures.append(f"SKILL.md is missing required contract text: {term}")
+
+    if not CONFIGURATION_PREFLIGHT.is_file():
+        failures.append(f"missing referenced doc: {CONFIGURATION_PREFLIGHT}")
+    else:
+        reference = CONFIGURATION_PREFLIGHT.read_text()
+        for term in REQUIRED_REFERENCE_TERMS:
+            if term not in reference:
+                failures.append(f"configuration-preflight.md is missing required contract text: {term}")
 
     cases = json.loads(CASES.read_text())["cases"]
     failures.extend(validate_corpus(CASES, TUNING_CASES))
