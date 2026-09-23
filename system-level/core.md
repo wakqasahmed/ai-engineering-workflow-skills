@@ -81,7 +81,7 @@ Trivial fixes may omit this structure. Reserve `handover` specifically for conte
 - Never commit directly to protected branches.
 - Use feature branches and pull requests for review.
 - Do not add AI co-author lines or AI attribution to commit messages.
-- For external third-party open-source contributions, maintain at most 3 open pull requests at a time (recommended). Exceeding this concurrency threshold risks having contributions or the author account flagged as automated spam by maintainers or platform abuse systems. Wait for open external PRs to be merged or closed before opening new ones.
+- For external third-party open-source contributions, maintain at most 3 open pull requests per third-party repository at a time (recommended), not a total across the whole campaign. Exceeding this per-repo concurrency threshold risks having contributions or the author account flagged as automated spam by maintainers or platform abuse systems. Space new PRs into the same repo rather than opening several at once.
 
 ## Validation
 
