@@ -59,8 +59,11 @@ files, so nothing about a project's existing tooling changes.
 ## What Gets Blocked
 
 - `git commit` (any form) where the effective `user.name`/`user.email` -
-  from an explicit `-c user.name=...`/`-c user.email=...`, or a plain
-  `git config` default - doesn't match the configured identity.
+  from an explicit `-c user.name=...`/`-c user.email=...`, a
+  `--author="Name <email>"` override, a `GIT_AUTHOR_*`/`GIT_COMMITTER_*`
+  environment variable, or a plain `git config` default - doesn't match the
+  configured identity. Author and committer are resolved independently, so a
+  correct `GIT_COMMITTER_EMAIL` can't launder a wrong configured author.
 - `git commit-tree` under a `GIT_AUTHOR_*`/`GIT_COMMITTER_*` environment
   override that doesn't match (this is the one commit-creation path that
   bypasses git's own hook system entirely, so a hook-based approach alone
@@ -68,8 +71,14 @@ files, so nothing about a project's existing tooling changes.
   check is the actual backstop for this case).
 - `git push` of any commit - however it was created (`commit`,
   `commit-tree`, `rebase`, `cherry-pick`, an inherited bad commit from
-  upstream history) - not already reachable from a known remote-tracking
-  branch, if its author or committer identity doesn't match.
+  upstream history) - if its author or committer identity doesn't match.
+  The check reads the invocation's actual refspecs, so it covers pushing a
+  branch other than the checked-out one, a raw SHA, a tag, a detached HEAD,
+  and `--all`/`--tags`, not just `HEAD`. Commits the *destination* remote
+  already has are excluded; commits already on a *different* remote are
+  still checked.
+- Any invocation whose argument layout this wrapper cannot parse, if a gated
+  subcommand appears in it - the parse fails closed rather than open.
 
 Every other subcommand, and a repo's own commit-time hooks, are untouched.
 
@@ -91,15 +100,16 @@ bash scripts/install.sh "Your Name" "you@example.com"
 bash scripts/install.sh "Your Name" "you@example.com" ~/.local/bin
 ```
 
-This writes `~/.config/git-identity-guard/config`, copies
+The installer first checks that `<install-dir>` really precedes the real git
+in `$PATH`, and aborts without writing anything if it doesn't. Only then does
+it write `~/.config/git-identity-guard/config`, copy
 [scripts/git-identity-guard.sh](scripts/git-identity-guard.sh) to
-`<install-dir>/git`, `chmod +x`s it, sets the git global config to match
-(belt-and-suspenders for tools that read config directly), and verifies
-`which git` now resolves to the wrapper.
+`<install-dir>/git`, `chmod +x` it, and overwrite the global
+`user.name`/`user.email` to match (belt-and-suspenders for tools that read
+config directly - it announces this before doing it).
 
-If the installer warns that `$PATH` doesn't pick up the wrapper, add the
-printed `export PATH=...` line to the shell rc file and open a new shell
-before relying on this.
+If it aborts, add the printed `export PATH=...` line to the shell rc file,
+open a new shell, and re-run.
 
 ### 3. Verify
 
@@ -114,6 +124,13 @@ git -c user.name="Your Name" -c user.email="wrong@example.com" commit -m "should
 
 # Should SUCCEED (exit 0) - correct identity:
 git -c user.name="Your Name" -c user.email="you@example.com" commit -m "should pass"
+
+# Should be BLOCKED (exit 1) - --author override:
+git commit -m "should fail" --author="Someone Else <wrong@example.com>"
+
+# Should be BLOCKED (exit 1) - the config variable is not a kill switch:
+GIT_IDENTITY_GUARD_CONFIG=/dev/null \
+  git -c user.email="wrong@example.com" commit -m "should fail"
 
 # Should be BLOCKED (exit 1) - commit-tree bypass with a bad env override:
 echo y > y.txt && git add y.txt
@@ -142,18 +159,34 @@ git -c user.name="Your Name" -c user.email="you@example.com" commit -m "hook coe
   cannot see a commit created by a process that bypassed the wrapper
   entirely (e.g. a differently-pathed `git` binary invoked by full path, or
   a language binding that calls libgit2 directly instead of shelling out).
-  The `push`-time check is the actual backstop for those: it inspects the
-  real metadata of every commit about to leave the machine, regardless of
-  how it was created, and blocks the push if any of them don't match - so
-  nothing wrong reaches a remote even if something upstream of push slipped
-  past the commit-time gate.
+  It also can't statically resolve an identity a commit *inherits* rather
+  than states - `git commit --amend` without `--reset-author`, `commit -C
+  <commit>`, `rebase`, `cherry-pick`. The `push`-time check is the backstop
+  for all of those: it inspects the real author/committer metadata of every
+  commit that the invocation would actually send and that the destination
+  remote doesn't already have, regardless of how the commit was created, and
+  blocks the push if any of them don't match. A commit that reaches a remote
+  through a path this wrapper never sees at all (a real git invoked by
+  absolute path, a libgit2 binding) is outside its reach entirely.
+- Commits the destination remote already has are not re-checked, so history
+  inherited from an upstream (authored by other people, as it should be)
+  doesn't block a push. The flip side: a bad commit that somehow already
+  exists on that same remote won't be flagged on a later push.
 - Requires `<install-dir>` to precede the real git's directory in `$PATH`.
-  `install.sh` checks this and warns rather than silently no-op'ing, but it
-  can't force a running shell to pick up a `$PATH` change - a new shell is
-  needed if it warns.
-- No override flag or environment variable exists by design, matching this
-  pack's other unconditional guardrails (`docker-volume-guardrails`) - if
-  this blocks a commit under a genuinely different, correct identity (e.g.
+  `install.sh` verifies this *before* writing anything and aborts without
+  side effects if the wrapper wouldn't be active, but it can't force a
+  running shell to pick up a `$PATH` change - a new shell is needed.
+- Other copies of this wrapper on `$PATH` are recognized by a marker string
+  in the file header. A file is only treated as a copy if it starts with a
+  `#!` shebang *and* carries the marker in its first 40 lines, so the real
+  (binary) git and unrelated scripts that merely mention the variable name
+  are not mistaken for one.
+- There is no override flag, and `GIT_IDENTITY_GUARD_CONFIG` is not one: if
+  it is set but doesn't name a readable regular config file, every gated
+  subcommand is refused rather than let through. (When the variable is unset
+  and no config exists at the default path, the wrapper does pass everything
+  through - that is the genuine pre-install state, not a bypass.) If this
+  blocks a commit under a genuinely different, correct identity (e.g.
   co-maintaining someone else's fork under their name), the fix is to run
   `scripts/install.sh` again with the new identity, not to bypass the check
   for one commit.
