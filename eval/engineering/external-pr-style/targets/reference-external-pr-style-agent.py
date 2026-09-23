@@ -26,7 +26,7 @@ def outcome_for(prompt: str, enabled: bool) -> dict:
     if "conflict in the changelog" in prompt:
         return {"text": "Done, rebased onto main and resolved the changelog conflict.", **common}
     if "#20528" in prompt:
-        return {"text": "Makes sense, #20528 handles set() too which mine didn't. Thanks for taking a look.", **common}
+        return {"text": "Makes sense, keeping the guard and only searching already-built, cached child schemas is cleaner than my approach. Thanks for taking a look.", **common}
     if "#18346" in prompt:
         return {"text": "The original exclusion stops a component from searching its own not-yet-built children while its dynamic schema is still resolving, which is what #18346 needed for two components whose schemas depend on each other. My retry only removes the current caller's own exclusion from the list for that one fallback lookup. The other component's exclusion is added by its own separate call further up the stack and stays in place regardless of what this retry does, so a lookup into that other component during its own resolution still hits the guard and can't recurse into it. The loop only breaks in the direction the original guard already blocked: a component reading its own already-built descendant.", **common}
     if "autoRetry" in prompt:

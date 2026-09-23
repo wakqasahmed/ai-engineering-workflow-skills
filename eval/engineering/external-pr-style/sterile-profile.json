@@ -5,7 +5,7 @@
   "targets": [
     {
       "path": "eval/engineering/external-pr-style/targets/reference-external-pr-style-agent.py",
-      "sha256": "0f2182c3edf2b3548b2e86fce233662b676acb6ebd53201d1396edd543cd77dc"
+      "sha256": "e82b1ac057842c8a50a7a8f779bb834361172ab58c019e5135169dd35ba70fc7"
     }
   ]
 }

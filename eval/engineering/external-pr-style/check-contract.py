@@ -18,6 +18,9 @@ REQUIRED_SKILL_TERMS = (
     "~40 words",
     "~90 words",
     "~220 words",
+    "~150 words",
+    "Reply (routine question, rebase request, acknowledgment)",
+    "Reply (maintainer explicitly asked for detail)",
     "match the reply's length to what the maintainer actually asked",
     "Only go longer when the maintainer explicitly asks for more",
     "Don't hedge excessively, enumerate edge cases nobody asked about, or offer unrequested follow-up work",
@@ -48,11 +51,14 @@ def validate() -> list[str]:
     failures = [f"SKILL.md is missing required contract text: {term}" for term in REQUIRED_SKILL_TERMS if term not in skill_text]
     cases = json.loads(CASES.read_text())["cases"]
     failures.extend(validate_corpus(CASES, TUNING_CASES))
-    ids, tiers = set(), set()
+    ids, tiers, has_min_words_floor = set(), set(), False
     for case in cases:
         missing = REQUIRED_CASE_FIELDS - case.keys()
         if missing:
             failures.append(f"{case.get('id', '<unknown>')} is missing {sorted(missing)}")
+            continue
+        if not isinstance(case.get("prompt"), str):
+            failures.append(f"{case.get('id', '<unknown>')} has a non-string prompt")
             continue
         if case["id"] in ids:
             failures.append(f"duplicate held-out case id: {case['id']}")
@@ -68,10 +74,13 @@ def validate() -> list[str]:
             failures.append(f"{case['id']} has an invalid expected outcome")
         else:
             tiers.add(outcome["tier"])
+            has_min_words_floor = has_min_words_floor or min_words > 0
     if len(cases) < 10:
         failures.append("held-out manifest needs at least ten cases")
-    if not tiers >= {"small", "medium", "large", "reply"}:
-        failures.append("held-out manifest must exercise small, medium, large, and reply tiers")
+    if not tiers >= {"small", "medium", "large", "reply", "reply_detailed"}:
+        failures.append("held-out manifest must exercise small, medium, large, reply, and reply_detailed tiers")
+    if not has_min_words_floor:
+        failures.append("held-out manifest must include at least one case with a min_words floor")
     return failures
 
 

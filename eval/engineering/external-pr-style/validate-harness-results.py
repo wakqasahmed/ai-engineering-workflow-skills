@@ -14,18 +14,21 @@ MINIMUM_ENABLED_OUTCOME_DELTA = 0.1
 EM_DASH_CEILING = 1
 
 # Invented section headers, matched only as a standalone header (an optional markdown
-# heading mark, or a trailing colon), not as an ordinary phrase inside a sentence — real
-# compliant prose is allowed to say "the root cause was a missing null guard".
+# heading mark, bold/italic wrapper, or list marker, ending at a colon or end of line),
+# not as an ordinary phrase inside a sentence — real compliant prose is allowed to say
+# "the root cause was a missing null guard".
 BANNED_HEADER_PATTERN = re.compile(
-    r"(?im)^\s{0,3}(#{1,6}\s*(root cause|why this (fix )?works|alternatives considered|summary)\b"
-    r"|(root cause|why this (fix )?works|alternatives considered|summary)\s*:)"
+    r"(?im)^\s{0,3}(?:[-*+]\s+)?(?:#{1,6}\s*)?(?:\*{1,2}|_{1,2})?"
+    r"(?:root cause|why this (?:fix )?works|alternatives considered|summary)\b"
+    r"(?:\*{1,2}|_{1,2})?(?:\s*:|\s*$)"
 )
 HEDGE_PHRASES = (
-    r"i'd be happy to", r"please note that", r"it'?s worth mentioning", r"it is worth mentioning",
+    r"i['’]d be happy to", r"please note that", r"it['’]?s worth mentioning", r"it is worth mentioning",
     r"\bcertainly\b", r"\bof course\b", r"\bi believe\b", r"\bfeel free to\b", r"\bjust\b", r"\breally\b",
     r"\bbasically\b", r"\bactually\b", r"\bsimply\b", r"\bessentially\b",
 )
 HEDGE_PATTERN = re.compile("|".join(HEDGE_PHRASES), re.IGNORECASE)
+DASH_PATTERN = re.compile(r"[—–]")
 
 
 def meets_style_contract(response: str, expected: dict) -> bool:
@@ -34,7 +37,7 @@ def meets_style_contract(response: str, expected: dict) -> bool:
     word_count = len(response.split())
     if word_count > expected["max_words"] or word_count < expected.get("min_words", 0):
         return False
-    if response.count("—") > EM_DASH_CEILING:
+    if len(DASH_PATTERN.findall(response)) > EM_DASH_CEILING:
         return False
     return not BANNED_HEADER_PATTERN.search(response) and not HEDGE_PATTERN.search(response)
 

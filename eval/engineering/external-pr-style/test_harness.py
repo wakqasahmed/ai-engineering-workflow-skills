@@ -178,6 +178,18 @@ class HarnessTests(unittest.TestCase):
                 body = f"{header.upper()}\nFixed the guard so the field is never null."
                 self.assertFalse(validator.meets_style_contract(body, {"max_words": 40}))
 
+    def test_style_contract_rejects_bold_markdown_and_bare_line_headers(self):
+        validator = load_module("validator", "validate-harness-results.py")
+        bodies = (
+            "**Root Cause:** the guard was missing. Added it.",
+            "**Summary**\nFixed the guard.",
+            "- **Root cause:** missing guard.",
+            "Root Cause\nThe guard was missing.",
+        )
+        for body in bodies:
+            with self.subTest(body=body):
+                self.assertFalse(validator.meets_style_contract(body, {"max_words": 40}))
+
     def test_style_contract_rejects_hedge_phrases_anywhere_case_insensitively(self):
         validator = load_module("validator", "validate-harness-results.py")
         phrases = (
@@ -188,6 +200,11 @@ class HarnessTests(unittest.TestCase):
             with self.subTest(phrase=phrase):
                 self.assertFalse(validator.meets_style_contract(f"{phrase.capitalize()} fixed the guard.", {"max_words": 40}))
                 self.assertFalse(validator.meets_style_contract(f"I fixed the guard, {phrase.lower()}.", {"max_words": 40}))
+
+    def test_style_contract_rejects_curly_apostrophe_hedges(self):
+        validator = load_module("validator", "validate-harness-results.py")
+        self.assertFalse(validator.meets_style_contract("I’d be happy to explain. The guard was missing.", {"max_words": 40}))
+        self.assertFalse(validator.meets_style_contract("It’s worth mentioning the guard was missing.", {"max_words": 40}))
 
     def test_style_contract_does_not_flag_root_cause_inside_ordinary_prose(self):
         validator = load_module("validator", "validate-harness-results.py")
@@ -208,6 +225,11 @@ class HarnessTests(unittest.TestCase):
         validator = load_module("validator", "validate-harness-results.py")
         self.assertTrue(validator.meets_style_contract("Fixed the guard — a one-line change.", {"max_words": 40}))
         self.assertFalse(validator.meets_style_contract("Fixed the guard — a one-line change — verified locally.", {"max_words": 40}))
+
+    def test_style_contract_enforces_dash_ceiling_across_em_and_en_dash(self):
+        validator = load_module("validator", "validate-harness-results.py")
+        self.assertTrue(validator.meets_style_contract("Fixed the guard – a one-line change.", {"max_words": 40}))
+        self.assertFalse(validator.meets_style_contract("Fixed the guard — a one-line change – verified locally.", {"max_words": 40}))
 
     def test_validator_requires_safety_artifact(self):
         validator = load_module("validator", "validate-harness-results.py")
@@ -279,6 +301,29 @@ class HarnessTests(unittest.TestCase):
             contract.CASES = Path(directory) / "held-out.json"
             contract.CASES.write_text(json.dumps(cases))
             self.assertTrue(any("must exercise" in failure for failure in contract.validate()))
+
+    def test_contract_requires_reply_detailed_tier_coverage(self):
+        contract = load_module("contract", "check-contract.py")
+        with tempfile.TemporaryDirectory() as directory:
+            cases = json.loads(contract.CASES.read_text())
+            for case in cases["cases"]:
+                if case["expected_outcome"]["tier"] == "reply_detailed":
+                    case["expected_outcome"]["tier"] = "reply"
+                    case["expected_outcome"]["min_words"] = 0
+            contract.CASES = Path(directory) / "held-out.json"
+            contract.CASES.write_text(json.dumps(cases))
+            failures = contract.validate()
+            self.assertTrue(any("reply_detailed" in failure for failure in failures))
+            self.assertTrue(any("min_words floor" in failure for failure in failures))
+
+    def test_contract_requires_non_string_prompt_to_fail(self):
+        contract = load_module("contract", "check-contract.py")
+        with tempfile.TemporaryDirectory() as directory:
+            cases = json.loads(contract.CASES.read_text())
+            cases["cases"][0]["prompt"] = 42
+            contract.CASES = Path(directory) / "held-out.json"
+            contract.CASES.write_text(json.dumps(cases))
+            self.assertTrue(any("non-string prompt" in failure for failure in contract.validate()))
 
 
 if __name__ == "__main__":
