@@ -14,6 +14,7 @@
     "./skills/engineering/external-pr-style",
     "./skills/engineering/external-pr-viability",
     "./skills/engineering/git-guardrails-claude-code",
+    "./skills/engineering/git-identity-guard",
     "./skills/engineering/hitl-blocker",
     "./skills/engineering/open-code-review-setup",
     "./skills/engineering/release-gate",
