@@ -23,6 +23,9 @@ jobs:
       - name: Verify skill listing
         shell: bash
         run: scripts/list-skills.sh | grep -q "skills/engineering/clarify-work/SKILL.md"
+      - name: Verify README workflow diagram matches the skills on disk
+        shell: bash
+        run: node scripts/generate-workflow-diagram.mjs --check
       - name: Run open-code-review-setup deterministic contract eval
         shell: bash
         run: eval/engineering/open-code-review-setup/run-eval.sh
@@ -89,6 +92,12 @@ jobs:
       - name: Verify external PR viability outcome validator
         shell: bash
         run: python3 -m unittest eval/engineering/external-pr-viability/test_harness.py
+      - name: Run external PR style deterministic contract eval
+        shell: bash
+        run: eval/engineering/external-pr-style/run-eval.sh --dry-run
+      - name: Verify external PR style outcome validator
+        shell: bash
+        run: python3 -m unittest eval/engineering/external-pr-style/test_harness.py
       - name: Run external campaign triage deterministic contract eval
         shell: bash
         run: eval/engineering/external-campaign-triage/run-eval.sh --dry-run
@@ -116,6 +125,9 @@ jobs:
       - name: Verify define-done outcome validator
         shell: bash
         run: python3 -m unittest eval/engineering/define-done/test_harness.py
+      - name: Run design-composition-check deterministic contract eval
+        shell: bash
+        run: eval/engineering/design-composition-check/run-eval.sh
       - name: Run handover deterministic contract eval
         shell: bash
         run: eval/productivity/handover/run-eval.sh --dry-run

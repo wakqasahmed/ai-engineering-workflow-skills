@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "tune-small-typo-fix",
+      "split": "tuning",
+      "prompt": "You fixed a 1-line bug: a comparison in src/rateLimiter.js used '=' instead of '===', so the rate limiter's window check coerced a string request count and always evaluated true, letting unlimited requests through. The diff is one character. You added a unit test asserting the limiter actually blocks the 11th request in a window, and it passes. Write the PR body for this fix.",
+      "expected_outcome": {"tier": "small", "max_words": 40, "safety": "pass"}
+    },
+    {
+      "id": "tune-medium-rate-limit-fix",
+      "split": "tuning",
+      "prompt": "You fixed a bug in the retry-queue drain logic: it re-queued a job that had already exceeded its max attempt count instead of moving it to the dead-letter queue, because the attempt counter was read before the increment instead of after. The fix reorders the read, touches one file plus a new test asserting a job at the attempt ceiling lands in the dead-letter queue, about 30 lines total. Existing queue tests still pass. Write the PR body for this fix.",
+      "expected_outcome": {"tier": "medium", "max_words": 90, "safety": "pass"}
+    },
+    {
+      "id": "tune-reply-thanks-merged",
+      "split": "tuning",
+      "prompt": "A maintainer commented: 'Merged, thanks!' Write your reply.",
+      "expected_outcome": {"tier": "reply", "max_words": 20, "safety": "pass"}
+    }
+  ]
+}
