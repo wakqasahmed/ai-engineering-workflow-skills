@@ -1,6 +1,6 @@
 ---
 name: docker-db-guardrails
-description: Set up a Claude Code hook to block Laravel/SQL schema-wipe commands (migrate:fresh, migrate:refresh, db:wipe, DROP DATABASE/TABLE/SCHEMA, TRUNCATE) against a Docker container unless the actually-resolved target database visibly indicates it is disposable (test/testing/demo). Use when copying files into a container to run tests, when running Laravel artisan commands inside a shared/staging container, or when setting up guardrails against destructive database mistakes in Claude Code.
+description: Set up a Claude Code hook to block schema-wipe commands (Laravel migrate:fresh/migrate:refresh/migrate:reset/db:wipe, Rails db:drop/db:reset, prisma migrate reset, sequelize db:drop, alembic downgrade base, DROP DATABASE/TABLE/SCHEMA, TRUNCATE, dropdb, mysqladmin drop, mongo dropDatabase, redis FLUSHALL/FLUSHDB) against a Docker container unless the actually-resolved target database visibly indicates it is disposable (test/testing/demo/sandbox/scratch). Use when copying files into a container to run tests, when running Laravel artisan commands inside a shared/staging container, or when setting up guardrails against destructive database mistakes in Claude Code.
 ---
 
 # Docker DB Guardrails
@@ -40,34 +40,59 @@ Docker itself and require it to look disposable, or refuse.
 
 ## What Gets Blocked
 
-- `artisan migrate:fresh`, `artisan migrate:refresh`, `artisan db:wipe`
+- `artisan migrate:fresh` / `migrate:refresh` / `migrate:reset` / `db:wipe`
+- `rails db:drop` / `db:reset`, `prisma migrate reset`, `sequelize db:drop`,
+  `alembic downgrade base`
 - `DROP DATABASE` / `DROP TABLE` / `DROP SCHEMA`
-- `TRUNCATE TABLE`
+- `TRUNCATE <name>` (with or without the optional `TABLE` keyword)
+- `dropdb <name>`, `mysqladmin drop <name>`, Mongo `db.dropDatabase()`
+- `redis-cli FLUSHALL` / `FLUSHDB`
 
 ...but only when the command also actually invokes one of the tools these
-run through (`artisan`, `psql`, `mysql`, `mariadb`, `sqlite3`, `mongosh`) —
-prose that merely *mentions* one of these keywords (a GH issue/PR body
-describing this very incident, for example) is not blocked.
+run through (`artisan`, `psql`, `mysql`, `mariadb`, `sqlite3`, `mongosh`,
+`mongo`, `redis-cli`, `dropdb`, `mysqladmin`, `rails`, `rake`, `prisma`,
+`sequelize`, `alembic`). The invoking tool is matched on its **basename**,
+so `/tmp/test-branch/artisan` counts as `artisan`, and a nested
+`bash -c "..."` payload is re-tokenized and analysed as its own command
+rather than treated as one opaque word.
+
+Prose that merely *mentions* one of these keywords (a GH issue/PR body
+describing this very incident, for example) is not blocked: the value of a
+text-carrying flag (`-m`/`--message`, `--body`, `--title`, `--comment`,
+`-F`/`--file`) is excluded from the invoking-tool and target-name decisions.
+Its text is still scanned for destructive keywords, so a prose value can
+never *hide* a real destructive command from the pattern check.
 
 For a matched command, the hook resolves the real target and only allows it
-through if the target visibly contains `test`, `testing`, or `demo`
-(case-insensitive), checked in this order:
+through if the target visibly indicates a disposable database — a
+`test`, `testing`, `demo`, `sandbox` or `scratch` token, delimited by a
+word boundary or `_`/`.`/`-` (so `signalops_demo` is safe but `contest_live`,
+`db_latest`, `attestation` and `demographics` are not). Checked in this
+order:
 
-1. An explicit `-d <name>` / `--dbname=<name>` / `--db=<name>` argument in
-   the command itself (lets an intentional `psql -d signalops_demo ...`
-   against a shared multi-database Postgres container pass, without
-   trusting the command's target implicitly the way the original incident
-   did — that command had no explicit `-d`/`--dbname` argument at all).
-2. If the command runs via `docker exec`/`docker compose exec <container>`,
-   that container's own real `DB_DATABASE`/`DB_NAME`/`POSTGRES_DB`
-   environment variable, read directly from Docker (`docker exec <container>
-   env`) — never from anything the command claims about itself.
+1. Every explicitly named database in the command — `psql -d <name>` /
+   `--dbname=<name>`, `mysql`/`mariadb` `-D <name>` **and** their trailing
+   positional database argument (which outranks `-D`), `dropdb <name>`.
+   **All** of them must look disposable; one unsafe name blocks the whole
+   command line, so a safe first name cannot whitelist a chained second
+   invocation. Laravel's `artisan --database=<x>` is deliberately *not*
+   consulted: it names a *connection* in `config/database.php`, not a
+   database, so it can never vouch for the target.
+2. If the command runs via `docker exec` / `docker compose [-f <file>] exec
+   <container>`, that container's own real `DB_DATABASE`/`DB_NAME`/
+   `POSTGRES_DB`/`MYSQL_DATABASE`/`MARIADB_DATABASE` environment variables,
+   read directly from Docker (`docker exec <container> env`) — never from
+   anything the command claims about itself. Every such variable present
+   must look disposable.
 3. Otherwise (a bare local command), this shell's own equivalent env vars,
    as a best effort.
 
 **A missing or ambiguous resolved name is treated as "assume production,"
 never as "assume safe."** Any of the three checks above finding no
-test/testing/demo indication blocks the command.
+disposable-name indication blocks the command. So do: an unparseable hook
+payload, a command that cannot be tokenized (unbalanced quotes), and a
+chain (`&&`/`||`/`;`/`|`) of more than one recognized invocation where the
+explicit names do not account for every invocation.
 
 ## Steps
 
@@ -119,7 +144,9 @@ instead.)
 ### 4. Ask about customization
 
 Ask if the user wants to broaden or narrow the "safe name" pattern (default:
-`test|testing|demo`) or the recognized destructive-command / invoking-tool
+`test|testing|demo|sandbox|scratch`, anchored on word/`_`/`.`/`-` boundaries —
+keep the anchoring when editing, an unanchored substring match reads
+`contest_live` as safe) or the recognized destructive-command / invoking-tool
 patterns. Edit the copied script's `SAFE_NAME_PATTERN`, `DESTRUCTIVE_PATTERN`,
 and `INVOKING_TOOLS` constants near the top for these.
 
@@ -133,10 +160,25 @@ SCRIPT=~/.claude/hooks/block-unverified-destructive-db.py
 # Should exit 2 (BLOCKED):
 echo '{"tool_input":{"command":"docker exec my-staging-app php artisan migrate:fresh --force"}}' | "$SCRIPT"
 echo '{"tool_input":{"command":"php artisan migrate:fresh --force"}}' | "$SCRIPT"
+# ...including the original incident's exact shape (path-qualified artisan):
+echo '{"tool_input":{"command":"docker exec my-staging-app php /tmp/test-branch/artisan migrate:fresh --env=testing --force"}}' | "$SCRIPT"
+# ...a nested shell, and a name that only looks disposable:
+echo '{"tool_input":{"command":"docker exec prod-app bash -c \"php artisan migrate:fresh --force\""}}' | "$SCRIPT"
+echo '{"tool_input":{"command":"psql -d contest_live -c \"DROP TABLE users\""}}' | "$SCRIPT"
 
 # Should exit 0 (allowed) — routine command, and prose that merely mentions these words:
 echo '{"tool_input":{"command":"docker exec my-staging-app php artisan migrate:status"}}' | "$SCRIPT"
 echo '{"tool_input":{"command":"gh issue create --body \"discusses migrate:fresh risk\""}}' | "$SCRIPT"
+echo '{"tool_input":{"command":"psql -d signalops_demo -c \"DROP TABLE users\""}}' | "$SCRIPT"
+```
+
+The full regression table (every known bypass shape, both directions) lives
+in [`tests/test_block_unverified_destructive_db.py`](../../../tests/test_block_unverified_destructive_db.py)
+and runs in CI — extend it there when broadening `DESTRUCTIVE_PATTERN`,
+`INVOKING_TOOLS` or `SAFE_NAME_PATTERN`:
+
+```bash
+python3 -m unittest tests/test_block_unverified_destructive_db.py
 ```
 
 Then prove it fires live in-session against a real container in this
@@ -154,12 +196,21 @@ this repo's own `update-config`-style hook-construction discipline
   a real command invocation — an early substring-scan version of this exact
   hook blocked its own `git commit -m "..."` commit message while it was
   being written, because the message discussed both a destructive keyword
-  and an invoking-tool name in plain prose. Still, it does not resolve
-  command substitution, shell variables, or multi-command chains. The
-  threat model here is an honest agent's wrong mental model about
-  environment isolation, not evasion of untrusted input — unlike
+  and an invoking-tool name in plain prose.
+- It resolves one layer of indirection that matters in practice — a
+  path-qualified binary and a nested `bash -c`/`sh -c` payload — but it
+  still does not resolve command substitution (`$(...)`), shell variable
+  expansion, aliases, or a destructive command assembled at runtime. A
+  chain it cannot fully resolve is blocked rather than allowed. The threat
+  model here is an honest agent's wrong mental model about environment
+  isolation, not evasion of untrusted input — unlike
   `git-guardrails-claude-code`'s adversarially-hardened tokenizer, which
   must resist deliberately obfuscated dangerous commands.
+- The destructive-verb and invoking-tool lists are enumerations, not a
+  semantic understanding of "wipes data". A stack or CLI not listed above
+  (a bespoke wipe script, an ORM this list does not name) passes
+  unrecognized. Add it to `DESTRUCTIVE_PATTERN`/`INVOKING_TOOLS` and to the
+  regression table in `tests/` when you hit one.
 - A shared, multi-database container without an explicit `-d`/`--dbname`
   argument in the command can only be checked against its own bootstrap env
   var (often just `postgres`), which will correctly fail closed even for a
