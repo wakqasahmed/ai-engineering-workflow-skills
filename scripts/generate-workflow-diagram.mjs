@@ -75,6 +75,7 @@ const TRACKS = [
     skills: [
       "git-guardrails-claude-code",
       "docker-volume-guardrails",
+      "docker-db-guardrails",
       "writing-for-agents",
       "write-prompt-guide",
       "tmux-orphaned-socket",
