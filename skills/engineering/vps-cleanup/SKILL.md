@@ -20,7 +20,8 @@ then ask the user **once, batched** before each approval tier. Anything uncertai
    stores) runs for minutes and hits tool timeouts in the foreground.
 
    ```bash
-   nice du -xh --max-depth=2 /tmp "$HOME" /opt /srv 2>/dev/null | sort -rh | head -80 > /tmp/du-survey.txt
+   out=$(mktemp); echo "$out"
+   nohup sh -c 'nice du -xh --max-depth=2 /tmp "$HOME" /opt /srv 2>/dev/null | sort -rh | head -80' > "$out" 2>&1 &
    ```
 
    Root-only dirs (`/var/lib/docker`) are unreadable; size them with `docker system df`.
@@ -28,28 +29,39 @@ then ask the user **once, batched** before each approval tier. Anything uncertai
 4. Find live users of every candidate cache path before touching it:
 
    ```bash
+   c=<candidate-path>
    pgrep -af 'npm|npx|pnpm|yarn|bun|pip|uv|playwright|puppeteer|go '
    for p in /proc/[0-9]*; do
-     ls -l "$p/cwd" "$p/fd" 2>/dev/null | grep -F "<candidate-path>" && echo "in use by ${p#/proc/}"
+     ls "$p/fd" >/dev/null 2>&1 || { echo "unreadable ${p#/proc/}"; continue; }
+     { ls -l "$p/cwd" "$p/exe" "$p/fd"; cat "$p/maps"; } 2>/dev/null | grep -qF "$c" && echo "in use by ${p#/proc/}"
    done
+   docker ps -q | xargs -r docker inspect --format '{{range .Mounts}}{{.Source}}{{"\n"}}{{end}}' | grep -F "$c"
    ```
 
-   A path in use is skipped and goes on the keep list. Example: `~/.npm/_npx` and
-   `~/.cache/ms-playwright` held open by running playwright-mcp servers.
+   `exe` and `maps` catch running binaries and loaded libraries, which `fd` misses; the
+   `docker inspect` line catches containers bind-mounting the path. A path in use is skipped
+   and goes on the keep list. Example: `~/.npm/_npx` and `~/.cache/ms-playwright` used by
+   running playwright-mcp servers. Unreadable processes (other users, root, containers) make
+   the check incomplete: unless you run it as root, treat the path as possibly in use and move
+   it to the next approval tier instead of Tier 1.
 
 Done when: `df` baseline recorded, candidate list sized, every candidate cache checked for live
 processes.
 
 ## Tier 1: regenerable caches (no approval needed)
 
-The only cost is re-downloading or rebuilding. Skip anything the survey found in use.
+The only cost is re-downloading or rebuilding. Skip anything the survey found in use. Run
+these from `$HOME`, not inside a repo: Yarn Berry's `yarn cache clean` inside a project clears
+its `.yarn/cache`, which zero-install repos track in git.
 
 - `docker builder prune -af`: usually the single largest win.
 - `pnpm store prune`: removes only packages no registered project references. Repeat with
   `pnpm store prune --store-dir <dir>` for each extra store.
 - `pip cache purge`, `uv cache clean`, `yarn cache clean`, `npm cache clean --force` (leaves
   `_npx` alone).
-- Tool caches under `~/.cache` (`puppeteer`, `go-build`, and similar), except ones in use.
+- Only these `~/.cache` dirs: `go-build`, `puppeteer`, `ms-playwright`. Every other
+  `~/.cache/*` entry (model or dataset caches, tool state, other agents' caches) goes into the
+  Tier 2 question.
 
 Done when: `df -h /` re-run and the tier's reclaim recorded.
 
@@ -66,13 +78,19 @@ Candidates:
 
   ```bash
   d=/tmp/<repo>-issue-<n>
-  [ "$(git -C "$d" rev-parse --show-toplevel)" = "$d" ]                        # git top-level
-  [ -z "$(find "$d" -maxdepth 2 -path '*/.git' -prune -o -mtime -7 -print)" ] # untouched 7+ days
-  [ -z "$(git -C "$d" status --porcelain)" ]                                  # clean
-  [ -n "$(git -C "$d" branch -r --contains HEAD)" ]                           # HEAD is on a remote
+  git -C "$d" fetch --prune --quiet &&                                       # refresh remote refs
+  [ "$(git -C "$d" rev-parse --show-toplevel)" = "$d" ] &&                    # git top-level
+  [ -z "$(find "$d" -maxdepth 2 -path '*/.git' -prune -o -mtime -7 -print)" ] && # untouched 7+ days
+  [ -z "$(git -C "$d" status --porcelain)" ] &&                               # clean
+  [ -n "$(git -C "$d" branch -r --contains HEAD)" ] &&                        # HEAD is on a remote
+  [ -z "$(git -C "$d" log --branches --not --remotes --oneline)" ] &&         # no unpushed branch
+  [ -z "$(git -C "$d" stash list)" ] &&                                       # no stashes
+  echo QUALIFIES || echo KEEP
   ```
 
-  Anything failing a check goes on the keep list as *recent*, *dirty*, or *not pushed*. Large
+  Only `QUALIFIES` is a candidate. `KEEP` goes on the keep list as *recent*, *dirty*, or *not
+  pushed*; a failed fetch also means `KEEP`. In a linked worktree the branch and stash checks
+  cover the whole parent clone, so they can over-keep, which is the safe direction. Large
   recent trees are usually active work in another concurrent session.
 
 Deletion rules:
@@ -81,9 +99,18 @@ Deletion rules:
 - Exclude live-process sockets (`/tmp/tmux-*`, `/tmp/ssh-*`, `/tmp/.X11-unix`, `/tmp/.ICE-unix`);
   see `tmux-orphaned-socket`.
 - Go module caches are read-only: `chmod -R u+w <dir>` before `rm -rf <dir>`.
-- Root-owned files from Docker runs without `--user`, for an already-approved path only:
-  `docker run --rm -v /tmp:/host_tmp ubuntu rm -rf /host_tmp/<path>`. This clears approved
-  paths; it never routes around a denial.
+- Root-owned files from Docker runs without `--user`, for an already-approved path only.
+  Mount only that path, never all of `/tmp`, and use an image already present locally
+  (`docker images`); pulling one onto a full disk can fail:
+
+  ```bash
+  p=$(realpath -e -- "<approved-path>") && case "$p" in
+    /tmp/?*) docker run --rm -v "$p:/target" <local-image> find /target -mindepth 1 -delete && rmdir "$p" ;;
+    *) echo "refuse: $p" ;;
+  esac
+  ```
+
+  This clears approved paths; it never routes around a denial.
 - After deleting a linked worktree, run `git worktree prune` in its parent clone.
 
 Done when: approved paths deleted, worktrees pruned, `df -h /` re-run and reclaim recorded.
@@ -93,15 +120,20 @@ Done when: approved paths deleted, worktrees pruned, `df -h /` re-run and reclai
 1. Find unused images: those whose ID no container (running or stopped) references.
 
    ```bash
-   docker ps -aq | xargs -r docker inspect --format '{{.Image}}' | sort -u > /tmp/used-images.txt
-   docker images -q --no-trunc | sort -u | comm -23 - /tmp/used-images.txt
+   used=$(mktemp)
+   docker ps -aq | xargs -r docker inspect --format '{{.Image}}' | sort -u > "$used"
+   docker images -q --no-trunc | sort -u | comm -23 - "$used"
    ```
 
-2. Keep one previous tag per deployed app (`<app>:<prev-tag>`) for rollback.
+2. Keep the current and one previous tag for every deployed app, whether or not a container
+   exists (a stopped or `compose down` app has none). Read the image each app deploys from its
+   compose or deploy config.
 3. Present the list with repo, tag, and size in one question.
-4. Remove approved images by ID with plain `docker rmi <id>`, never `-f`, so Docker refuses
-   anything still in use. A dangling `<none>` image can back a running container even when
-   `docker system df -v` shows 0 containers for it.
+4. Remove approved images with plain `docker rmi`, never `-f`, so Docker refuses anything still
+   in use. Use the ID for untagged images and `repo:tag` for each tag of a multi-tagged image
+   (by ID Docker refuses it as "must be forced"). If `rmi` refuses, the image goes on the keep
+   list; never retry with `-f`. A dangling `<none>` image can back a running container even
+   when `docker system df -v` shows 0 containers for it.
 5. `SIZE` double-counts shared layers: measure the reclaim with `df -h /` before and after,
    not by summing sizes.
 
