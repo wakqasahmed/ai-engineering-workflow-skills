@@ -43,5 +43,6 @@ This directory contains deterministic contract evaluations and model-outcome har
 | `open-code-review-setup` | Intentional deferral | Not yet tracked | OCR setup workflow |
 | `resolving-merge-conflicts` | Intentional deferral | Not yet tracked | Conflict resolution procedure |
 | `tmux-orphaned-socket` | Intentional deferral | Not yet tracked | Low-level socket recovery |
+| `vps-cleanup` | Intentional deferral | Not yet tracked | Operator-gated disk cleanup procedure |
 | `wizard` | Intentional deferral | Not yet tracked | Procedural bash generator |
 | `writing-for-agents` | Intentional deferral | Not yet tracked | Authoring reference |

@@ -79,6 +79,7 @@ const TRACKS = [
       "writing-for-agents",
       "write-prompt-guide",
       "tmux-orphaned-socket",
+      "vps-cleanup",
     ],
   },
   {
