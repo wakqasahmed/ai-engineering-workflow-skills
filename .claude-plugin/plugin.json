@@ -23,6 +23,7 @@
     "./skills/engineering/subagent-pipeline",
     "./skills/engineering/tmux-orphaned-socket",
     "./skills/engineering/to-prd",
+    "./skills/engineering/vps-cleanup",
     "./skills/engineering/wizard",
     "./skills/engineering/workflow-router",
     "./skills/engineering/write-prompt-guide",

@@ -34,6 +34,7 @@ This repository contains my AI-assisted engineering workflow and agent operating
 - Use `caveman` only when the user explicitly asks for caveman mode or ultra-compressed replies; keep it active until the user says "stop caveman" or "normal mode", except for Auto-Clarity safety cases.
 - Use `handover` when context crosses an agent or session boundary, when only 5-10% of the session limit remains with work unfinished, or when context usage passes 40% on unfinished multi-step work.
 - Use `tmux-orphaned-socket` when `tmux ls`/`attach` fails with a missing-socket error, especially right after any `/tmp` cleanup — check for a live orphaned server before assuming sessions are gone.
+- Use `vps-cleanup` when a VPS or server disk is high or full (`No space left on device`, before a large build) — survey read-only, clear regenerable caches, then ask once, batched, before deleting `/tmp` worktrees/caches or Docker images; never volumes.
 
 ## Summary
 
