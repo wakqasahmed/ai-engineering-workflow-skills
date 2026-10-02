@@ -1,0 +1,27 @@
+name: Leak check
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  leak-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+      - name: Verify leak checker
+        shell: bash
+        run: python3 -m unittest tests/test_check_leaks.py
+      - name: Check tracked files for home paths, token files, credentials, and private names
+        shell: bash
+        env:
+          # Optional, newline- or comma-separated. Set it as a repository
+          # secret; never commit it. Unavailable on fork PRs, where only the
+          # built-in patterns run.
+          LEAK_DENYLIST: ${{ secrets.LEAK_DENYLIST }}
+        run: python3 scripts/check-leaks.py
