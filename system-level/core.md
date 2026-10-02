@@ -67,6 +67,7 @@ Trivial fixes may omit this structure. Reserve `handover` specifically for conte
 - Never overwrite existing instruction files without comparing contents first.
 - Prefer backups before symlink normalization.
 - Treat auth, payments, secrets, and deployment paths as high-risk areas.
+- Use repo-relative paths only in any public issue/PR comment, body, or public-repo file, including non-handover status comments — apply the public-surface rule in `handover` before posting.
 - Before adding a production dependency, verify its source, maintenance status, license, and necessity. Require human approval.
 - Use `tmux-orphaned-socket` before any broad `/tmp` cleanup — check for live process handles, not just file age, before deleting.
 - Use `vps-cleanup` when disk is high or full — tiered, approval-gated reclaim that keeps other sessions' worktrees, in-use caches, rollback images, and all volumes.
