@@ -77,7 +77,7 @@ ALLOWED_CASES = [
     ("commit message about this hook",
      'git commit -m "guardrails: block artisan migrate:fresh against psql"'),
     ("explicit disposable database",
-     'psql -d signalops_demo -c "DROP TABLE users"'),
+     'psql -d app_demo -c "DROP TABLE users"'),
     ("explicit testing database", 'psql --dbname=app_testing -c "TRUNCATE users"'),
     ("every explicit name disposable",
      'psql -d app_test -c "DROP TABLE x" && psql -d other_demo -c "DROP TABLE y"'),

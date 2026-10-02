@@ -66,7 +66,7 @@ never *hide* a real destructive command from the pattern check.
 For a matched command, the hook resolves the real target and only allows it
 through if the target visibly indicates a disposable database — a
 `test`, `testing`, `demo`, `sandbox` or `scratch` token, delimited by a
-word boundary or `_`/`.`/`-` (so `signalops_demo` is safe but `contest_live`,
+word boundary or `_`/`.`/`-` (so `app_demo` is safe but `contest_live`,
 `db_latest`, `attestation` and `demographics` are not). Checked in this
 order:
 
@@ -169,7 +169,7 @@ echo '{"tool_input":{"command":"psql -d contest_live -c \"DROP TABLE users\""}}'
 # Should exit 0 (allowed) — routine command, and prose that merely mentions these words:
 echo '{"tool_input":{"command":"docker exec my-staging-app php artisan migrate:status"}}' | "$SCRIPT"
 echo '{"tool_input":{"command":"gh issue create --body \"discusses migrate:fresh risk\""}}' | "$SCRIPT"
-echo '{"tool_input":{"command":"psql -d signalops_demo -c \"DROP TABLE users\""}}' | "$SCRIPT"
+echo '{"tool_input":{"command":"psql -d app_demo -c \"DROP TABLE users\""}}' | "$SCRIPT"
 ```
 
 The full regression table (every known bypass shape, both directions) lives
