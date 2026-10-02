@@ -76,7 +76,7 @@ Agent role contracts:
 
 Definition of done:
 
-- Acceptance criteria are satisfied.
+- Acceptance criteria are satisfied. For probabilistic-output features (model, classifier, extraction, ranking), they include a numeric target error rate per `define-done`'s Probabilistic Output Requirement.
 - Relevant tests are added or updated, or the issue states why automated tests are not appropriate.
 - The minimum relevant checks have been run and named.
 - Backwards compatibility is assessed: if the change touches a public API, schema, configuration format, supported version, serialized format, or integration contract, state whether it is backwards-compatible; breaking changes must be explicit and justified in the PR, not incidental.
@@ -101,7 +101,7 @@ Definition of done:
 - Use staging and HITL validation for risky changes, especially user-facing, auth, payment, data-sensitive, or workflow-critical work.
 - Deploy to production only after the relevant review and validation gates are satisfied.
 - Final changelog assembly can happen later, but each non-trivial PR should include a short release-note candidate.
-- For medium-risk and high-risk changes, state the rollback path and the production health check before release.
+- For medium-risk and high-risk changes, state the rollback path and the production health check before release; for probabilistic-output features, also the post-release accuracy signal (see `release-gate`).
 
 ### 7. Handover When Needed
 

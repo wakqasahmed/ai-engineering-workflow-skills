@@ -32,6 +32,7 @@ Apply this gate selectively based on risk level to prevent release gridlock:
 - Smoke test command
 - Rollback command or previous artifact
 - Health check signal
+- Post-release accuracy signal, for changes with probabilistic output: the named dashboard, query, or scheduled grading job that reports the error rate against the target, method, and owner set under `define-done`'s Probabilistic Output Requirement. A green health check does not stand in for it.
 - Configuration completeness and secret-delivery verification, for changes that introduce or change required config/secrets (see [configuration preflight](references/configuration-preflight.md))
 
 ## Guardrails

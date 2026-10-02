@@ -34,6 +34,15 @@ For medium/high-risk work that involves queue jobs, background workers, retries,
 - Write a test for at least one failure path (timeout, provider error, partial write), not only the happy path.
 - Verify state transitions are correct under retry: a record re-attempted after a partial failure must not silently double-count, skip, or corrupt its tracked state.
 
+## Probabilistic Output Requirement
+
+For work whose user-visible output is produced by a model, a heuristic ranking, or any component whose correctness varies by input (an LLM answer, a classifier, an extraction step, a ranking). Work with deterministic output skips this section.
+
+- State a target error rate in the acceptance criteria as a number with its unit and window, e.g. "at most 3% of sampled answers graded wrong, per rolling 7 days". Three forms are rejected: "accurate" and "high quality" are unmeasurable, and "zero errors" is an unmeasured target, not a strict one.
+- Name the measurement method: what is sampled, how often, and what it is graded against. A grading source that is the model's own output or its own transcript does not count.
+- Name the role accountable for the number after release, and confirm it is a different role from the one accountable for the feature's adoption or coverage.
+- Add at least one regression case per confirmed production failure, and keep it permanently.
+
 ## Done Means
 
 - Acceptance criteria satisfied.

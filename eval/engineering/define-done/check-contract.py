@@ -18,6 +18,13 @@ REQUIRED_SKILL_TERMS = (
     "Low: narrow copy, style, test-only, or isolated bug fix (with no business-rule change).",
     "Medium: user-visible behavior, business logic, data handling, CI, integrations, or multi-file behavior.",
     "High: auth, payments, permissions, secrets, migrations, deployment, infrastructure, tenant data, or irreversible operations.",
+    "## Probabilistic Output Requirement",
+    "Work with deterministic output skips this section.",
+    "State a target error rate in the acceptance criteria as a number with its unit and window",
+    'Three forms are rejected: "accurate" and "high quality" are unmeasurable, and "zero errors" is an unmeasured target, not a strict one.',
+    "A grading source that is the model's own output or its own transcript does not count.",
+    "confirm it is a different role from the one accountable for the feature's adoption or coverage",
+    "Add at least one regression case per confirmed production failure",
 )
 REQUIRED_CASE_FIELDS = {"id", "split", "prompt", "expected_outcome"}
 VALID_RISKS = {"low", "medium", "high"}

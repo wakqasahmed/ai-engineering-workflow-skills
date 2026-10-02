@@ -22,6 +22,8 @@ REQUIRED_SKILL_TERMS = (
     "run a non-secret canary through that path and block until the canary confirms delivery works (`run_canary`)",
     "distinct from step 3's reconciliation, which is for config/secret names already obtainable through an existing provisioning process that simply haven't been set in the target environment yet",
     "[configuration preflight](references/configuration-preflight.md)",
+    "- Post-release accuracy signal, for changes with probabilistic output:",
+    "`define-done`'s Probabilistic Output Requirement",
 )
 REQUIRED_REFERENCE_TERMS = (
     "## 1. Reconciliation",
