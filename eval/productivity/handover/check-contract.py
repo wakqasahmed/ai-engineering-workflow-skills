@@ -16,6 +16,8 @@ REQUIRED_SKILL_TERMS = (
     "Do not duplicate content already captured in other artifacts",
     "No next steps beyond the single \"Pick up here\" line",
     "Comment on the issue with the full handover content, sanitized per Rule 6",
+    "Use repo-relative paths only",
+    "Before posting, scan the public draft:",
     "Do not audit the filesystem or git history to reconstruct this.",
 )
 REQUIRED_CASE_FIELDS = {"id", "split", "prompt", "expected_outcome"}
