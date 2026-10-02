@@ -34,7 +34,7 @@ Skip it when ample context remains and work is progressing, or when the work is 
 6. Redact secrets, API keys, passwords, personally identifiable information, credential values, and local credential-file paths as `Credential details: [redacted]`. Retain absolute paths only in the local temporary artifact. Any public rendering — a GitHub issue/PR comment or body, or a file in a public repo — follows the **public-surface rule**:
    - Use repo-relative paths only (e.g. `src/cache/redis_client.py`) or commit URLs. Omit the temporary handover file path.
    - Replace every other host detail — absolute paths, home-directory layout, credential or token file locations, auth command patterns, private repo names — with `[local path redacted]` or generic wording ("a private repo", "the configured credentials").
-   - Before posting, scan the public draft: `grep -niE '/home/|/root/|/Users/|/opt/|/srv/|~/|[a-z]:\\|\.netrc|credential|token|auth login'`. Done when every hit is rewritten or is a repo-relative path or ordinary prose.
+   - Before posting, scan the public draft: `grep -niE '/home/|/root/|/Users/|/opt/|/srv/|~/|[a-z]:\\|netrc|credential|token|auth login'`. Done when every hit is rewritten or is a repo-relative path or ordinary prose.
 7. If the user passed arguments, treat them as what the next session will focus on and tailor the doc accordingly.
 
 ## Publish to the issue
